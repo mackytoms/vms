@@ -1,780 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visitor Check-In Kiosk</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <!-- QR Code Library -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
-    <!-- QR Scanner Library -->
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .kiosk-container {
-            height: 100vh;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            background: white;
-        }
-
-        /* Header */
-        .kiosk-header {
-            background: linear-gradient(135deg, #f39c12a8 0%, #f39c12 100%);
-            color: white;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .company-logo {
-            width: 50px;
-            height: 50px;
-            background: white;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 8px;
-        }
-
-        .kiosk-header h1 {
-            font-size: 2em;
-            font-weight: 800;
-            margin: 8px 0;
-            letter-spacing: 1px;
-        }
-
-        .datetime-display {
-            font-size: 1em;
-            opacity: 0.9;
-        }
-
-        /* Main Content Area */
-        .kiosk-content {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: #f8f9fa;
-            position: relative;
-            overflow-y: auto;
-        }
-
-        /* Step Indicator */
-        .step-indicator {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            z-index: 10;
-        }
-
-        .step-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #dee2e6;
-            transition: all 0.3s ease;
-        }
-
-        .step-dot.active {
-            background: #f39c12;
-            transform: scale(1.5);
-        }
-
-        .step-dot.completed {
-            background: #27ae60;
-        }
-
-        /* Screen Containers */
-        .screen {
-            display: none;
-            animation: slideIn 0.4s ease;
-            width: 100%;
-            max-width: 680px;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* Welcome Screen */
-        .welcome-screen {
-            text-align: center;
-        }
-
-        .welcome-icon {
-            font-size: 80px;
-            color: #f39c12;
-            margin-bottom: 20px;
-            animation: pulse 2s infinite;
-        }
-
-        .welcome-message {
-            font-size: 2.2em;
-            color: #f39c12a8;
-            margin-bottom: 15px;
-            font-weight: 300;
-        }
-
-        .welcome-submessage {
-            font-size: 1.2em;
-            color: #7f8c8d;
-            margin-bottom: 25px;
-        }
-
-        .language-selector {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
-        .language-btn {
-            padding: 8px 20px;
-            border: 2px solid #f39c12;
-            background: white;
-            color: #f39c12;
-            border-radius: 20px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .language-btn:hover, .language-btn.active {
-            background: #f39c12;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        /* Action Buttons */
-        .action-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 2px solid transparent;
-        }
-
-        .action-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            border-color: #f39c12;
-        }
-
-        .action-card i {
-            font-size: 3em;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .action-card h3 {
-            font-size: 1.4em;
-            margin-bottom: 8px;
-            color: #f39c12a8;
-        }
-
-        .action-card p {
-            color: #7f8c8d;
-            font-size: 0.95em;
-        }
-
-        /* Form Styles */
-        .form-screen {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-        }
-
-        .form-title {
-            font-size: 1.8em;
-            color: #f39c12a8;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            font-size: 1.1em;
-            color: #495057;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .form-control-lg {
-            font-size: 1.2em;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 2px solid #dee2e6;
-            transition: all 0.3s ease;
-        }
-
-        .form-control-lg:focus {
-            border-color: #f39c12;
-            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-        }
-
-        .form-control-lg.is-invalid {
-            border-color: #dc3545;
-        }
-
-        .invalid-feedback {
-            display: none;
-            font-size: 0.875em;
-            color: #dc3545;
-            margin-top: 0.25rem;
-        }
-
-        .form-control-lg.is-invalid ~ .invalid-feedback {
-            display: block;
-        }
-
-        /* QR Scanner Styles */
-        .qr-scanner-container {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-        }
-
-        #qr-reader {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        #qr-reader video {
-            border-radius: 10px;
-        }
-
-        .qr-upload-section {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px dashed #dee2e6;
-        }
-
-        .qr-upload-btn {
-            position: relative;
-            display: inline-block;
-            padding: 12px 30px;
-            background: white;
-            border: 2px solid #f39c12;
-            color: #f39c12;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .qr-upload-btn:hover {
-            background: #f39c12;
-            color: white;
-        }
-
-        .qr-upload-btn input[type="file"] {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-
-        /* QR Code Display */
-        .qr-code-display {
-            text-align: center;
-            margin: 20px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-
-        .qr-code-display canvas {
-            margin: 0 auto;
-        }
-
-        /* Photo Capture */
-        .photo-capture-container {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            margin: 15px 0;
-        }
-
-        .camera-view {
-            width: 280px;
-            height: 210px;
-            background: #f39c12a8;
-            margin: 0 auto 15px;
-            border-radius: 12px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        #videoElement, #capturedImage {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 12px;
-        }
-
-        #capturedImage {
-            display: none;
-        }
-
-        .camera-overlay {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.3) 100%);
-            pointer-events: none;
-        }
-
-        .face-guide {
-            width: 150px;
-            height: 180px;
-            border: 3px dashed rgba(255,255,255,0.5);
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: pulse 2s infinite;
-        }
-
-        /* Host Selection */
-        .host-search {
-            position: relative;
-        }
-
-        .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 2px solid #f39c12;
-            border-radius: 10px;
-            margin-top: 5px;
-            max-height: 250px;
-            overflow-y: auto;
-            z-index: 100;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-
-        .search-result-item {
-            padding: 12px 15px;
-            border-bottom: 1px solid #ecf0f1;
-            cursor: pointer;
-            transition: background 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .search-result-item:hover {
-            background: #f39c12;
-            color: white;
-        }
-
-        .employee-info {
-            flex: 1;
-        }
-
-        .employee-name {
-            font-weight: 600;
-            font-size: 1em;
-        }
-
-        .employee-dept {
-            font-size: 0.85em;
-            opacity: 0.7;
-        }
-
-        /* Purpose Selection */
-        .purpose-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .purpose-card {
-            background: white;
-            border: 2px solid #dee2e6;
-            border-radius: 12px;
-            padding: 20px 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .purpose-card:hover {
-            border-color: #f39c12;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-        }
-
-        .purpose-card.selected {
-            background: #f39c12;
-            color: white;
-            border-color: #f39c12;
-        }
-
-        .purpose-card i {
-            font-size: 2.5em;
-            margin-bottom: 8px;
-        }
-
-        .purpose-card h5 {
-            font-size: 0.95em;
-            margin: 0;
-        }
-
-        /* Agreement Screen */
-        .agreement-container {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 15px 0;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .agreement-text {
-            font-size: 1em;
-            line-height: 1.6;
-            color: #495057;
-        }
-
-        .agreement-checkbox {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
-            margin: 15px 0;
-            cursor: pointer;
-        }
-
-        .agreement-checkbox input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            margin-top: 3px;
-        }
-
-        .agreement-checkbox label {
-            flex: 1;
-            font-size: 1.05em;
-            cursor: pointer;
-        }
-
-        /* Success Screen */
-        .success-screen {
-            text-align: center;
-            padding: 30px;
-            margin-top: 280px;
-        }
-
-        .success-icon {
-            width: 120px;
-            height: 120px;
-            background: #27ae60;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 25px;
-            animation: scaleIn 0.5s ease;
-        }
-
-        @keyframes scaleIn {
-            from {
-                transform: scale(0);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .success-icon i {
-            color: white;
-            font-size: 60px;
-        }
-
-        .badge-preview {
-            background: white;
-            border: 3px solid #f39c12;
-            border-radius: 12px;
-            padding: 25px;
-            max-width: 350px;
-            margin: 25px auto;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-
-        .badge-photo-display {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            border: 3px solid #f39c12;
-            overflow: hidden;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .badge-photo-display img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Navigation Buttons */
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-            gap: 15px;
-        }
-
-        .btn-large {
-            padding: 15px 30px;
-            font-size: 1.2em;
-            border-radius: 10px;
-            min-width: 150px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .btn-back {
-            background: #ecf0f1;
-            color: #7f8c8d;
-        }
-
-        .btn-back:hover {
-            background: #d5dbde;
-            transform: translateX(-3px);
-        }
-
-        .btn-next {
-            background: linear-gradient(135deg, #f39c12, #f39c12a8);
-            color: white;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-        }
-
-        .btn-next:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-        }
-
-        .btn-next:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-print {
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-            color: white;
-            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
-        }
-
-        .btn-print:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
-        }
-
-        /* Loading Spinner */
-        .loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #f39c12;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: white;
-            font-size: 1.3em;
-            margin-top: 15px;
-        }
-
-        /* Emergency Button */
-        .emergency-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #e74c3c;
-            color: white;
-            border-radius: 50%;
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8em;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .emergency-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
-        .quick-action-btn {
-            padding: 10px 20px;
-            background: white;
-            border: 2px solid #f39c12;
-            color: #f39c12;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1em;
-        }
-
-        .quick-action-btn:hover {
-            background: #f39c12;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        /* Modal Styles */
-        .modal-body {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .booking-item {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .booking-item:hover {
-            border-color: #f39c12;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .booking-code {
-            font-family: monospace;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #f39c12;
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            .badge-preview, .badge-preview * {
-                visibility: visible;
-            }
-            .badge-preview {
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-            }
-        }
-    </style>
-</head>
 <body>
     <!-- Main Kiosk Container -->
     <div class="kiosk-container">
@@ -886,14 +110,14 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label" data-translate="firstName">First Name *</label>
-                                <input type="text" class="form-control form-control-lg" id="firstName" placeholder="John">
+                                <input type="text" class="form-control form-control-lg" id="firstName">
                                 <div class="invalid-feedback" data-translate="firstNameRequired">First name is required</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label" data-translate="lastName">Last Name *</label>
-                                <input type="text" class="form-control form-control-lg" id="lastName" placeholder="Smith">
+                                <input type="text" class="form-control form-control-lg" id="lastName">
                                 <div class="invalid-feedback" data-translate="lastNameRequired">Last name is required</div>
                             </div>
                         </div>
@@ -901,7 +125,7 @@
 
                     <div class="form-group">
                         <label class="form-label" data-translate="email">Email Address *</label>
-                        <input type="email" class="form-control form-control-lg" id="email" placeholder="john.smith@company.com">
+                        <input type="email" class="form-control form-control-lg" id="email">
                         <div class="invalid-feedback" data-translate="emailInvalid">Please enter a valid email address</div>
                     </div>
 
@@ -909,14 +133,14 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label" data-translate="phone">Phone Number *</label>
-                                <input type="tel" class="form-control form-control-lg" id="phone" placeholder="(555) 123-4567">
+                                <input type="tel" class="form-control form-control-lg" id="phone">
                                 <div class="invalid-feedback" data-translate="phoneInvalid">Please enter a valid phone number</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label" data-translate="company">Company *</label>
-                                <input type="text" class="form-control form-control-lg" id="company" data-translate-placeholder="companyPlaceholder" placeholder="Your Company Name">
+                                <input type="text" class="form-control form-control-lg" id="company" data-translate-placeholder="companyPlaceholder" placeholder="Your Affiliated Company">
                                 <div class="invalid-feedback" data-translate="companyRequired">Company name is required</div>
                             </div>
                         </div>
@@ -959,35 +183,35 @@
                         <button class="btn-large btn-back" onclick="previousScreen()">
                             <i class="bi bi-arrow-left"></i> <span data-translate="back">Back</span>
                         </button>
-                        <button class="btn-large btn-next" onclick="nextScreen()">
+                        <button class="btn-large btn-skip" onclick="nextScreen()" id="photoSkipBtn">
                             <span data-translate="skipNow">Skip for Now</span> <i class="bi bi-arrow-right"></i>
+                        </button>
+                        <button class="btn-large btn-next" onclick="nextScreen()" id="photoNextBtn" style="display: none;">
+                            <span data-translate="continue">Continue</span> <i class="bi bi-arrow-right"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Screen 5: Host Selection -->
+            <!-- Screen 5: Host Selection (Enhanced) -->
             <div class="screen" id="hostScreen">
                 <div class="form-screen">
                     <h2 class="form-title" data-translate="hostTitle">Who are you here to see?</h2>
 
-                    <div class="mt-3">
-                        <p class="text-muted" data-translate="popularDepts">Popular departments:</p>
-                        <div class="quick-actions">
-                            <button class="quick-action-btn" onclick="selectDepartment('Sales')"><span data-translate="sales">Sales</span></button>
-                            <button class="quick-action-btn" onclick="selectDepartment('HR')"><span data-translate="hr">Human Resources</span></button>
-                            <button class="quick-action-btn" onclick="selectDepartment('IT')"><span data-translate="it">IT Support</span></button>
-                            <button class="quick-action-btn" onclick="selectDepartment('Reception')"><span data-translate="reception">Reception</span></button>
+                    <div class="department-selection">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="selectDepartment">Select Department</label>
+                            <select class="form-select form-select-lg" id="departmentSelect" onchange="onDepartmentChange()">
+                                <option value="" data-translate="chooseDepartment">Choose a department...</option>
+                            </select>
                         </div>
                     </div>
-                    
-                    <div class="form-group host-search" style="margin-top: 15px;">
-                        <label class="form-label" data-translate="searchHost">Search by name or department</label>
-                        <input type="text" class="form-control form-control-lg" id="hostSearch" 
-                               data-translate-placeholder="hostSearchPlaceholder"
-                               placeholder="Start typing name..." oninput="searchHost(this.value)">
-                        
-                        <div class="search-results" id="searchResults" style="display: none;"></div>
+
+                    <div id="employeeSection" style="display: none;">
+                        <label class="form-label" data-translate="selectEmployee">Select Employee</label>
+                        <div class="employee-grid" id="employeeGrid">
+                            <!-- Employees will be populated here -->
+                        </div>
                     </div>
 
                     <div class="form-group mt-3">
@@ -1102,7 +326,7 @@
                 </div>
             </div>
 
-            <!-- Screen 8: Success -->
+            <!-- Screen 8: Success (UPDATED - NO QR CODE) -->
             <div class="screen" id="successScreen">
                 <div class="success-screen">
                     <div class="success-icon">
@@ -1129,14 +353,6 @@
                             <strong data-translate="host">Host:</strong> <span id="badgeHost"></span><br>
                             <strong data-translate="validUntil">Valid Until:</strong> <span id="validUntil"></span>
                         </div>
-                    </div>
-
-                    <div class="qr-code-display">
-                        <h5 style="color: #f39c12a8; margin-bottom: 10px;" data-translate="yourQRCode">Your QR Code for Next Visit</h5>
-                        <div style="display: flex; justify-content: center; flex-direction: column;" id="qrcode"></div>
-                        <p style="margin-top: 10px; font-size: 0.9em; color: #7f8c8d;" data-translate="qrCodeNote">
-                            Save this QR code for faster check-in on your next visit
-                        </p>
                     </div>
 
                     <div style="background: #e8f4fd; border-left: 4px solid #f39c12; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left;">
@@ -1209,7 +425,146 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Language Translations (Extended)
+        // Department and Employee Data Structure
+        const departmentData = {
+            'ADM': {
+                name: 'Admin',
+                employees: [
+                    { id: 'ADM001', name: 'John Smith', email: 'j.smith@company.com' },
+                    { id: 'ADM002', name: 'Sarah Johnson', email: 's.johnson@company.com' },
+                    { id: 'ADM003', name: 'Michael Chen', email: 'm.chen@company.com' }
+                ]
+            },
+            'BDD': {
+                name: 'Design & Construction',
+                employees: [
+                    { id: 'BDD001', name: 'Emily Davis', email: 'e.davis@company.com' },
+                    { id: 'BDD002', name: 'Robert Wilson', email: 'r.wilson@company.com' }
+                ]
+            },
+            'CRT': {
+                name: 'Creatives',
+                employees: [
+                    { id: 'CRT001', name: 'Lisa Anderson', email: 'l.anderson@company.com' },
+                    { id: 'CRT002', name: 'David Martinez', email: 'd.martinez@company.com' },
+                    { id: 'CRT003', name: 'Jessica Taylor', email: 'j.taylor@company.com' }
+                ]
+            },
+            'ED': {
+                name: 'Ent. Risk Management',
+                employees: [
+                    { id: 'ED001', name: 'Thomas Brown', email: 't.brown@company.com' },
+                    { id: 'ED002', name: 'Jennifer White', email: 'j.white@company.com' }
+                ]
+            },
+            'EXE': {
+                name: 'Executive',
+                employees: [
+                    { id: 'EXE001', name: 'William Garcia', email: 'w.garcia@company.com' },
+                    { id: 'EXE002', name: 'Patricia Miller', email: 'p.miller@company.com' }
+                ]
+            },
+            'FIN': {
+                name: 'Finance',
+                employees: [
+                    { id: 'FIN001', name: 'Christopher Lee', email: 'c.lee@company.com' },
+                    { id: 'FIN002', name: 'Amanda Jones', email: 'a.jones@company.com' },
+                    { id: 'FIN003', name: 'Daniel Rodriguez', email: 'd.rodriguez@company.com' }
+                ]
+            },
+            'HR': {
+                name: 'Human Resource',
+                employees: [
+                    { id: 'HR001', name: 'Michelle Thompson', email: 'm.thompson@company.com' },
+                    { id: 'HR002', name: 'Kevin Harris', email: 'k.harris@company.com' },
+                    { id: 'HR003', name: 'Rachel Clark', email: 'r.clark@company.com' }
+                ]
+            },
+            'IMP': {
+                name: 'Importation',
+                employees: [
+                    { id: 'IMP001', name: 'Brian Lewis', email: 'b.lewis@company.com' },
+                    { id: 'IMP002', name: 'Sophia Walker', email: 's.walker@company.com' }
+                ]
+            },
+            'ITSD': {
+                name: 'Information Technology & Services',
+                employees: [
+                    { id: 'ITSD001', name: 'James Hall', email: 'j.hall@company.com' },
+                    { id: 'ITSD002', name: 'Olivia Allen', email: 'o.allen@company.com' },
+                    { id: 'ITSD003', name: 'Matthew Young', email: 'm.young@company.com' },
+                    { id: 'ITSD004', name: 'Emma King', email: 'e.king@company.com' }
+                ]
+            },
+            'MRK': {
+                name: 'Marketing',
+                employees: [
+                    { id: 'MRK001', name: 'Andrew Wright', email: 'a.wright@company.com' },
+                    { id: 'MRK002', name: 'Isabella Lopez', email: 'i.lopez@company.com' },
+                    { id: 'MRK003', name: 'Joshua Hill', email: 'j.hill@company.com' }
+                ]
+            },
+            'MER': {
+                name: 'Audit & Merchandising',
+                employees: [
+                    { id: 'MER001', name: 'Megan Scott', email: 'm.scott@company.com' },
+                    { id: 'MER002', name: 'Ryan Green', email: 'r.green@company.com' }
+                ]
+            },
+            'OP': {
+                name: 'Operations',
+                employees: [
+                    { id: 'OP001', name: 'Nicholas Adams', email: 'n.adams@company.com' },
+                    { id: 'OP002', name: 'Victoria Baker', email: 'v.baker@company.com' },
+                    { id: 'OP003', name: 'Alexander Nelson', email: 'a.nelson@company.com' }
+                ]
+            },
+            'ODSM': {
+                name: 'Org. Development & Strat. Mngt.',
+                employees: [
+                    { id: 'ODSM001', name: 'Samantha Carter', email: 's.carter@company.com' },
+                    { id: 'ODSM002', name: 'Joseph Mitchell', email: 'j.mitchell@company.com' }
+                ]
+            },
+            'SPD': {
+                name: 'Special Projects',
+                employees: [
+                    { id: 'SPD001', name: 'Lauren Perez', email: 'l.perez@company.com' },
+                    { id: 'SPD002', name: 'Charles Roberts', email: 'c.roberts@company.com' }
+                ]
+            },
+            'SD': {
+                name: 'Stocks Department',
+                employees: [
+                    { id: 'SD001', name: 'Ashley Turner', email: 'a.turner@company.com' },
+                    { id: 'SD002', name: 'Benjamin Phillips', email: 'b.phillips@company.com' }
+                ]
+            },
+            'TD': {
+                name: 'Technical',
+                employees: [
+                    { id: 'TD001', name: 'Nathan Campbell', email: 'n.campbell@company.com' },
+                    { id: 'TD002', name: 'Madison Parker', email: 'm.parker@company.com' }
+                ]
+            },
+            'WLD': {
+                name: 'Warehouse & Logistics',
+                employees: [
+                    { id: 'WLD001', name: 'Eric Evans', email: 'e.evans@company.com' },
+                    { id: 'WLD002', name: 'Hannah Edwards', email: 'h.edwards@company.com' },
+                    { id: 'WLD003', name: 'Tyler Collins', email: 't.collins@company.com' }
+                ]
+            },
+            'PA': {
+                name: 'Pan Asia HR',
+                employees: [
+                    { id: 'PA001', name: 'Grace Stewart', email: 'g.stewart@company.com' },
+                    { id: 'PA002', name: 'Dylan Sanchez', email: 'd.sanchez@company.com' }
+                ]
+            }
+        };
+
+        // Language Translations (Extended with new keys)
         const translations = {
             'en': {
                 companyName: "Welcome to TOMS WORLD",
@@ -1223,23 +578,15 @@
                 deliveryDesc: "I have a delivery or pickup",
                 preScheduled: "Pre-Scheduled Visit",
                 checkOut: "Check Out",
-                scanQRTitle: "Scan Your QR Code",
-                scanQRDesc: "Please scan the QR code from your previous visit",
-                orUploadQR: "Or upload QR code image",
-                uploadQR: "Upload QR Code",
-                noQRCode: "I don't have my QR code",
                 letsCheckIn: "Let's get you checked in!",
+                searchPrevious: "Search Your Previous Check-ins",
+                searchPlaceholder: "Start typing your name or email...",
                 firstName: "First Name *",
                 lastName: "Last Name *",
                 email: "Email Address *",
                 phone: "Phone Number *",
                 company: "Company *",
                 companyPlaceholder: "Your Company Name",
-                firstNameRequired: "First name is required",
-                lastNameRequired: "Last name is required",
-                emailInvalid: "Please enter a valid email address",
-                phoneInvalid: "Please enter a valid phone number",
-                companyRequired: "Company name is required",
                 back: "Back",
                 continue: "Continue",
                 photoTitle: "Let's take your photo",
@@ -1278,20 +625,12 @@
                 visitorBadge: "Your Visitor Badge",
                 host: "Host",
                 validUntil: "Valid Until",
-                yourQRCode: "Your QR Code for Next Visit",
-                qrCodeNote: "Save this QR code for faster check-in on your next visit",
                 nextSteps: "Next Steps",
                 printBadge: "Print Badge",
                 done: "Done",
                 autoReset: "This screen will reset in",
                 seconds: "seconds",
                 processing: "Processing...",
-                emailSentTitle: "QR Code Sent!",
-                emailSentMessage: "Your QR code has been sent to your email address",
-                qrValidatedTitle: "Welcome Back!",
-                qrValidatedMessage: "Your QR code has been validated successfully",
-                invalidQRTitle: "Invalid QR Code",
-                invalidQRMessage: "The QR code is not valid or has expired",
                 preScheduledTitle: "Pre-Scheduled Visit Check-In",
                 enterCode: "Enter your booking code or search by name:",
                 bookingSearchPlaceholder: "Enter booking code or name...",
@@ -1327,8 +666,7 @@
                 nextStepsContent: [
                     "Please collect your printed badge from the printer",
                     "Wait in the lobby area",
-                    "Your host will come to receive you shortly",
-                    "Check your email for your QR code for next visit"
+                    "Your host will come to receive you shortly"
                 ]
             },
             'zh-TW': {
@@ -1752,32 +1090,22 @@
         let visitorData = {};
         let selectedPurpose = null;
         let selectedHost = null;
+        let selectedDepartment = null;
         let countdownTimer = null;
         let videoStream = null;
         let capturedPhotoData = null;
         let html5QrCode = null;
+        let photoTaken = false;
 
         // Screen flow mapping
         const screenFlow = {
-            'new': [1, 3, 4, 5, 6, 7, 8],      // Welcome -> Basic Info -> Photo -> Host -> Purpose -> Agreement -> Success
-            'returning': [1, 2, 5, 6, 7, 8],    // Welcome -> QR Scanner -> Host -> Purpose -> Agreement -> Success
-            'delivery': [1, 3, 4, 5, 6, 7, 8]   // Same as new visitor
+            'new': [1, 3, 4, 5, 6, 7, 8],
+            'returning': [1, 2, 5, 6, 7, 8],
+            'delivery': [1, 3, 4, 5, 6, 7, 8]
         };
         
         let currentFlow = [];
         let currentFlowIndex = 0;
-
-        // Sample data
-        const employees = [
-            { id: 1, name: 'John Anderson', department: 'Sales', email: 'j.anderson@company.com' },
-            { id: 2, name: 'Sarah Williams', department: 'Human Resources', email: 's.williams@company.com' },
-            { id: 3, name: 'Michael Chen', department: 'IT Support', email: 'm.chen@company.com' },
-            { id: 4, name: 'Emily Johnson', department: 'Marketing', email: 'e.johnson@company.com' },
-            { id: 5, name: 'David Brown', department: 'Finance', email: 'd.brown@company.com' },
-            { id: 6, name: 'Lisa Martinez', department: 'Operations', email: 'l.martinez@company.com' },
-            { id: 7, name: 'Robert Taylor', department: 'Legal', email: 'r.taylor@company.com' },
-            { id: 8, name: 'Jennifer Davis', department: 'Customer Service', email: 'j.davis@company.com' }
-        ];
 
         // Sample pre-scheduled visits
         const preScheduledVisits = [
@@ -1785,7 +1113,7 @@
                 code: 'MEET-2024-001', 
                 name: 'Alice Johnson', 
                 company: 'Tech Solutions Inc.', 
-                host: 'John Anderson', 
+                host: 'John Smith', 
                 time: '10:00 AM',
                 purpose: 'Sales Meeting'
             }
@@ -1794,110 +1122,12 @@
         // Local storage for visitor data
         const STORAGE_KEY = 'kioskVisitorData';
         
-        // Get stored visitors
-        function getStoredVisitors() {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            return stored ? JSON.parse(stored) : [];
-        }
-        
-        // // Store visitor data
-        // function storeVisitor(visitor) {
-        //     const visitors = getStoredVisitors();
-        //     visitor.id = Date.now();
-        //     visitor.lastVisit = new Date().toISOString();
-        //     visitor.qrCode = generateVisitorQRData(visitor);
-        //     visitors.unshift(visitor);
-        //     if (visitors.length > 100) visitors.splice(100);
-        //     localStorage.setItem(STORAGE_KEY, JSON.stringify(visitors));
-        //     return visitor;
-        // }
-
-        // UPDATED: Store visitor with optimized QR data
-        function storeVisitor(visitor) {
-            const visitors = getStoredVisitors();
-            visitor.id = Date.now();
-            visitor.lastVisit = new Date().toISOString();
-            
-            // Generate optimized QR code data
-            visitor.qrCode = generateVisitorQRData(visitor);
-            
-            visitors.unshift(visitor);
-            if (visitors.length > 100) visitors.splice(100);
-            
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(visitors));
-            } catch (e) {
-                console.error('Storage error:', e);
-                // If storage is full, remove old photos
-                cleanupOldPhotos();
-            }
-            
-            return visitor;
-        }
-
-        // Helper function to cleanup old photos from localStorage
-        function cleanupOldPhotos() {
-            const keys = Object.keys(localStorage);
-            const photoKeys = keys.filter(k => k.startsWith('visitor_photo_'));
-            
-            // Remove photos older than 30 days
-            const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-            
-            photoKeys.forEach(key => {
-                const id = key.replace('visitor_photo_', '');
-                if (parseInt(id) < thirtyDaysAgo) {
-                    localStorage.removeItem(key);
-                }
-            });
-        }
-
-        // // Generate QR data
-        // function generateVisitorQRData(visitor) {
-        //     const qrData = {
-        //         id: visitor.id,
-        //         firstName: visitor.firstName,
-        //         lastName: visitor.lastName,
-        //         email: visitor.email,
-        //         company: visitor.company,
-        //         phone: visitor.phone,
-        //         photo: visitor.photo,
-        //         timestamp: new Date().toISOString()
-        //     };
-        //     return btoa(JSON.stringify(qrData));
-        // }
-
-        // UPDATED: Generate QR data without photo to reduce size
-        function generateVisitorQRData(visitor) {
-            // Don't include photo in QR code - it makes the code too dense
-            const qrData = {
-                id: visitor.id || Date.now(),
-                firstName: visitor.firstName,
-                lastName: visitor.lastName,
-                email: visitor.email,
-                company: visitor.company,
-                phone: visitor.phone,
-                // Remove photo from QR data - store it separately in localStorage
-                timestamp: new Date().toISOString()
-            };
-            
-            // Store photo separately in localStorage with visitor ID
-            if (visitor.photo) {
-                try {
-                    localStorage.setItem(`visitor_photo_${qrData.id}`, visitor.photo);
-                } catch (e) {
-                    console.warn('Could not store photo in localStorage:', e);
-                }
-            }
-            
-            // Create a shorter QR code string
-            return JSON.stringify(qrData); // Don't base64 encode - unnecessary overhead
-        }  
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             updateDateTime();
             setInterval(updateDateTime, 1000);
             translatePage();
+            populateDepartments();
         });
 
         // Update date and time
@@ -1907,6 +1137,94 @@
             const dateStr = now.toLocaleDateString('en-US', options);
             const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
             document.getElementById('datetime').textContent = `${dateStr} • ${timeStr}`;
+        }
+
+        // Populate departments dropdown
+        function populateDepartments() {
+            const select = document.getElementById('departmentSelect');
+            select.innerHTML = '<option value="">Choose a department...</option>';
+            
+            Object.keys(departmentData).forEach(deptCode => {
+                const option = document.createElement('option');
+                option.value = deptCode;
+                option.textContent = departmentData[deptCode].name;
+                select.appendChild(option);
+            });
+        }
+
+        // Handle department selection
+        function onDepartmentChange() {
+            const deptCode = document.getElementById('departmentSelect').value;
+            const employeeSection = document.getElementById('employeeSection');
+            const employeeGrid = document.getElementById('employeeGrid');
+            
+            if (!deptCode) {
+                employeeSection.style.display = 'none';
+                resetHostSelection();
+                return;
+            }
+            
+            selectedDepartment = deptCode;
+            const dept = departmentData[deptCode];
+            
+            employeeGrid.innerHTML = '';
+            
+            dept.employees.forEach(employee => {
+                const card = document.createElement('div');
+                card.className = 'employee-card';
+                card.innerHTML = `
+                    <i class="bi bi-person-circle"></i>
+                    <div class="employee-name">${employee.name}</div>
+                    <div class="employee-email">${employee.email}</div>
+                `;
+                card.onclick = () => selectEmployeeFromCard(employee, deptCode);
+                employeeGrid.appendChild(card);
+            });
+            
+            employeeSection.style.display = 'block';
+        }
+
+        // Select employee from card
+        function selectEmployeeFromCard(employee, deptCode) {
+            // Remove previous selection
+            document.querySelectorAll('.employee-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            event.currentTarget.classList.add('selected');
+            
+            selectedHost = {
+                ...employee,
+                department: departmentData[deptCode].name,
+                departmentCode: deptCode
+            };
+            
+            visitorData.host = selectedHost;
+            
+            document.getElementById('selectedHost').innerHTML = `
+                <div class="d-flex align-items-center gap-3">
+                    <i class="bi bi-person-circle" style="font-size: 2em;"></i>
+                    <div>
+                        <div style="font-weight: 600;">${employee.name}</div>
+                        <div style="font-size: 0.9em; color: #7f8c8d;">${departmentData[deptCode].name}</div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('hostNextBtn').disabled = false;
+        }
+
+        // Reset host selection
+        function resetHostSelection() {
+            selectedHost = null;
+            document.getElementById('selectedHost').innerHTML = `
+                <span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>
+            `;
+            document.getElementById('hostNextBtn').disabled = true;
+            document.querySelectorAll('.employee-card').forEach(card => {
+                card.classList.remove('selected');
+            });
         }
 
         // Language selection
@@ -1952,39 +1270,14 @@
             currentFlowIndex = 1;
             
             if (type === 'returning') {
-                showScreen(2); // Go to QR scanner
+                showScreen(2);
                 initQRScanner();
             } else {
-                showScreen(3); // Go to basic info
+                showScreen(3);
             }
         }
 
-        // // Initialize QR Scanner
-        // function initQRScanner() {
-        //     if (html5QrCode) {
-        //         html5QrCode.stop();
-        //     }
-            
-        //     html5QrCode = new Html5Qrcode("qr-reader");
-            
-        //     const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-            
-        //     html5QrCode.start(
-        //         { facingMode: "environment" },
-        //         config,
-        //         (decodedText) => {
-        //             handleQRCodeSuccess(decodedText);
-        //         },
-        //         (error) => {
-        //             // Ignore scan errors
-        //         }
-        //     ).catch((err) => {
-        //         console.error("Unable to start QR scanner:", err);
-        //         showNotification("Camera not available for QR scanning");
-        //     });
-        // }
-
-        // UPDATED: Initialize QR Scanner with better configuration
+        // Initialize QR Scanner
         function initQRScanner() {
             if (html5QrCode) {
                 html5QrCode.stop();
@@ -1992,7 +1285,6 @@
             
             html5QrCode = new Html5Qrcode("qr-reader");
             
-            // Optimized config for better scanning
             const config = { 
                 fps: 10, 
                 qrbox: { width: 250, height: 250 },
@@ -2016,7 +1308,6 @@
             ).catch((err) => {
                 console.error("Unable to start QR scanner:", err);
                 
-                // Try with user-facing camera if environment camera fails
                 html5QrCode.start(
                     { facingMode: "user" },
                     config,
@@ -2030,82 +1321,22 @@
             });
         }
 
-        // // Test function to verify QR generation and reading
-        // function testQRGeneration() {
-        //     const testData = {
-        //         id: Date.now(),
-        //         firstName: "Test",
-        //         lastName: "User",
-        //         email: "test@example.com",
-        //         company: "Test Company",
-        //         phone: "1234567890"
-        //     };
-            
-        //     const qrData = generateVisitorQRData(testData);
-        //     console.log('Generated QR data:', qrData);
-        //     console.log('QR data length:', qrData.length);
-            
-        //     // Try to decode it
-        //     try {
-        //         const decoded = JSON.parse(qrData);
-        //         console.log('Successfully decoded:', decoded);
-        //     } catch (e) {
-        //         console.error('Decode failed:', e);
-        //     }
-        // }
-
-        // // Handle QR code success
-        // function handleQRCodeSuccess(decodedText) {
-        //     try {
-        //         const qrData = JSON.parse(atob(decodedText));
-                
-        //         if (qrData.email) {
-        //             // Valid QR code found
-        //             if (html5QrCode) {
-        //                 html5QrCode.stop();
-        //             }
-                    
-        //             // Pre-fill visitor data
-        //             visitorData = {
-        //                 ...visitorData,
-        //                 ...qrData
-        //             };
-                    
-        //             Swal.fire({
-        //                 title: translations[currentLanguage].qrValidatedTitle,
-        //                 text: translations[currentLanguage].qrValidatedMessage,
-        //                 icon: 'success',
-        //                 confirmButtonColor: '#27ae60'
-        //             });
-                    
-        //             // Skip to host selection
-        //             showScreen(5);
-        //         }
-        //     } catch (e) {
-        //         showNotification(translations[currentLanguage].invalidQRMessage);
-        //     }
-        // }
-
-        // UPDATED: Handle QR code success with new format
+        // Handle QR code success
         function handleQRCodeSuccess(decodedText) {
             try {
                 let qrData;
                 
-                // Try to parse as JSON first (new format)
                 try {
                     qrData = JSON.parse(decodedText);
                 } catch (e) {
-                    // Fallback to base64 decode for old QR codes
                     qrData = JSON.parse(atob(decodedText));
                 }
                 
                 if (qrData.email) {
-                    // Valid QR code found
                     if (html5QrCode) {
                         html5QrCode.stop();
                     }
                     
-                    // Try to retrieve photo from localStorage
                     if (qrData.id) {
                         const storedPhoto = localStorage.getItem(`visitor_photo_${qrData.id}`);
                         if (storedPhoto) {
@@ -2113,25 +1344,23 @@
                         }
                     }
                     
-                    // Pre-fill visitor data
                     visitorData = {
                         ...visitorData,
                         ...qrData
                     };
                     
                     Swal.fire({
-                        title: translations[currentLanguage].qrValidatedTitle,
-                        text: translations[currentLanguage].qrValidatedMessage,
+                        title: translations[currentLanguage].qrValidatedTitle || 'Welcome Back!',
+                        text: translations[currentLanguage].qrValidatedMessage || 'Your QR code has been validated successfully',
                         icon: 'success',
                         confirmButtonColor: '#27ae60'
                     });
                     
-                    // Skip to host selection
                     showScreen(5);
                 }
             } catch (e) {
                 console.error('QR decode error:', e);
-                showNotification(translations[currentLanguage].invalidQRMessage);
+                showNotification(translations[currentLanguage].invalidQRMessage || 'Invalid QR Code');
             }
         }
 
@@ -2147,7 +1376,7 @@
                                 handleQRCodeSuccess(decodedText);
                             })
                             .catch(err => {
-                                showNotification(translations[currentLanguage].invalidQRMessage);
+                                showNotification(translations[currentLanguage].invalidQRMessage || 'Invalid QR Code');
                             });
                     }
                 };
@@ -2160,12 +1389,11 @@
             if (html5QrCode) {
                 html5QrCode.stop();
             }
-            showScreen(3); // Go to basic info form
+            showScreen(3);
         }
 
         // Screen navigation
         function showScreen(screenNumber) {
-            // Stop camera/QR scanner if leaving those screens
             if (currentScreen === 2 && html5QrCode) {
                 html5QrCode.stop();
             }
@@ -2182,7 +1410,6 @@
                 document.getElementById(screens[screenNumber]).classList.add('active');
             }
             
-            // Initialize screen-specific features
             if (screenNumber === 4) startCamera();
             if (screenNumber === 7) {
                 document.getElementById('agreementText').innerHTML = translations[currentLanguage].agreementContent;
@@ -2218,17 +1445,33 @@
             }
         }
 
-        // Update step indicator
+        // Update step indicator - FIXED VERSION
         function updateStepIndicator(step) {
-            const actualStep = currentFlow.length > 0 ? currentFlowIndex + 1 : step;
+            // Map screen number to step number (7 total steps shown)
+            const screenToStep = {
+                1: 1,  // Welcome
+                2: 2,  // QR Scanner
+                3: 2,  // Basic Info (same step as QR for returning visitors)
+                4: 3,  // Photo
+                5: 4,  // Host
+                6: 5,  // Purpose
+                7: 6,  // Agreement
+                8: 7   // Success
+            };
+            
+            const actualStep = screenToStep[step] || step;
+            
             document.querySelectorAll('.step-dot').forEach((dot, index) => {
                 dot.classList.remove('active', 'completed');
-                if (index + 1 < actualStep) dot.classList.add('completed');
-                else if (index + 1 === actualStep) dot.classList.add('active');
+                if (index + 1 < actualStep) {
+                    dot.classList.add('completed');
+                } else if (index + 1 === actualStep) {
+                    dot.classList.add('active');
+                }
             });
         }
 
-        // Input validation functions
+        // Validation functions
         function validateEmail(email) {
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);
@@ -2247,13 +1490,12 @@
             return company.trim().length >= 2;
         }
 
-        // Validate current screen with enhanced validation
+        // Validate current screen
         function validateCurrentScreen() {
             switch(currentScreen) {
-                case 3: // Basic Info Screen
+                case 3:
                     let isValid = true;
                     
-                    // First Name validation
                     const firstName = document.getElementById('firstName');
                     const firstNameValue = firstName.value.trim();
                     if (!firstNameValue || !validateName(firstNameValue)) {
@@ -2264,7 +1506,6 @@
                         visitorData.firstName = firstNameValue;
                     }
                     
-                    // Last Name validation
                     const lastName = document.getElementById('lastName');
                     const lastNameValue = lastName.value.trim();
                     if (!lastNameValue || !validateName(lastNameValue)) {
@@ -2275,7 +1516,6 @@
                         visitorData.lastName = lastNameValue;
                     }
                     
-                    // Email validation
                     const email = document.getElementById('email');
                     const emailValue = email.value.trim();
                     if (!emailValue || !validateEmail(emailValue)) {
@@ -2286,7 +1526,6 @@
                         visitorData.email = emailValue.toLowerCase();
                     }
                     
-                    // Phone validation
                     const phone = document.getElementById('phone');
                     const phoneValue = phone.value.trim();
                     if (!phoneValue || !validatePhone(phoneValue)) {
@@ -2297,7 +1536,6 @@
                         visitorData.phone = phoneValue;
                     }
                     
-                    // Company validation
                     const company = document.getElementById('company');
                     const companyValue = company.value.trim();
                     if (!companyValue || !validateCompany(companyValue)) {
@@ -2313,18 +1551,18 @@
                     }
                     return isValid;
                     
-                case 4: // Photo Screen
+                case 4:
                     visitorData.photo = capturedPhotoData;
                     return true;
                     
-                case 5: // Host Screen
+                case 5:
                     if (!selectedHost) {
                         showNotification('Please select who you are here to see');
                         return false;
                     }
                     return true;
                     
-                case 6: // Purpose Screen
+                case 6:
                     if (!selectedPurpose) {
                         showNotification('Please select the purpose of your visit');
                         return false;
@@ -2333,7 +1571,7 @@
                     if (notes) visitorData.notes = notes;
                     return true;
                     
-                case 7: // Agreement Screen
+                case 7:
                     const terms = document.getElementById('agreeTerms').checked;
                     const photo = document.getElementById('agreePhoto').checked;
                     if (!terms || !photo) {
@@ -2384,7 +1622,7 @@
             }
         }
 
-        // Capture photo
+        // Capture photo - Updated
         function capturePhoto() {
             const video = document.getElementById('videoElement');
             const image = document.getElementById('capturedImage');
@@ -2405,11 +1643,16 @@
             document.getElementById('captureBtn').style.display = 'none';
             document.getElementById('retakeBtn').style.display = 'block';
             
+            // IMPORTANT: Change Skip button to Continue button when photo is taken
+            document.getElementById('photoSkipBtn').style.display = 'none';
+            document.getElementById('photoNextBtn').style.display = 'block';
+            
             visitorData.photo = capturedPhotoData;
+            photoTaken = true;
             showNotification('Photo captured successfully!');
         }
 
-        // Retake photo
+        // Retake photo - Updated
         function retakePhoto() {
             const video = document.getElementById('videoElement');
             const image = document.getElementById('capturedImage');
@@ -2420,63 +1663,12 @@
             document.getElementById('captureBtn').style.display = 'block';
             document.getElementById('retakeBtn').style.display = 'none';
             
+            // Revert to Skip button when retaking
+            document.getElementById('photoSkipBtn').style.display = 'block';
+            document.getElementById('photoNextBtn').style.display = 'none';
+            
             capturedPhotoData = null;
-        }
-
-        // Host search
-        function searchHost(query) {
-            const resultsDiv = document.getElementById('searchResults');
-            
-            if (query.length < 2) {
-                resultsDiv.style.display = 'none';
-                return;
-            }
-            
-            const filtered = employees.filter(emp => 
-                emp.name.toLowerCase().includes(query.toLowerCase()) ||
-                emp.department.toLowerCase().includes(query.toLowerCase())
-            );
-            
-            resultsDiv.innerHTML = '';
-            filtered.forEach(emp => {
-                const item = document.createElement('div');
-                item.className = 'search-result-item';
-                item.innerHTML = `
-                    <i class="bi bi-person-circle" style="font-size: 2em;"></i>
-                    <div class="employee-info">
-                        <div class="employee-name">${emp.name}</div>
-                        <div class="employee-dept">${emp.department}</div>
-                    </div>
-                `;
-                item.onclick = () => selectHost(emp);
-                resultsDiv.appendChild(item);
-            });
-            
-            resultsDiv.style.display = filtered.length > 0 ? 'block' : 'none';
-        }
-
-        function selectHost(employee) {
-            selectedHost = employee;
-            visitorData.host = employee;
-            
-            document.getElementById('selectedHost').innerHTML = `
-                <div class="d-flex align-items-center gap-3">
-                    <i class="bi bi-person-circle" style="font-size: 2em;"></i>
-                    <div>
-                        <div style="font-weight: 600;">${employee.name}</div>
-                        <div style="font-size: 0.9em; color: #7f8c8d;">${employee.department}</div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('hostNextBtn').disabled = false;
-            document.getElementById('searchResults').style.display = 'none';
-            document.getElementById('hostSearch').value = '';
-        }
-
-        function selectDepartment(dept) {
-            document.getElementById('hostSearch').value = dept;
-            searchHost(dept);
+            photoTaken = false;
         }
 
         // Purpose selection
@@ -2495,76 +1687,36 @@
             document.getElementById('agreeNextBtn').disabled = !(terms && photo);
         }
 
-        // Complete check-in with QR generation and email
-        // Modified completeCheckIn function with better QR code handling
-        // function completeCheckIn() {
-        //     showLoading();
+        // Storage functions
+        function getStoredVisitors() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function storeVisitor(visitor) {
+            const visitors = getStoredVisitors();
+            visitor.id = Date.now();
+            visitor.lastVisit = new Date().toISOString();
             
-        //     // Store visitor and get QR data
-        //     const storedVisitor = storeVisitor(visitorData);
+            visitors.unshift(visitor);
+            if (visitors.length > 100) visitors.splice(100);
             
-        //     setTimeout(() => {
-        //         hideLoading();
-                
-        //         const badgeNumber = 'V-' + new Date().getFullYear() + '-' + 
-        //                         String(Math.floor(Math.random() * 10000)).padStart(4, '0');
-                
-        //         // Update badge display
-        //         document.getElementById('badgeNumber').textContent = badgeNumber;
-        //         document.getElementById('visitorName').textContent = visitorData.firstName + ' ' + visitorData.lastName;
-        //         document.getElementById('visitorCompany').textContent = visitorData.company;
-        //         document.getElementById('badgeHost').textContent = visitorData.host.name;
-                
-        //         const badgePhotoDiv = document.getElementById('badgePhotoDisplay');
-        //         if (visitorData.photo) {
-        //             badgePhotoDiv.innerHTML = `<img src="${visitorData.photo}" alt="Visitor Photo">`;
-        //         } else {
-        //             badgePhotoDiv.innerHTML = '<i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>';
-        //         }
-                
-        //         const validUntil = new Date();
-        //         validUntil.setHours(validUntil.getHours() + 8);
-        //         document.getElementById('validUntil').textContent = 
-        //             validUntil.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-                
-        //         // Generate QR Code with error handling
-        //         const qrContainer = document.getElementById('qrcode');
-        //         qrContainer.innerHTML = ''; // Clear any existing content
-                
-        //         try {
-        //             // Check if QRCode is available
-        //             if (typeof QRCode !== 'undefined') {
-        //                 new QRCode(qrContainer, {
-        //                     text: storedVisitor.qrCode,
-        //                     width: 200,
-        //                     height: 200,
-        //                     colorDark: "#000000",
-        //                     colorLight: "#ffffff",
-        //                     correctLevel: QRCode.CorrectLevel.M
-        //                 });
-        //             } else {
-        //                 // Fallback if QRCode library fails to load
-        //                 console.error('QRCode library not loaded');
-        //                 qrContainer.innerHTML = '<div style="width: 200px; height: 200px; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; color: #999;">QR Code Generation Failed</div>';
-        //             }
-        //         } catch (error) {
-        //             console.error('Error generating QR code:', error);
-        //             qrContainer.innerHTML = '<div style="width: 200px; height: 200px; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; color: #999;">QR Code Error</div>';
-        //         }
-                
-        //         // Simulate sending email
-        //         sendQRCodeEmail(storedVisitor);
-                
-        //         showScreen(8);
-        //         startCountdown();
-                
-        //         console.log('Check-in complete:', storedVisitor);
-        //     }, 2000);
-        // }
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(visitors));
+            } catch (e) {
+                console.error('Storage error:', e);
+            }
+            
+            return visitor;
+        }
+
+        // Complete check-in - UPDATED WITHOUT QR CODE GENERATION
         function completeCheckIn() {
             showLoading();
             
-            // Store visitor and get QR data
+            // Update step indicator to show final step
+            updateStepIndicator(8);
+            
             const storedVisitor = storeVisitor(visitorData);
             
             setTimeout(() => {
@@ -2573,7 +1725,6 @@
                 const badgeNumber = 'V-' + new Date().getFullYear() + '-' + 
                                    String(Math.floor(Math.random() * 10000)).padStart(4, '0');
                 
-                // Update badge display
                 document.getElementById('badgeNumber').textContent = badgeNumber;
                 document.getElementById('visitorName').textContent = visitorData.firstName + ' ' + visitorData.lastName;
                 document.getElementById('visitorCompany').textContent = visitorData.company;
@@ -2591,260 +1742,12 @@
                 document.getElementById('validUntil').textContent = 
                     validUntil.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
                 
-                // // Generate QR Code (Fixed version)
-                // const qrContainer = document.getElementById('qrcode');
-                // qrContainer.innerHTML = '';
-                // new QRCode(qrContainer, {
-                //     text: storedVisitor.qrCode,
-                //     width: 200,
-                //     height: 200,
-                //     colorDark: "#000000",
-                //     colorLight: "#ffffff"
-                // });
-                const qrContainer = document.getElementById('qrcode');
-                generateQRCodeAlternative(qrContainer, storedVisitor.qrCode);
-                
-                // Simulate sending email
-                sendQRCodeEmail(storedVisitor);
-                
                 showScreen(8);
                 startCountdown();
                 
                 console.log('Check-in complete:', storedVisitor);
             }, 2000);
         }
-
-
-        // function generateQRCodeAlternative(container, text) {
-        //     // Clear container
-        //     container.innerHTML = '';
-            
-        //     // Create canvas element
-        //     const canvas = document.createElement('canvas');
-        //     canvas.width = 200;
-        //     canvas.height = 200;
-        //     container.appendChild(canvas);
-            
-        //     // Generate QR code
-        //     QrCreator.render({
-        //         text: text,
-        //         radius: 0.5, // 0.0 to 0.5
-        //         ecLevel: 'M', // L, M, Q, H
-        //         fill: '#000000',
-        //         background: '#ffffff',
-        //         size: 200
-        //     }, canvas);
-        // }
-
-        // UPDATED: Alternative QR generation with size optimization
-        function generateQRCodeAlternative(container, text) {
-            // Clear container
-            container.innerHTML = '';
-            
-            // If text is too long, show warning
-            if (text.length > 500) {
-                console.warn('QR code data is very large:', text.length, 'characters');
-                
-                // Create a simpler QR with just essential data
-                const simplified = {
-                    id: visitorData.id || Date.now(),
-                    email: visitorData.email,
-                    name: `${visitorData.firstName} ${visitorData.lastName}`
-                };
-                text = JSON.stringify(simplified);
-            }
-            
-            // Create canvas element
-            const canvas = document.createElement('canvas');
-            canvas.width = 200;
-            canvas.height = 200;
-            container.appendChild(canvas);
-            
-            try {
-                // Generate QR code with appropriate error correction
-                QrCreator.render({
-                    text: text,
-                    radius: 0.0, // Sharp corners for better scanning
-                    ecLevel: 'L', // Lower error correction for simpler QR
-                    fill: '#000000',
-                    background: '#ffffff',
-                    size: 200
-                }, canvas);
-                
-                // Add download button as backup
-                const downloadBtn = document.createElement('button');
-                downloadBtn.className = 'btn btn-sm btn-outline-primary mt-2';
-                downloadBtn.innerHTML = '<i class="bi bi-download"></i> Download QR';
-                downloadBtn.onclick = function() {
-                    const link = document.createElement('a');
-                    link.download = `visitor-qr-${Date.now()}.png`;
-                    link.href = canvas.toDataURL();
-                    link.click();
-                };
-                container.appendChild(downloadBtn);
-                
-            } catch (error) {
-                console.error('QR generation error:', error);
-                container.innerHTML = `
-                    <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle"></i> QR generation issue
-                        <br><small>Visitor ID: ${visitorData.id || 'N/A'}</small>
-                    </div>
-                `;
-            }
-        }
-
-        const API_BASE_URL = 'http://localhost:3000'; // Change this to your backend URL
-
-        // Updated function to actually send QR code via email
-        async function sendQRCodeEmail(visitor) {
-            try {
-                // Generate badge number
-                const badgeNumber = 'V-' + new Date().getFullYear() + '-' + 
-                                String(Math.floor(Math.random() * 10000)).padStart(4, '0');
-                
-                // Prepare the data to send
-                const emailData = {
-                    visitor: visitor,
-                    qrData: visitor.qrCode,
-                    badgeNumber: badgeNumber
-                };
-                
-                // Show loading state
-                console.log('Sending QR code to:', visitor.email);
-                
-                // Make API call to backend
-                const response = await fetch(`${API_BASE_URL}/api/send-visitor-qr`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(emailData)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Email sent successfully
-                    Swal.fire({
-                        title: translations[currentLanguage].emailSentTitle || 'QR Code Sent!',
-                        text: translations[currentLanguage].emailSentMessage || 'Your QR code has been sent to your email address',
-                        icon: 'success',
-                        confirmButtonColor: '#27ae60',
-                        timer: 3000,
-                        timerProgressBar: true
-                    });
-                    
-                    console.log('Email sent successfully to:', result.emailSent);
-                } else {
-                    // Email failed to send
-                    throw new Error(result.message || 'Failed to send email');
-                }
-                
-            } catch (error) {
-                console.error('Email sending error:', error);
-                
-                // Show error message to user
-                Swal.fire({
-                    title: 'Email Not Sent',
-                    html: `
-                        <p>We couldn't send the QR code to your email at this moment.</p>
-                        <p style="color: #666; font-size: 14px; margin-top: 10px;">
-                            Please take a photo of the QR code on screen or ask reception for assistance.
-                        </p>
-                        <p style="color: #999; font-size: 12px; margin-top: 15px;">
-                            Error: ${error.message}
-                        </p>
-                    `,
-                    icon: 'warning',
-                    confirmButtonColor: '#f39c12',
-                    confirmButtonText: 'OK, I\'ll save it manually'
-                });
-            }
-        }
-
-        // Alternative: If you're using PHP backend instead, here's a simpler version:
-        async function sendQRCodeEmailPHP(visitor) {
-            try {
-                const formData = new FormData();
-                formData.append('email', visitor.email);
-                formData.append('firstName', visitor.firstName);
-                formData.append('lastName', visitor.lastName);
-                formData.append('company', visitor.company);
-                formData.append('host', visitor.host?.name || 'Reception');
-                formData.append('purpose', visitor.purpose || 'Meeting');
-                formData.append('qrData', visitor.qrCode);
-                formData.append('photo', visitor.photo || '');
-                
-                const response = await fetch('send-email.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    Swal.fire({
-                        title: 'QR Code Sent!',
-                        text: 'Check your email for your visitor pass and QR code',
-                        icon: 'success',
-                        timer: 3000,
-                        timerProgressBar: true
-                    });
-                } else {
-                    throw new Error(result.message);
-                }
-            } catch (error) {
-                console.error('Email error:', error);
-                Swal.fire({
-                    title: 'Email Issue',
-                    text: 'Please save the QR code from the screen',
-                    icon: 'warning'
-                });
-            }
-        }
-
-        // Add this function to allow manual email sending from success screen
-        function resendEmail() {
-            if (visitorData && visitorData.email) {
-                sendQRCodeEmail(visitorData);
-            }
-        }
-
-        // Optional: Add a download QR code function as backup
-        function downloadQRCode() {
-            const canvas = document.querySelector('#qrcode canvas');
-            if (canvas) {
-                const link = document.createElement('a');
-                link.download = `visitor-qr-${Date.now()}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-                
-                Swal.fire({
-                    title: 'QR Code Downloaded',
-                    text: 'Your QR code has been saved to your device',
-                    icon: 'success',
-                    timer: 2000
-                });
-            }
-        }
-
-        // // Simulate sending QR code via email
-        // function sendQRCodeEmail(visitor) {
-        //     // In production, this would make an API call to your backend
-        //     console.log('Sending QR code to:', visitor.email);
-            
-        //     setTimeout(() => {
-        //         Swal.fire({
-        //             title: translations[currentLanguage].emailSentTitle || 'QR Code Sent!',
-        //             text: translations[currentLanguage].emailSentMessage || 'Your QR code has been sent to your email address',
-        //             icon: 'success',
-        //             confirmButtonColor: '#27ae60',
-        //             timer: 3000,
-        //             timerProgressBar: true
-        //         });
-        //     }, 1000);
-        // }
 
         // Countdown timer
         function startCountdown() {
@@ -2868,15 +1771,15 @@
                 html5QrCode.stop().catch(() => {});
             }
             
-            // Reset all data
             visitorData = {};
             selectedHost = null;
             selectedPurpose = null;
+            selectedDepartment = null;
             capturedPhotoData = null;
+            photoTaken = false;
             currentFlow = [];
             currentFlowIndex = 0;
             
-            // Reset form fields
             document.querySelectorAll('input').forEach(input => {
                 if (input.type !== 'checkbox') {
                     input.value = '';
@@ -2894,10 +1797,14 @@
                 card.classList.remove('selected');
             });
             
+            document.getElementById('departmentSelect').value = '';
+            document.getElementById('employeeSection').style.display = 'none';
             document.getElementById('selectedHost').innerHTML = `<span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>`;
             document.getElementById('captureBtn').style.display = 'block';
             document.getElementById('retakeBtn').style.display = 'none';
             document.getElementById('capturedImage').style.display = 'none';
+            document.getElementById('photoSkipBtn').style.display = 'block';
+            document.getElementById('photoNextBtn').style.display = 'none';
             document.getElementById('hostNextBtn').disabled = true;
             document.getElementById('purposeNextBtn').disabled = true;
             document.getElementById('agreeNextBtn').disabled = true;
@@ -2995,14 +1902,6 @@
                 document.getElementById('lastName').value = names.slice(1).join(' ') || '';
                 document.getElementById('company').value = visit.company;
                 
-                const hostEmployee = employees.find(emp => emp.name === visit.host);
-                if (hostEmployee) {
-                    selectHost(hostEmployee);
-                }
-                
-                selectedPurpose = visit.purpose.toLowerCase().replace(' ', '');
-                visitorData.purpose = selectedPurpose;
-                
                 bootstrap.Modal.getInstance(document.getElementById('preScheduledModal')).hide();
                 
                 currentFlow = screenFlow['new'];
@@ -3084,6 +1983,486 @@
 
         // Prevent context menu for kiosk mode
         // document.addEventListener('contextmenu', e => e.preventDefault());
+
+
+
+        // Updated completeCheckIn function to connect with database
+        function completeCheckIn() {
+            showLoading();
+            
+            // Prepare data for database insertion
+            const checkInData = {
+                firstName: visitorData.firstName,
+                lastName: visitorData.lastName,
+                email: visitorData.email,
+                phone: visitorData.phone,
+                company: visitorData.company,
+                photo: visitorData.photo || null,
+                type: visitorData.type,
+                host: {
+                    id: selectedHost.id || selectedHost.employeeId,
+                    name: selectedHost.name,
+                    email: selectedHost.email,
+                    department: selectedHost.department,
+                    departmentCode: selectedHost.departmentCode
+                },
+                purpose: selectedPurpose,
+                notes: visitorData.notes || null,
+                booking_code: visitorData.booking_code || null
+            };
+            
+            // Send data to server for database insertion
+            fetch('<?= base_url("kiosk/complete_checkin") ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(checkInData)
+            })
+            .then(response => response.json())
+            .then(result => {
+                hideLoading();
+                
+                if (result.status === 'success') {
+                    // Update success screen with actual data from database
+                    updateSuccessScreen(result.data);
+                    
+                    // Update step indicator to show final step
+                    updateStepIndicator(8);
+                    
+                    // Show success screen
+                    showScreen(8);
+                    
+                    // Start countdown timer
+                    startCountdown();
+                    
+                    console.log('Check-in successful:', result.data);
+                    
+                    // Store photo locally if available (for QR code reference)
+                    if (visitorData.photo && result.data.visit_id) {
+                        try {
+                            localStorage.setItem(`visitor_photo_${result.data.visit_id}`, visitorData.photo);
+                        } catch (e) {
+                            console.error('Could not store photo:', e);
+                        }
+                    }
+                } else {
+                    // Show error message
+                    Swal.fire({
+                        title: 'Check-in Failed',
+                        text: result.message || 'An error occurred during check-in. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#e74c3c'
+                    });
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Check-in error:', error);
+                
+                Swal.fire({
+                    title: 'Connection Error',
+                    text: 'Unable to connect to the server. Please check your connection and try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#e74c3c'
+                });
+            });
+        }
+
+        // Update success screen with actual database data
+        function updateSuccessScreen(data) {
+            // Update badge number
+            document.getElementById('badgeNumber').textContent = data.badge_number;
+            
+            // Update visitor information
+            document.getElementById('visitorName').textContent = data.visitor_name;
+            document.getElementById('visitorCompany').textContent = data.company;
+            
+            // Update host information
+            document.getElementById('badgeHost').textContent = data.host_name;
+            
+            // Update valid until time
+            const validUntilDate = new Date(data.valid_until);
+            document.getElementById('validUntil').textContent = 
+                validUntilDate.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    hour12: true 
+                });
+            
+            // Update badge photo if available
+            const badgePhotoDiv = document.getElementById('badgePhotoDisplay');
+            if (visitorData.photo) {
+                badgePhotoDiv.innerHTML = `<img src="${visitorData.photo}" alt="Visitor Photo">`;
+            } else {
+                badgePhotoDiv.innerHTML = '<i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>';
+            }
+            
+            // Store visit ID for potential future reference
+            visitorData.visit_id = data.visit_id;
+            visitorData.badge_number = data.badge_number;
+        }
+
+        // Updated department loading function to fetch from database
+        function populateDepartments() {
+            fetch('<?= base_url("kiosk/get_departments") ?>', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const select = document.getElementById('departmentSelect');
+                    select.innerHTML = '<option value="">Choose a department...</option>';
+                    
+                    result.departments.forEach(dept => {
+                        const option = document.createElement('option');
+                        option.value = dept.department_code;
+                        option.textContent = dept.name;
+                        select.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error loading departments:', error);
+                // Fallback to hardcoded departments if API fails
+                populateDepartmentsStatic();
+            });
+        }
+
+        // Updated employee loading function to fetch from database
+        function onDepartmentChange() {
+            const deptCode = document.getElementById('departmentSelect').value;
+            const employeeSection = document.getElementById('employeeSection');
+            const employeeGrid = document.getElementById('employeeGrid');
+            
+            if (!deptCode) {
+                employeeSection.style.display = 'none';
+                resetHostSelection();
+                return;
+            }
+            
+            // Show loading indicator
+            employeeGrid.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+            employeeSection.style.display = 'block';
+            
+            // Fetch employees from database
+            fetch(`<?= base_url("kiosk/get_employees/") ?>${deptCode}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    employeeGrid.innerHTML = '';
+                    
+                    result.employees.forEach(employee => {
+                        const card = document.createElement('div');
+                        card.className = 'employee-card';
+                        card.innerHTML = `
+                            <i class="bi bi-person-circle"></i>
+                            <div class="employee-name">${employee.name}</div>
+                            <div class="employee-email">${employee.email}</div>
+                        `;
+                        card.onclick = () => selectEmployeeFromCard({
+                            id: employee.employee_id,
+                            employeeId: employee.employee_id,
+                            name: employee.name,
+                            email: employee.email
+                        }, deptCode);
+                        employeeGrid.appendChild(card);
+                    });
+                    
+                    if (result.employees.length === 0) {
+                        employeeGrid.innerHTML = '<p class="text-muted text-center">No employees found in this department</p>';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading employees:', error);
+                employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees. Please try again.</p>';
+            });
+        }
+
+        // Handle QR code for returning visitors
+        function handleQRCodeSuccess(decodedText) {
+            try {
+                let qrData;
+                
+                try {
+                    qrData = JSON.parse(decodedText);
+                } catch (e) {
+                    qrData = JSON.parse(atob(decodedText));
+                }
+                
+                if (qrData.email) {
+                    if (html5QrCode) {
+                        html5QrCode.stop();
+                    }
+                    
+                    // Search for visitor in database
+                    fetch('<?= base_url("kiosk/search_visitor") ?>', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ email: qrData.email })
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.status === 'success' && result.visitor) {
+                            // Populate form with visitor data
+                            visitorData = {
+                                ...visitorData,
+                                firstName: result.visitor.first_name,
+                                lastName: result.visitor.last_name,
+                                email: result.visitor.email,
+                                phone: result.visitor.phone,
+                                company: result.visitor.company,
+                                photo: result.visitor.photo,
+                                visitor_id: result.visitor.visitor_id,
+                                total_visits: result.visitor.total_visits
+                            };
+                            
+                            // Pre-fill the form if moving to basic info screen
+                            if (document.getElementById('firstName')) {
+                                document.getElementById('firstName').value = result.visitor.first_name;
+                                document.getElementById('lastName').value = result.visitor.last_name;
+                                document.getElementById('email').value = result.visitor.email;
+                                document.getElementById('phone').value = result.visitor.phone;
+                                document.getElementById('company').value = result.visitor.company;
+                            }
+                            
+                            Swal.fire({
+                                title: `Welcome Back!`,
+                                text: `Welcome back, ${result.visitor.first_name}! You've visited us ${result.visitor.total_visits} time(s) before.`,
+                                icon: 'success',
+                                confirmButtonColor: '#27ae60'
+                            });
+                            
+                            // Skip to host selection for returning visitors
+                            showScreen(5);
+                        } else {
+                            showNotification('Visitor not found. Please complete full registration.');
+                            showScreen(3);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error searching visitor:', error);
+                        showNotification('Error processing QR code. Please continue with manual entry.');
+                        showScreen(3);
+                    });
+                }
+            } catch (e) {
+                console.error('QR decode error:', e);
+                showNotification('Invalid QR Code');
+            }
+        }
+
+        // Load pre-scheduled visits from database
+        function loadPreScheduledVisits() {
+            const resultsDiv = document.getElementById('bookingResults');
+            resultsDiv.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+            
+            fetch('<?= base_url("kiosk/get_prescheduled") ?>', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    resultsDiv.innerHTML = '';
+                    
+                    if (result.visits.length === 0) {
+                        resultsDiv.innerHTML = '<p class="text-muted text-center">No pre-scheduled visits found for today</p>';
+                        return;
+                    }
+                    
+                    result.visits.forEach(visit => {
+                        const scheduledTime = new Date(visit.scheduled_time);
+                        const timeStr = scheduledTime.toLocaleTimeString('en-US', { 
+                            hour: '2-digit', 
+                            minute: '2-digit', 
+                            hour12: true 
+                        });
+                        
+                        const item = document.createElement('div');
+                        item.className = 'booking-item';
+                        item.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="booking-code">${visit.booking_code}</div>
+                                    <div class="mt-2">
+                                        <strong>${visit.visitor_name}</strong> - ${visit.visitor_company || 'N/A'}
+                                    </div>
+                                    <div class="text-muted">
+                                        Host: ${visit.host_name} (${visit.department}) | Time: ${timeStr}
+                                    </div>
+                                    <div class="text-primary mt-1">
+                                        <i class="bi bi-calendar-check"></i> ${visit.purpose}
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary" onclick="selectPreScheduled('${visit.booking_code}')">
+                                    Check In
+                                </button>
+                            </div>
+                        `;
+                        resultsDiv.appendChild(item);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error loading pre-scheduled visits:', error);
+                resultsDiv.innerHTML = '<p class="text-danger text-center">Error loading scheduled visits. Please try again.</p>';
+            });
+        }
+
+        // Search pre-scheduled visits
+        function searchBookings(query) {
+            if (query.length < 2) {
+                loadPreScheduledVisits();
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('bookingResults');
+            resultsDiv.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+            
+            fetch(`<?= base_url("kiosk/get_prescheduled") ?>?search=${encodeURIComponent(query)}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    resultsDiv.innerHTML = '';
+                    
+                    const filtered = result.visits.filter(visit =>
+                        visit.booking_code.toLowerCase().includes(query.toLowerCase()) ||
+                        visit.visitor_name.toLowerCase().includes(query.toLowerCase())
+                    );
+                    
+                    if (filtered.length === 0) {
+                        resultsDiv.innerHTML = '<p class="text-muted text-center">No matching bookings found</p>';
+                        return;
+                    }
+                    
+                    filtered.forEach(visit => {
+                        const scheduledTime = new Date(visit.scheduled_time);
+                        const timeStr = scheduledTime.toLocaleTimeString('en-US', { 
+                            hour: '2-digit', 
+                            minute: '2-digit', 
+                            hour12: true 
+                        });
+                        
+                        const item = document.createElement('div');
+                        item.className = 'booking-item';
+                        item.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="booking-code">${visit.booking_code}</div>
+                                    <div class="mt-2">
+                                        <strong>${visit.visitor_name}</strong> - ${visit.visitor_company || 'N/A'}
+                                    </div>
+                                    <div class="text-muted">
+                                        Host: ${visit.host_name} (${visit.department}) | Time: ${timeStr}
+                                    </div>
+                                    <div class="text-primary mt-1">
+                                        <i class="bi bi-calendar-check"></i> ${visit.purpose}
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary" onclick="selectPreScheduled('${visit.booking_code}')">
+                                    Check In
+                                </button>
+                            </div>
+                        `;
+                        resultsDiv.appendChild(item);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error searching bookings:', error);
+                resultsDiv.innerHTML = '<p class="text-danger text-center">Error searching bookings. Please try again.</p>';
+            });
+        }
+
+        // Implement actual check-out functionality
+        function checkOut() {
+            Swal.fire({
+                title: 'Check Out',
+                input: 'text',
+                inputLabel: 'Enter your badge number',
+                inputPlaceholder: 'V-2024-XXXX',
+                showCancelButton: true,
+                confirmButtonColor: '#f39c12',
+                confirmButtonText: 'Check Out',
+                cancelButtonText: 'Cancel',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Please enter your badge number';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('<?= base_url("kiosk/checkout") ?>', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ badge_number: result.value })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                title: 'Checked Out Successfully',
+                                text: 'Thank you for visiting. Have a great day!',
+                                icon: 'success',
+                                confirmButtonColor: '#27ae60'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Check Out Failed',
+                                text: data.message || 'Invalid badge number or already checked out',
+                                icon: 'error',
+                                confirmButtonColor: '#e74c3c'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Checkout error:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Unable to process check-out. Please try again.',
+                            icon: 'error',
+                            confirmButtonColor: '#e74c3c'
+                        });
+                    });
+                }
+            });
+        }
+
+        // Keep the static populate function as fallback
+        function populateDepartmentsStatic() {
+            const select = document.getElementById('departmentSelect');
+            select.innerHTML = '<option value="">Choose a department...</option>';
+            
+            // Use the original departmentData object as fallback
+            Object.keys(departmentData).forEach(deptCode => {
+                const option = document.createElement('option');
+                option.value = deptCode;
+                option.textContent = departmentData[deptCode].name;
+                select.appendChild(option);
+            });
+        }
     </script>
-</body>
-</html>

@@ -2710,6 +2710,47 @@
                 currentlyIn.textContent = newValue;
             }
         }, 30000); // Update every 30 seconds
+
+        // Replace sample data with database calls
+        function loadVisitors() {
+            $.ajax({
+                url: '<?= base_url("visitor/search") ?>',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    populateVisitorTable(data);
+                }
+            });
+        }
+
+        // Check-in visitor via AJAX
+        function checkInVisitor() {
+            const formData = new FormData($('#checkinForm')[0]);
+            
+            $.ajax({
+                url: '<?= base_url("visitor/checkin") ?>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if(response.success) {
+                        Swal.fire('Success', 'Visitor checked in', 'success');
+                        loadVisitors();
+                    }
+                }
+            });
+        }
+
+        // Check-out visitor
+        function checkOutVisitor(visitId) {
+            $.post('<?= base_url("visitor/checkout/") ?>' + visitId, function(response) {
+                if(response.success) {
+                    Swal.fire('Success', 'Visitor checked out', 'success');
+                    loadVisitors();
+                }
+            });
+        }
     </script>
 </body>
 </html>
