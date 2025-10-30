@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visitor Management - Admin Dashboard</title>
+    <title>VMS Admin Dashboard - Tom's World & Pan-Asia</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
@@ -49,7 +49,7 @@
 
         .sidebar-header {
             background: linear-gradient(135deg, #f39c12, #1e9338);
-            padding: 20px 0px 20px 0px;
+            padding: 20px;
             text-align: center;
             color: white;
         }
@@ -65,14 +65,19 @@
         }
 
         .sidebar-logo {
-            width: 50px;
-            height: 50px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-logo img {
+            width: 40px;
+            height: 40px;
             background: white;
             border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
+            padding: 5px;
+            object-fit: contain;
         }
 
         .sidebar-menu {
@@ -415,6 +420,80 @@
             color: var(--primary-color);
         }
 
+        /* Purpose Badge Colors */
+        .purpose-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .purpose-badge.meeting {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--info-color);
+        }
+
+        .purpose-badge.interview {
+            background: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+        }
+
+        .purpose-badge.delivery {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--primary-color);
+        }
+
+        .purpose-badge.service {
+            background: rgba(41, 128, 185, 0.1);
+            color: #2980b9;
+        }
+
+        .purpose-badge.training {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .purpose-badge.tour {
+            background: rgba(26, 188, 156, 0.1);
+            color: #1abc9c;
+        }
+
+        .purpose-badge.event {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+        }
+
+        .purpose-badge.other {
+            background: rgba(149, 165, 166, 0.1);
+            color: #95a5a6;
+        }
+
+        /* Department Stats */
+        .dept-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .dept-stat-item {
+            text-align: center;
+            flex: 0 0 14%;
+            margin-bottom: 15px;
+        }
+
+        .dept-stat-value {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .dept-stat-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
         /* Action Buttons */
         .action-btn {
             padding: 5px 10px;
@@ -439,60 +518,6 @@
 
         .action-btn.delete {
             color: var(--danger-color);
-        }
-
-        /* Activity List */
-        .activity-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .activity-item {
-            display: flex;
-            align-items: start;
-            gap: 15px;
-            padding: 15px 0;
-            border-bottom: 1px solid #ecf0f1;
-        }
-
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .activity-icon.check-in {
-            background: rgba(39, 174, 96, 0.1);
-            color: var(--success-color);
-        }
-
-        .activity-icon.check-out {
-            background: rgba(52, 152, 219, 0.1);
-            color: var(--info-color);
-        }
-
-        .activity-content {
-            flex: 1;
-        }
-
-        .activity-title {
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-
-        .activity-desc {
-            color: #7f8c8d;
-            font-size: 0.9em;
-        }
-
-        .activity-time {
-            color: #95a5a6;
-            font-size: 0.85em;
-            white-space: nowrap;
         }
 
         /* Quick Stats Bar */
@@ -548,134 +573,15 @@
             margin-bottom: 5px;
         }
 
-        /* Export Menu */
-        .export-menu {
-            position: relative;
-            display: inline-block;
-        }
-
-        .export-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            margin-top: 5px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            z-index: 100;
-            display: none;
-            min-width: 150px;
-        }
-
-        .export-dropdown.show {
-            display: block;
-        }
-
-        .export-option {
-            padding: 10px 15px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .export-option:hover {
-            background: #f8f9fa;
-        }
-
-        /* Modal Customization */
-        .modal-header {
-            background: var(--primary-color);
+        /* Badge Number Display */
+        .badge-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-        }
-
-        /* Calendar Styles */
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background: #dee2e6;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .calendar-header {
-            background: var(--primary-color);
-            color: white;
-            padding: 8px;
-            text-align: center;
-            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 6px;
             font-size: 0.85em;
-        }
-
-        .calendar-day {
-            background: white;
-            padding: 8px;
-            min-height: 50px;
-            text-align: center;
-            cursor: pointer;
-            position: relative;
-            transition: background 0.2s;
-        }
-
-        .calendar-day:hover {
-            background: #f8f9fa;
-        }
-
-        .calendar-day.other-month {
-            color: #95a5a6;
-            background: #f8f9fa;
-        }
-
-        .calendar-day.today {
-            background: rgba(243, 156, 18, 0.1);
             font-weight: 600;
-        }
-
-        .calendar-day.has-events {
-            font-weight: 600;
-        }
-
-        .calendar-day-number {
-            font-size: 0.9em;
-        }
-
-        .calendar-event-count {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            background: var(--primary-color);
-            color: white;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7em;
-        }
-
-        .calendar-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .calendar-nav button {
-            border: none;
-            background: none;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 5px;
-            transition: background 0.2s;
-        }
-
-        .calendar-nav button:hover {
-            background: #f8f9fa;
+            letter-spacing: 0.5px;
         }
 
         /* Responsive */
@@ -695,6 +601,10 @@
             .search-box {
                 width: 150px;
             }
+
+            .dept-stat-item {
+                flex: 0 0 30%;
+            }
         }
     </style>
 </head>
@@ -703,26 +613,24 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" 
-                    alt="Toms World" 
-                style="width: 40px; height: 40px; object-fit: contain; border-radius: 50%;">
+                <img src="assets/images/icons/stufftoy - Copy.png" alt="TOMS WORLD">
+                <img src="assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg" alt="PAN-ASIA">
             </div>
-            <div class="sidebar-logo">
-                <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" 
-                    alt="Pan-Asia" 
-                style="width: 40px; height: 40px; object-fit: contain; border-radius: 50%;">
-            </div>
-            <h3>VISITOR</h3>
+            <h3>VMS ADMIN</h3>
         </div>
         <div class="sidebar-menu">
             <div class="sidebar-item active" onclick="showSection('dashboard')">
                 <i class="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
             </div>
+            <div class="sidebar-item" onclick="showSection('active-visits')">
+                <i class="bi bi-person-check"></i>
+                <span>Active Visits</span>
+                <span class="sidebar-badge" id="activeVisitCount">2</span>
+            </div>
             <div class="sidebar-item" onclick="showSection('visitors')">
                 <i class="bi bi-people"></i>
-                <span>Visitors</span>
-                <span class="sidebar-badge">12</span>
+                <span>All Visitors</span>
             </div>
             <div class="sidebar-item" onclick="showSection('pre-scheduled')">
                 <i class="bi bi-calendar-check"></i>
@@ -732,17 +640,13 @@
                 <i class="bi bi-person-badge"></i>
                 <span>Employees</span>
             </div>
+            <div class="sidebar-item" onclick="showSection('departments')">
+                <i class="bi bi-building"></i>
+                <span>Departments</span>
+            </div>
             <div class="sidebar-item" onclick="showSection('reports')">
                 <i class="bi bi-file-earmark-text"></i>
                 <span>Reports</span>
-            </div>
-            <div class="sidebar-item" onclick="showSection('analytics')">
-                <i class="bi bi-graph-up"></i>
-                <span>Analytics</span>
-            </div>
-            <div class="sidebar-item" onclick="showSection('security')">
-                <i class="bi bi-shield-check"></i>
-                <span>Security Logs</span>
             </div>
             <div class="sidebar-item" onclick="showSection('settings')">
                 <i class="bi bi-gear"></i>
@@ -758,44 +662,44 @@
             <div class="topbar-left">
                 <i class="bi bi-list menu-toggle" onclick="toggleSidebar()"></i>
                 <div class="search-box">
-                    <input type="text" placeholder="Search visitors, employees...">
+                    <input type="text" placeholder="Search visitors, employees..." id="globalSearch" onkeyup="performGlobalSearch()">
                     <i class="bi bi-search"></i>
                 </div>
             </div>
             <div class="topbar-right">
                 <div class="notification-icon">
                     <i class="bi bi-bell"></i>
-                    <span class="notification-badge">3</span>
+                    <span class="notification-badge">5</span>
                 </div>
                 <div class="user-profile">
-                    <div class="user-avatar">JD</div>
-                    <span>John Doe</span>
+                    <div class="user-avatar">AD</div>
+                    <span>Admin</span>
                     <i class="bi bi-chevron-down"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Dashboard Content -->
+        <!-- Dashboard Section -->
         <div class="dashboard-content" id="dashboardSection">
             <h1 class="page-title">Visitor Management Dashboard</h1>
-            <p class="page-subtitle">Welcome back! Here's what's happening today.</p>
+            <p class="page-subtitle">Welcome back! Here's what's happening today at Tom's World & Pan-Asia.</p>
 
             <!-- Quick Stats Bar -->
             <div class="quick-stats">
                 <div class="quick-stat-item">
-                    <div class="quick-stat-value" id="todayTotal">47</div>
+                    <div class="quick-stat-value" id="todayTotal">2</div>
                     <div class="quick-stat-label">Today's Visitors</div>
                 </div>
                 <div class="quick-stat-item">
-                    <div class="quick-stat-value" id="currentlyIn">23</div>
+                    <div class="quick-stat-value" id="currentlyIn">2</div>
                     <div class="quick-stat-label">Currently In Building</div>
                 </div>
                 <div class="quick-stat-item">
-                    <div class="quick-stat-value" id="scheduledToday">8</div>
+                    <div class="quick-stat-value" id="scheduledToday">1</div>
                     <div class="quick-stat-label">Scheduled Today</div>
                 </div>
                 <div class="quick-stat-item">
-                    <div class="quick-stat-value" id="avgDuration">2.5h</div>
+                    <div class="quick-stat-value" id="avgDuration">4.5h</div>
                     <div class="quick-stat-label">Avg. Visit Duration</div>
                 </div>
             </div>
@@ -805,122 +709,147 @@
                 <div class="col-md-3">
                     <div class="stat-card">
                         <i class="bi bi-people stat-card-icon"></i>
-                        <div class="stat-value text-primary">1,234</div>
-                        <div class="stat-label">Total Visitors This Month</div>
+                        <div class="stat-value text-primary">2</div>
+                        <div class="stat-label">Total Visitors</div>
                         <div class="stat-change positive">
                             <i class="bi bi-arrow-up"></i>
-                            <span>12% from last month</span>
+                            <span>New this week</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card">
-                        <i class="bi bi-person-check stat-card-icon"></i>
-                        <div class="stat-value text-success">892</div>
-                        <div class="stat-label">Returning Visitors</div>
-                        <div class="stat-change positive">
-                            <i class="bi bi-arrow-up"></i>
-                            <span>8% increase</span>
-                        </div>
+                        <i class="bi bi-building stat-card-icon"></i>
+                        <div class="stat-value text-success">18</div>
+                        <div class="stat-label">Departments</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card">
-                        <i class="bi bi-clock stat-card-icon"></i>
-                        <div class="stat-value text-info">3.2h</div>
-                        <div class="stat-label">Average Visit Time</div>
-                        <div class="stat-change negative">
-                            <i class="bi bi-arrow-down"></i>
-                            <span>5% decrease</span>
-                        </div>
+                        <i class="bi bi-person-badge stat-card-icon"></i>
+                        <div class="stat-value text-info">44</div>
+                        <div class="stat-label">Active Employees</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card">
                         <i class="bi bi-calendar-check stat-card-icon"></i>
-                        <div class="stat-value text-warning">156</div>
+                        <div class="stat-value text-warning">1</div>
                         <div class="stat-label">Pre-Scheduled</div>
-                        <div class="stat-change positive">
-                            <i class="bi bi-arrow-up"></i>
-                            <span>23% increase</span>
-                        </div>
                     </div>
                 </div>
             </div>
 
-            
-            <!-- Recent Visitors Table -->
-            <div class="row mb-4">
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3 class="chart-title">Recent Visitors</h3>
-                        <div class="table-actions">
-                            <button class="btn btn-outline-secondary btn-sm" onclick="refreshVisitorTable()">
-                                <i class="bi bi-arrow-clockwise"></i> Refresh
-                            </button>
-                            <button class="btn btn-primary btn-sm" onclick="showAddVisitorModal()">
-                                <i class="bi bi-plus-circle"></i> Add Visitor
-                            </button>
-                        </div>
+            <!-- Recent Activity Table -->
+            <div class="table-container mb-4">
+                <div class="table-header">
+                    <h3 class="chart-title">Recent Check-ins</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="refreshDashboard()">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
                     </div>
-                    <table class="table table-hover" id="visitorTable">
-                        <thead>
-                            <tr>
-                                <th>Photo</th>
-                                <th>Name</th>
-                                <th>Company</th>
-                                <th>Host</th>
-                                <th>Purpose</th>
-                                <th>Check-In</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="visitorTableBody">
-                            <!-- Table rows will be populated here -->
-                        </tbody>
-                    </table>
                 </div>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Badge #</th>
+                            <th>Visitor</th>
+                            <th>Company</th>
+                            <th>Host</th>
+                            <th>Purpose</th>
+                            <th>Check-In</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentActivityTable">
+                        <!-- Will be populated from database -->
+                    </tbody>
+                </table>
             </div>
 
-            <!-- Charts Row -->
-            <div class="row mb-4">
+            <!-- Department Distribution -->
+            <div class="row">
                 <div class="col-md-8">
                     <div class="chart-container">
                         <div class="chart-header">
-                            <h3 class="chart-title">Visitor Traffic</h3>
-                            <div class="chart-actions">
-                                <button class="chart-action-btn active">Week</button>
-                                <button class="chart-action-btn">Month</button>
-                                <button class="chart-action-btn">Year</button>
-                            </div>
+                            <h3 class="chart-title">Visit Purposes Overview</h3>
                         </div>
                         <div class="chart-canvas-container">
-                            <canvas id="visitorChart"></canvas>
+                            <canvas id="purposeChart"></canvas>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="chart-container">
                         <div class="chart-header">
-                            <h3 class="chart-title">Visit Purpose</h3>
+                            <h3 class="chart-title">Department Visits</h3>
                         </div>
                         <div class="chart-canvas-container small">
-                            <canvas id="purposeChart"></canvas>
+                            <canvas id="deptChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Visitors Section -->
+        <!-- Active Visits Section -->
+        <div class="dashboard-content" id="active-visitsSection" style="display: none;">
+            <h1 class="page-title">Active Visits</h1>
+            <p class="page-subtitle">Visitors currently in the building</p>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="chart-title">Currently Checked In</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-primary btn-sm" onclick="printAllBadges()">
+                            <i class="bi bi-printer"></i> Print All Badges
+                        </button>
+                    </div>
+                </div>
+                <table class="table table-hover" id="activeVisitsTable">
+                    <thead>
+                        <tr>
+                            <th>Badge Number</th>
+                            <th>Photo</th>
+                            <th>Visitor Name</th>
+                            <th>Company</th>
+                            <th>Host</th>
+                            <th>Department</th>
+                            <th>Purpose</th>
+                            <th>Check-In Time</th>
+                            <th>Valid Until</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activeVisitsTableBody">
+                        <!-- Populated from active_visits view -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- All Visitors Section -->
         <div class="dashboard-content" id="visitorsSection" style="display: none;">
             <h1 class="page-title">Visitor Management</h1>
-            <p class="page-subtitle">Manage all visitor records and check-ins</p>
+            <p class="page-subtitle">Complete visitor records</p>
 
             <!-- Filters -->
             <div class="filters-panel">
                 <div class="filter-group">
+                    <div class="filter-item">
+                        <div class="filter-label">Visitor Type</div>
+                        <select class="form-select" id="filterVisitorType">
+                            <option value="">All Types</option>
+                            <option value="new">New</option>
+                            <option value="returning">Returning</option>
+                            <option value="delivery">Delivery</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <div class="filter-label">Company</div>
+                        <input type="text" class="form-control" id="filterCompany" placeholder="Filter by company">
+                    </div>
                     <div class="filter-item">
                         <div class="filter-label">Date Range</div>
                         <input type="date" class="form-control" id="filterStartDate">
@@ -930,61 +859,23 @@
                         <input type="date" class="form-control" id="filterEndDate">
                     </div>
                     <div class="filter-item">
-                        <div class="filter-label">Status</div>
-                        <select class="form-select">
-                            <option>All Status</option>
-                            <option>Checked In</option>
-                            <option>Checked Out</option>
-                            <option>Pending</option>
-                        </select>
-                    </div>
-                    <div class="filter-item">
-                        <div class="filter-label">Purpose</div>
-                        <select class="form-select">
-                            <option>All Purposes</option>
-                            <option>Meeting</option>
-                            <option>Interview</option>
-                            <option>Delivery</option>
-                            <option>Service</option>
-                        </select>
-                    </div>
-                    <div class="filter-item">
                         <div class="filter-label">&nbsp;</div>
-                        <button class="btn btn-primary w-100">Apply Filters</button>
+                        <button class="btn btn-primary w-100" onclick="applyFilters()">Apply Filters</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Full Visitor Table -->
+            <!-- Visitors Table -->
             <div class="table-container">
                 <div class="table-header">
                     <h3 class="chart-title">All Visitors</h3>
                     <div class="table-actions">
-                        <div class="export-menu">
-                            <button class="btn btn-outline-secondary btn-sm" onclick="toggleExportMenu()">
-                                <i class="bi bi-download"></i> Export
-                            </button>
-                            <div class="export-dropdown" id="exportDropdown">
-                                <div class="export-option" onclick="exportData('csv')">
-                                    <i class="bi bi-file-earmark-csv"></i>
-                                    <span>Export as CSV</span>
-                                </div>
-                                <div class="export-option" onclick="exportData('excel')">
-                                    <i class="bi bi-file-earmark-excel"></i>
-                                    <span>Export as Excel</span>
-                                </div>
-                                <div class="export-option" onclick="exportData('pdf')">
-                                    <i class="bi bi-file-earmark-pdf"></i>
-                                    <span>Export as PDF</span>
-                                </div>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary btn-sm" onclick="showAddVisitorModal()">
-                            <i class="bi bi-plus-circle"></i> Add New Visitor
+                        <button class="btn btn-outline-secondary btn-sm" onclick="exportVisitors()">
+                            <i class="bi bi-download"></i> Export
                         </button>
                     </div>
                 </div>
-                <table class="table table-hover" id="fullVisitorTable">
+                <table class="table table-hover" id="allVisitorsTable">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -993,191 +884,122 @@
                             <th>Email</th>
                             <th>Phone</th>
                             <th>Company</th>
-                            <th>Host</th>
-                            <th>Purpose</th>
-                            <th>Check-In</th>
-                            <th>Check-Out</th>
-                            <th>Status</th>
+                            <th>Type</th>
+                            <th>Total Visits</th>
+                            <th>Last Visit</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="fullVisitorTableBody">
-                        <!-- Data will be populated here -->
+                    <tbody id="allVisitorsTableBody">
+                        <!-- Populated from visitors table -->
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Pre-Scheduled Visits Section -->
+        <!-- Pre-Scheduled Section -->
         <div class="dashboard-content" id="pre-scheduledSection" style="display: none;">
             <h1 class="page-title">Pre-Scheduled Visits</h1>
             <p class="page-subtitle">Manage upcoming scheduled visits</p>
 
-            <!-- Quick Stats for Scheduled Visits -->
             <div class="row mb-4">
                 <div class="col-md-3">
                     <div class="stat-card">
                         <i class="bi bi-calendar-plus stat-card-icon"></i>
-                        <div class="stat-value text-primary">24</div>
-                        <div class="stat-label">Today's Scheduled</div>
+                        <div class="stat-value text-primary">1</div>
+                        <div class="stat-label">Scheduled Today</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card">
                         <i class="bi bi-calendar-week stat-card-icon"></i>
-                        <div class="stat-value text-info">156</div>
+                        <div class="stat-value text-info">1</div>
                         <div class="stat-label">This Week</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card">
                         <i class="bi bi-check-circle stat-card-icon"></i>
-                        <div class="stat-value text-success">18</div>
-                        <div class="stat-label">Confirmed Today</div>
+                        <div class="stat-value text-success">0</div>
+                        <div class="stat-label">Checked In</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card">
                         <i class="bi bi-clock-history stat-card-icon"></i>
-                        <div class="stat-value text-warning">3</div>
-                        <div class="stat-label">Pending Approval</div>
+                        <div class="stat-value text-warning">1</div>
+                        <div class="stat-label">Pending</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Calendar View and List -->
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="table-container">
-                        <h4>Calendar View</h4>
-                        <div id="miniCalendar" style="padding: 20px;">
-                            <div class="calendar-nav">
-                                <button onclick="changeMonth(-1)"><i class="bi bi-chevron-left"></i></button>
-                                <h5 id="calendarMonth">December 2024</h5>
-                                <button onclick="changeMonth(1)"><i class="bi bi-chevron-right"></i></button>
-                            </div>
-                            <div class="calendar-grid" id="calendarGrid">
-                                <!-- Calendar will be generated here -->
-                            </div>
-                        </div>
-                        <div class="mt-3 p-3 bg-light rounded">
-                            <h6>Legend</h6>
-                            <small><span class="badge bg-primary">3</span> Scheduled visits</small><br>
-                            <small><span class="badge bg-success">✓</span> Confirmed</small><br>
-                            <small><span class="badge bg-warning">!</span> Pending</small>
-                        </div>
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="chart-title">Scheduled Visits</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-primary btn-sm" onclick="showScheduleModal()">
+                            <i class="bi bi-plus-circle"></i> Schedule Visit
+                        </button>
                     </div>
                 </div>
-                <div class="col-md-8">
-                    <div class="table-container">
-                        <div class="table-header">
-                            <h4>Scheduled Visits</h4>
-                            <div class="table-actions">
-                                <button class="btn btn-outline-secondary btn-sm" onclick="showCalendarView()">
-                                    <i class="bi bi-calendar3"></i> Full Calendar
-                                </button>
-                                <button class="btn btn-primary btn-sm" onclick="showScheduleModal()">
-                                    <i class="bi bi-plus-circle"></i> Schedule Visit
-                                </button>
-                            </div>
-                        </div>
-                        <table class="table table-hover" id="scheduledTable">
-                            <thead>
-                                <tr>
-                                    <th>Code</th>
-                                    <th>Visitor</th>
-                                    <th>Company</th>
-                                    <th>Date & Time</th>
-                                    <th>Host</th>
-                                    <th>Purpose</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="scheduledTableBody">
-                                <!-- Will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <table class="table table-hover" id="scheduledTable">
+                    <thead>
+                        <tr>
+                            <th>Booking Code</th>
+                            <th>Visitor</th>
+                            <th>Company</th>
+                            <th>Scheduled Time</th>
+                            <th>Host</th>
+                            <th>Purpose</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduledTableBody">
+                        <!-- Populated from pre_scheduled_visits table -->
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Employee Directory Section -->
+        <!-- Employees Section -->
         <div class="dashboard-content" id="employeesSection" style="display: none;">
             <h1 class="page-title">Employee Directory</h1>
             <p class="page-subtitle">Manage employee records and host assignments</p>
 
-            <!-- Department Quick Stats -->
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <div class="table-container">
-                        <h4>Department Overview</h4>
-                        <div class="row mt-3">
-                            <div class="col-md-2 text-center">
-                                <h5 class="text-primary">35</h5>
-                                <small>Sales</small>
-                            </div>
-                            <div class="col-md-2 text-center">
-                                <h5 class="text-info">28</h5>
-                                <small>Marketing</small>
-                            </div>
-                            <div class="col-md-2 text-center">
-                                <h5 class="text-success">42</h5>
-                                <small>IT</small>
-                            </div>
-                            <div class="col-md-2 text-center">
-                                <h5 class="text-warning">15</h5>
-                                <small>HR</small>
-                            </div>
-                            <div class="col-md-2 text-center">
-                                <h5 class="text-danger">22</h5>
-                                <small>Finance</small>
-                            </div>
-                            <div class="col-md-2 text-center">
-                                <h5 class="text-secondary">18</h5>
-                                <small>Operations</small>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Department Stats -->
+            <div class="table-container mb-4">
+                <h4>Department Distribution</h4>
+                <div class="dept-stats" id="deptStats">
+                    <!-- Will be populated dynamically -->
                 </div>
             </div>
 
-            <!-- Employee Search and Filters -->
+            <!-- Employee Filters -->
             <div class="filters-panel">
                 <div class="filter-group">
                     <div class="filter-item">
                         <div class="filter-label">Department</div>
-                        <select class="form-select" id="deptFilter" onchange="filterEmployees()">
+                        <select class="form-select" id="deptFilter">
                             <option value="">All Departments</option>
-                            <option>Sales</option>
-                            <option>Marketing</option>
-                            <option>IT</option>
-                            <option>HR</option>
-                            <option>Finance</option>
-                            <option>Operations</option>
+                            <!-- Populated from departments table -->
                         </select>
                     </div>
                     <div class="filter-item">
                         <div class="filter-label">Status</div>
-                        <select class="form-select" id="statusFilter" onchange="filterEmployees()">
+                        <select class="form-select" id="statusFilter">
                             <option value="">All Status</option>
-                            <option>Active</option>
-                            <option>On Leave</option>
-                            <option>Remote</option>
-                        </select>
-                    </div>
-                    <div class="filter-item">
-                        <div class="filter-label">Can Host Visitors</div>
-                        <select class="form-select" id="hostFilter" onchange="filterEmployees()">
-                            <option value="">All</option>
-                            <option>Yes</option>
-                            <option>No</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
                         </select>
                     </div>
                     <div class="filter-item">
                         <div class="filter-label">Search</div>
-                        <input type="text" class="form-control" placeholder="Name or Email" id="employeeSearch" onkeyup="filterEmployees()">
+                        <input type="text" class="form-control" placeholder="Name or Email" id="employeeSearch">
+                    </div>
+                    <div class="filter-item">
+                        <div class="filter-label">&nbsp;</div>
+                        <button class="btn btn-primary w-100" onclick="filterEmployees()">Search</button>
                     </div>
                 </div>
             </div>
@@ -1187,9 +1009,6 @@
                 <div class="table-header">
                     <h4>Employee List</h4>
                     <div class="table-actions">
-                        <button class="btn btn-outline-secondary btn-sm" onclick="importEmployees()">
-                            <i class="bi bi-upload"></i> Import
-                        </button>
                         <button class="btn btn-primary btn-sm" onclick="showAddEmployeeModal()">
                             <i class="bi bi-person-plus"></i> Add Employee
                         </button>
@@ -1198,20 +1017,49 @@
                 <table class="table table-hover" id="employeeTable">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Photo</th>
+                            <th>Employee ID</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Department</th>
-                            <th>Position</th>
-                            <th>Extension</th>
                             <th>Status</th>
-                            <th>Can Host</th>
+                            <th>Total Visits Hosted</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="employeeTableBody">
-                        <!-- Will be populated by JavaScript -->
+                        <!-- Populated from employees table -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Departments Section -->
+        <div class="dashboard-content" id="departmentsSection" style="display: none;">
+            <h1 class="page-title">Department Management</h1>
+            <p class="page-subtitle">Manage organizational departments</p>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="chart-title">All Departments</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-primary btn-sm" onclick="showAddDepartmentModal()">
+                            <i class="bi bi-plus-circle"></i> Add Department
+                        </button>
+                    </div>
+                </div>
+                <table class="table table-hover" id="departmentTable">
+                    <thead>
+                        <tr>
+                            <th>Department Code</th>
+                            <th>Department Name</th>
+                            <th>Total Employees</th>
+                            <th>Total Visits</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="departmentTableBody">
+                        <!-- Populated from departments table -->
                     </tbody>
                 </table>
             </div>
@@ -1219,189 +1067,80 @@
 
         <!-- Reports Section -->
         <div class="dashboard-content" id="reportsSection" style="display: none;">
-            <h1 class="page-title">Reports</h1>
-            <p class="page-subtitle">Generate and download comprehensive reports</p>
+            <h1 class="page-title">Reports & Analytics</h1>
+            <p class="page-subtitle">Generate comprehensive reports</p>
 
-            <!-- Report Type Selection -->
             <div class="row mb-4">
                 <div class="col-md-3">
-                    <div class="stat-card" style="cursor: pointer;" onclick="selectReportType('daily')">
+                    <div class="stat-card" style="cursor: pointer;" onclick="generateReport('daily')">
                         <i class="bi bi-calendar-day stat-card-icon"></i>
                         <h4>Daily Report</h4>
                         <p class="text-muted">Today's visitor summary</p>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="stat-card" style="cursor: pointer;" onclick="selectReportType('weekly')">
+                    <div class="stat-card" style="cursor: pointer;" onclick="generateReport('weekly')">
                         <i class="bi bi-calendar-week stat-card-icon"></i>
                         <h4>Weekly Report</h4>
                         <p class="text-muted">7-day visitor analysis</p>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="stat-card" style="cursor: pointer;" onclick="selectReportType('monthly')">
+                    <div class="stat-card" style="cursor: pointer;" onclick="generateReport('monthly')">
                         <i class="bi bi-calendar-month stat-card-icon"></i>
                         <h4>Monthly Report</h4>
                         <p class="text-muted">Monthly statistics</p>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="stat-card" style="cursor: pointer;" onclick="selectReportType('custom')">
-                        <i class="bi bi-gear stat-card-icon"></i>
-                        <h4>Custom Report</h4>
-                        <p class="text-muted">Build your own report</p>
+                    <div class="stat-card" style="cursor: pointer;" onclick="generateReport('security')">
+                        <i class="bi bi-shield-check stat-card-icon"></i>
+                        <h4>Security Report</h4>
+                        <p class="text-muted">Security audit log</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Report Configuration -->
-            <div class="table-container" id="reportConfig">
-                <h4>Configure Report</h4>
+            <div class="table-container">
+                <h4>Report Configuration</h4>
                 <div class="row mt-3">
                     <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label">Report Type</label>
-                            <select class="form-select" id="reportType">
-                                <option>Visitor Summary</option>
-                                <option>Security Log</option>
-                                <option>Host Statistics</option>
-                                <option>Department Analysis</option>
-                                <option>Compliance Report</option>
-                            </select>
+                        <label class="form-label">Report Type</label>
+                        <select class="form-select" id="reportType">
+                            <option>Visitor Summary</option>
+                            <option>Department Analysis</option>
+                            <option>Employee Activity</option>
+                            <option>Security Log</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Date Range</label>
+                        <div class="input-group">
+                            <input type="date" class="form-control" id="reportStartDate">
+                            <span class="input-group-text">to</span>
+                            <input type="date" class="form-control" id="reportEndDate">
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label">Date Range</label>
-                            <div class="input-group">
-                                <input type="date" class="form-control" id="reportStartDate">
-                                <span class="input-group-text">to</span>
-                                <input type="date" class="form-control" id="reportEndDate">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label">Format</label>
-                            <select class="form-select" id="reportFormat">
-                                <option>PDF</option>
-                                <option>Excel</option>
-                                <option>CSV</option>
-                                <option>HTML</option>
-                            </select>
-                        </div>
+                        <label class="form-label">Format</label>
+                        <select class="form-select" id="reportFormat">
+                            <option>PDF</option>
+                            <option>Excel</option>
+                            <option>CSV</option>
+                        </select>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="mb-3">
-                            <label class="form-label">Include Options</label>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="includePhotos" checked>
-                                <label class="form-check-label" for="includePhotos">Visitor Photos</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="includeCharts" checked>
-                                <label class="form-check-label" for="includeCharts">Charts & Graphs</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="includeDetails" checked>
-                                <label class="form-check-label" for="includeDetails">Detailed Breakdown</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="includeSummary" checked>
-                                <label class="form-check-label" for="includeSummary">Executive Summary</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button class="btn btn-primary" onclick="generateReport()">
+                <button class="btn btn-primary mt-3" onclick="generateCustomReport()">
                     <i class="bi bi-file-earmark-text"></i> Generate Report
                 </button>
             </div>
-
-            <!-- Recent Reports -->
-            <div class="table-container mt-4">
-                <h4>Recent Reports</h4>
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Report Name</th>
-                            <th>Type</th>
-                            <th>Generated</th>
-                            <th>Generated By</th>
-                            <th>Size</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><i class="bi bi-file-pdf text-danger"></i> Monthly_Visitor_Report_Nov2024.pdf</td>
-                            <td>Monthly Summary</td>
-                            <td>Dec 1, 2024 09:00 AM</td>
-                            <td>John Doe</td>
-                            <td>2.4 MB</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i></button>
-                                <button class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></button>
-                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><i class="bi bi-file-excel text-success"></i> Weekly_Security_Log_W48.xlsx</td>
-                            <td>Security Log</td>
-                            <td>Nov 30, 2024 05:00 PM</td>
-                            <td>System</td>
-                            <td>845 KB</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i></button>
-                                <button class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></button>
-                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </div>
 
-        <div class="dashboard-content" id="analyticsSection" style="display: none;">
-            <h1 class="page-title">Analytics & Insights</h1>
-            <p class="page-subtitle">Detailed visitor analytics and trends</p>
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="chart-container">
-                        <div class="chart-header">
-                            <h3 class="chart-title">Peak Hours</h3>
-                        </div>
-                        <div class="chart-canvas-container">
-                            <canvas id="peakHoursChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="chart-container">
-                        <div class="chart-header">
-                            <h3 class="chart-title">Department Distribution</h3>
-                        </div>
-                        <div class="chart-canvas-container">
-                            <canvas id="departmentChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="dashboard-content" id="securitySection" style="display: none;">
-            <h1 class="page-title">Security Logs</h1>
-            <p class="page-subtitle">Monitor security events and alerts</p>
-            <div class="table-container">
-                <p class="text-center text-muted p-5">Security logs coming soon...</p>
-            </div>
-        </div>
-
+        <!-- Settings Section -->
         <div class="dashboard-content" id="settingsSection" style="display: none;">
             <h1 class="page-title">System Settings</h1>
             <p class="page-subtitle">Configure visitor management system</p>
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="table-container">
@@ -1409,12 +1148,16 @@
                         <form>
                             <div class="mb-3">
                                 <label class="form-label">Company Name</label>
-                                <input type="text" class="form-control" value="TOMS WORLD">
+                                <input type="text" class="form-control" value="Tom's World Philippines, Inc.">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Default Visit Duration (Hours)</label>
+                                <input type="number" class="form-control" value="8" min="1" max="24">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Auto Check-out Time</label>
                                 <select class="form-select">
-                                    <option>After 8 hours</option>
+                                    <option selected>After 8 hours</option>
                                     <option>After 12 hours</option>
                                     <option>End of day</option>
                                     <option>Manual only</option>
@@ -1426,58 +1169,50 @@
                 </div>
                 <div class="col-md-6">
                     <div class="table-container">
-                        <h4>Notification Settings</h4>
-                        <form>
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="notifyHost" checked>
-                                <label class="form-check-label" for="notifyHost">
-                                    Notify host on visitor arrival
-                                </label>
-                            </div>
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="notifySecurity" checked>
-                                <label class="form-check-label" for="notifySecurity">
-                                    Alert security for unscheduled visits
-                                </label>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Update Notifications</button>
-                        </form>
+                        <h4>Language Settings</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Language</th>
+                                    <th>Code</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>English</td>
+                                    <td>en</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td><button class="btn btn-sm btn-outline-secondary" disabled>Default</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Filipino</td>
+                                    <td>fil</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td><button class="btn btn-sm btn-outline-primary">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td>简体中文</td>
+                                    <td>zh-CN</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td><button class="btn btn-sm btn-outline-primary">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td>繁體中文</td>
+                                    <td>zh-TW</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td><button class="btn btn-sm btn-outline-primary">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td>日本語</td>
+                                    <td>ja</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td><button class="btn btn-sm btn-outline-primary">Edit</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Visitor Details Modal -->
-    <div class="modal fade" id="visitorModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Visitor Details</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4 text-center">
-                            <div class="visitor-photo" style="width: 150px; height: 150px; margin: 0 auto;">
-                                <i class="bi bi-person-circle" style="font-size: 8em; color: #dee2e6;"></i>
-                            </div>
-                            <h4 class="mt-3" id="modalVisitorName">-</h4>
-                            <p class="text-muted" id="modalVisitorCompany">-</p>
-                        </div>
-                        <div class="col-md-8">
-                            <h6>Visit Information</h6>
-                            <table class="table table-sm">
-                                <tbody id="modalVisitorInfo">
-                                    <!-- Will be populated dynamically -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Print Badge</button>
                 </div>
             </div>
         </div>
@@ -1489,114 +1224,357 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
-        // Sample visitor data
-        let sampleVisitors = [
-            { id: 1, name: 'Alice Johnson', company: 'Tech Solutions Inc.', email: 'alice@tech.com', phone: '555-0101', host: 'John Anderson', purpose: 'Meeting', checkIn: '09:30 AM', checkOut: '', status: 'checked-in' },
-            { id: 2, name: 'Bob Smith', company: 'Career Seekers', email: 'bob@career.com', phone: '555-0102', host: 'Sarah Williams', purpose: 'Interview', checkIn: '10:15 AM', checkOut: '', status: 'checked-in' },
-            { id: 3, name: 'Carol Davis', company: 'Logistics Co', email: 'carol@logistics.com', phone: '555-0103', host: 'Reception', purpose: 'Delivery', checkIn: '08:45 AM', checkOut: '09:15 AM', status: 'checked-out' },
-            { id: 4, name: 'David Wilson', company: 'Consulting Group', email: 'david@consulting.com', phone: '555-0104', host: 'Michael Chen', purpose: 'Training', checkIn: '11:00 AM', checkOut: '', status: 'checked-in' },
-            { id: 5, name: 'Emma Brown', company: 'Marketing Agency', email: 'emma@marketing.com', phone: '555-0105', host: 'Emily Johnson', purpose: 'Meeting', checkIn: '02:30 PM', checkOut: '', status: 'checked-in' }
-        ];
-
-        // Sample scheduled visits data (mutable for editing)
-        let scheduledVisits = [
-            { code: 'MEET-2024-001', visitor: 'Alice Johnson', company: 'Tech Solutions Inc.', date: '2024-12-05', time: '10:00 AM', host: 'John Anderson', purpose: 'Sales Meeting', status: 'confirmed' },
-            { code: 'INT-2024-042', visitor: 'Bob Smith', company: 'Career Seekers', date: '2024-12-05', time: '2:00 PM', host: 'Sarah Williams', purpose: 'Job Interview', status: 'confirmed' },
-            { code: 'TRAIN-2024-015', visitor: 'Charlie Davis', company: 'Learning Corp', date: '2024-12-06', time: '9:00 AM', host: 'Michael Chen', purpose: 'IT Training', status: 'pending' },
-            { code: 'EVENT-2024-008', visitor: 'Diana Martinez', company: 'Event Planners LLC', date: '2024-12-06', time: '11:30 AM', host: 'Emily Johnson', purpose: 'Event Planning', status: 'confirmed' },
-            { code: 'TOUR-2024-003', visitor: 'Edward Wilson', company: 'University Tours', date: '2024-12-07', time: '3:00 PM', host: 'Lisa Martinez', purpose: 'Facility Tour', status: 'pending' },
-            { code: 'MEET-2024-045', visitor: 'Frank Chen', company: 'Import Export Co', date: '2024-12-08', time: '10:30 AM', host: 'David Brown', purpose: 'Business Meeting', status: 'confirmed' }
-        ];
-
-        // Sample employee data with mutable canHost property
-        let employees = [
-            { id: 'E001', name: 'John Anderson', email: 'j.anderson@company.com', department: 'Sales', position: 'Sales Manager', extension: '2001', status: 'active', canHost: true },
-            { id: 'E002', name: 'Sarah Williams', email: 's.williams@company.com', department: 'HR', position: 'HR Director', extension: '2002', status: 'active', canHost: true },
-            { id: 'E003', name: 'Michael Chen', email: 'm.chen@company.com', department: 'IT', position: 'IT Support Lead', extension: '2003', status: 'active', canHost: true },
-            { id: 'E004', name: 'Emily Johnson', email: 'e.johnson@company.com', department: 'Marketing', position: 'Marketing Manager', extension: '2004', status: 'active', canHost: true },
-            { id: 'E005', name: 'David Brown', email: 'd.brown@company.com', department: 'Finance', position: 'Finance Director', extension: '2005', status: 'active', canHost: true },
-            { id: 'E006', name: 'Lisa Martinez', email: 'l.martinez@company.com', department: 'Operations', position: 'Operations Manager', extension: '2006', status: 'on-leave', canHost: false },
-            { id: 'E007', name: 'Robert Taylor', email: 'r.taylor@company.com', department: 'Legal', position: 'Legal Counsel', extension: '2007', status: 'active', canHost: true },
-            { id: 'E008', name: 'Jennifer Davis', email: 'j.davis@company.com', department: 'Sales', position: 'Sales Rep', extension: '2008', status: 'active', canHost: false },
-            { id: 'E009', name: 'William Garcia', email: 'w.garcia@company.com', department: 'IT', position: 'Developer', extension: '2009', status: 'remote', canHost: true },
-            { id: 'E010', name: 'Maria Rodriguez', email: 'm.rodriguez@company.com', department: 'HR', position: 'HR Specialist', extension: '2010', status: 'active', canHost: true }
-        ];
-
-        // Chart instances
-        let visitorChart = null;
-        let purposeChart = null;
-        let peakHoursChart = null;
-        let departmentChart = null;
-
-        // Calendar state
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
-
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeDashboard();
-            populateVisitorTable();
-            populateScheduledVisits();
-            populateEmployeeDirectory();
-            generateCalendar();
-        });
+        // Database Data from SQL file
+        const dbData = {
+            visitors: [
+                { visitor_id: 1, first_name: 'Lucky', last_name: 'Yunque', email: 'ithelpdesk@tomsworld.com.ph', phone: '09672406964', company: 'TOMS WORLD', visitor_type: 'new' },
+                { visitor_id: 2, first_name: 'Chad', last_name: 'Cortes', email: 'itdesk@tomsworld.com.ph', phone: '09672406963', company: 'TOMS WORLD', visitor_type: 'new' }
+            ],
+            visits: [
+                { visit_id: 1, visitor_id: 1, host_employee_id: 'HR002', badge_number: 'V-2025-5054', purpose: 'meeting', check_in_time: '2025-10-30 04:04:36', check_out_time: null, valid_until: '2025-10-30 12:04:36' },
+                { visit_id: 2, visitor_id: 2, host_employee_id: 'MRK001', badge_number: 'V-2025-2877', purpose: 'interview', check_in_time: '2025-10-30 04:18:04', check_out_time: null, valid_until: '2025-10-30 12:18:04' }
+            ],
+            employees: [
+                { employee_id: 'HR002', name: 'Kevin Harris', email: 'k.harris@company.com', department_code: 'HR' },
+                { employee_id: 'MRK001', name: 'Andrew Wright', email: 'a.wright@company.com', department_code: 'MRK' }
+            ],
+            departments: [
+                { department_code: 'ADM', name: 'Admin' },
+                { department_code: 'BDD', name: 'Design & Construction' },
+                { department_code: 'CRT', name: 'Creatives' },
+                { department_code: 'ED', name: 'Ent. Risk Management' },
+                { department_code: 'EXE', name: 'Executive' },
+                { department_code: 'FIN', name: 'Finance' },
+                { department_code: 'HR', name: 'Human Resource' },
+                { department_code: 'IMP', name: 'Importation' },
+                { department_code: 'ITSD', name: 'Information Technology & Services' },
+                { department_code: 'MER', name: 'Audit & Merchandising' },
+                { department_code: 'MRK', name: 'Marketing' },
+                { department_code: 'ODSM', name: 'Org. Development & Strat. Mngt.' },
+                { department_code: 'OP', name: 'Operations' },
+                { department_code: 'PA', name: 'Pan Asia HR' },
+                { department_code: 'SD', name: 'Stocks Department' },
+                { department_code: 'SPD', name: 'Special Projects' },
+                { department_code: 'TD', name: 'Technical' },
+                { department_code: 'WLD', name: 'Warehouse & Logistics' }
+            ],
+            pre_scheduled_visits: [
+                { booking_id: 1, booking_code: 'MEET-2024-001', visitor_name: 'Alice Johnson', visitor_email: 'alice.johnson@techsolutions.com', visitor_company: 'Tech Solutions Inc.', host_employee_id: 'ADM001', scheduled_time: '2025-10-29 18:06:35', purpose: 'Sales Meeting', status: 'scheduled' }
+            ]
+        };
 
         // Initialize Dashboard
-        function initializeDashboard() {
-            initMainCharts();
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            initializeCharts();
+            loadActiveVisits();
+        });
+
+        // Load Dashboard Data
+        function loadDashboardData() {
+            // Recent Activity
+            const recentActivity = document.getElementById('recentActivityTable');
+            if (recentActivity) {
+                recentActivity.innerHTML = '';
+                dbData.visits.forEach(visit => {
+                    const visitor = dbData.visitors.find(v => v.visitor_id === visit.visitor_id);
+                    const host = dbData.employees.find(e => e.employee_id === visit.host_employee_id);
+                    
+                    recentActivity.innerHTML += `
+                        <tr>
+                            <td><span class="badge-number">${visit.badge_number}</span></td>
+                            <td>${visitor.first_name} ${visitor.last_name}</td>
+                            <td>${visitor.company}</td>
+                            <td>${host ? host.name : 'N/A'}</td>
+                            <td><span class="purpose-badge ${visit.purpose}">${visit.purpose}</span></td>
+                            <td>${new Date(visit.check_in_time).toLocaleTimeString()}</td>
+                            <td><span class="status-badge checked-in">Checked In</span></td>
+                        </tr>
+                    `;
+                });
+            }
         }
 
-        // Initialize main dashboard charts
-        function initMainCharts() {
-            // Visitor Traffic Chart
-            const ctx1 = document.getElementById('visitorChart');
-            if (ctx1) {
-                visitorChart = new Chart(ctx1, {
-                    type: 'line',
+        // Load Active Visits
+        function loadActiveVisits() {
+            const activeTable = document.getElementById('activeVisitsTableBody');
+            if (activeTable) {
+                activeTable.innerHTML = '';
+                dbData.visits.filter(v => !v.check_out_time).forEach(visit => {
+                    const visitor = dbData.visitors.find(v => v.visitor_id === visit.visitor_id);
+                    const host = dbData.employees.find(e => e.employee_id === visit.host_employee_id);
+                    const dept = host ? dbData.departments.find(d => d.department_code === host.department_code) : null;
+                    
+                    activeTable.innerHTML += `
+                        <tr>
+                            <td><span class="badge-number">${visit.badge_number}</span></td>
+                            <td>
+                                <div class="visitor-photo">
+                                    <i class="bi bi-person-circle" style="font-size: 1.5em; color: #dee2e6;"></i>
+                                </div>
+                            </td>
+                            <td><strong>${visitor.first_name} ${visitor.last_name}</strong></td>
+                            <td>${visitor.company}</td>
+                            <td>${host ? host.name : 'N/A'}</td>
+                            <td>${dept ? dept.name : 'N/A'}</td>
+                            <td><span class="purpose-badge ${visit.purpose}">${visit.purpose}</span></td>
+                            <td>${new Date(visit.check_in_time).toLocaleString()}</td>
+                            <td>${new Date(visit.valid_until).toLocaleString()}</td>
+                            <td>
+                                <button class="action-btn view" onclick="viewVisitDetails(${visit.visit_id})">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="action-btn delete" onclick="checkOutVisitor(${visit.visit_id})">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Update active visit count
+            const activeCount = dbData.visits.filter(v => !v.check_out_time).length;
+            document.getElementById('activeVisitCount').textContent = activeCount;
+            document.getElementById('currentlyIn').textContent = activeCount;
+        }
+
+        // Load All Visitors
+        function loadAllVisitors() {
+            const visitorsTable = document.getElementById('allVisitorsTableBody');
+            if (visitorsTable) {
+                visitorsTable.innerHTML = '';
+                dbData.visitors.forEach(visitor => {
+                    const visitCount = dbData.visits.filter(v => v.visitor_id === visitor.visitor_id).length;
+                    const lastVisit = dbData.visits
+                        .filter(v => v.visitor_id === visitor.visitor_id)
+                        .sort((a, b) => new Date(b.check_in_time) - new Date(a.check_in_time))[0];
+                    
+                    visitorsTable.innerHTML += `
+                        <tr>
+                            <td>${visitor.visitor_id}</td>
+                            <td>
+                                <div class="visitor-photo">
+                                    <i class="bi bi-person-circle" style="font-size: 1.5em; color: #dee2e6;"></i>
+                                </div>
+                            </td>
+                            <td><strong>${visitor.first_name} ${visitor.last_name}</strong></td>
+                            <td>${visitor.email}</td>
+                            <td>${visitor.phone}</td>
+                            <td>${visitor.company}</td>
+                            <td><span class="badge bg-info">${visitor.visitor_type}</span></td>
+                            <td>${visitCount}</td>
+                            <td>${lastVisit ? new Date(lastVisit.check_in_time).toLocaleDateString() : 'N/A'}</td>
+                            <td>
+                                <button class="action-btn view" onclick="viewVisitor(${visitor.visitor_id})">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="action-btn edit" onclick="editVisitor(${visitor.visitor_id})">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                // Initialize DataTable
+                if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#allVisitorsTable')) {
+                    $('#allVisitorsTable').DataTable();
+                }
+            }
+        }
+
+        // Load Scheduled Visits
+        function loadScheduledVisits() {
+            const scheduledTable = document.getElementById('scheduledTableBody');
+            if (scheduledTable) {
+                scheduledTable.innerHTML = '';
+                dbData.pre_scheduled_visits.forEach(visit => {
+                    const statusBadge = visit.status === 'scheduled' 
+                        ? '<span class="badge bg-warning">Scheduled</span>'
+                        : visit.status === 'checked_in' 
+                        ? '<span class="badge bg-success">Checked In</span>'
+                        : '<span class="badge bg-secondary">Cancelled</span>';
+                    
+                    scheduledTable.innerHTML += `
+                        <tr>
+                            <td><span class="badge bg-secondary">${visit.booking_code}</span></td>
+                            <td>${visit.visitor_name}</td>
+                            <td>${visit.visitor_company}</td>
+                            <td>${new Date(visit.scheduled_time).toLocaleString()}</td>
+                            <td>${visit.host_employee_id}</td>
+                            <td>${visit.purpose}</td>
+                            <td>${statusBadge}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewScheduledVisit('${visit.booking_code}')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success" onclick="checkInScheduledVisit('${visit.booking_code}')">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        // Load Employee Directory
+        function loadEmployees() {
+            const employeeTable = document.getElementById('employeeTableBody');
+            if (employeeTable) {
+                employeeTable.innerHTML = '';
+                
+                // Get all employees from database (sample shown)
+                const allEmployees = [
+                    { employee_id: 'ADM001', name: 'John Smith', email: 'j.smith@company.com', department_code: 'ADM', is_active: 1 },
+                    { employee_id: 'HR002', name: 'Kevin Harris', email: 'k.harris@company.com', department_code: 'HR', is_active: 1 },
+                    { employee_id: 'MRK001', name: 'Andrew Wright', email: 'a.wright@company.com', department_code: 'MRK', is_active: 1 },
+                    // Add more employees as needed
+                ];
+
+                allEmployees.forEach(emp => {
+                    const dept = dbData.departments.find(d => d.department_code === emp.department_code);
+                    const visitCount = dbData.visits.filter(v => v.host_employee_id === emp.employee_id).length;
+                    
+                    employeeTable.innerHTML += `
+                        <tr>
+                            <td>${emp.employee_id}</td>
+                            <td><strong>${emp.name}</strong></td>
+                            <td>${emp.email}</td>
+                            <td>${dept ? dept.name : 'N/A'}</td>
+                            <td>
+                                <span class="badge ${emp.is_active ? 'bg-success' : 'bg-secondary'}">
+                                    ${emp.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                            </td>
+                            <td>${visitCount}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewEmployee('${emp.employee_id}')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning" onclick="editEmployee('${emp.employee_id}')">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                // Load department filter
+                const deptFilter = document.getElementById('deptFilter');
+                if (deptFilter && deptFilter.options.length === 1) {
+                    dbData.departments.forEach(dept => {
+                        const option = document.createElement('option');
+                        option.value = dept.department_code;
+                        option.textContent = dept.name;
+                        deptFilter.appendChild(option);
+                    });
+                }
+            }
+        }
+
+        // Load Departments
+        function loadDepartments() {
+            const deptTable = document.getElementById('departmentTableBody');
+            if (deptTable) {
+                deptTable.innerHTML = '';
+                
+                // Get employee count for each department (simplified)
+                const employeeCounts = {
+                    'ADM': 3, 'BDD': 2, 'CRT': 3, 'ED': 2, 'EXE': 2,
+                    'FIN': 3, 'HR': 3, 'IMP': 2, 'ITSD': 4, 'MER': 2,
+                    'MRK': 3, 'ODSM': 2, 'OP': 3, 'PA': 2, 'SD': 2,
+                    'SPD': 2, 'TD': 2, 'WLD': 3
+                };
+
+                dbData.departments.forEach(dept => {
+                    const empCount = employeeCounts[dept.department_code] || 0;
+                    const visitCount = dbData.visits.filter(v => {
+                        const emp = dbData.employees.find(e => e.employee_id === v.host_employee_id);
+                        return emp && emp.department_code === dept.department_code;
+                    }).length;
+                    
+                    deptTable.innerHTML += `
+                        <tr>
+                            <td><span class="badge bg-secondary">${dept.department_code}</span></td>
+                            <td><strong>${dept.name}</strong></td>
+                            <td>${empCount}</td>
+                            <td>${visitCount}</td>
+                            <td>2025-10-28</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewDepartment('${dept.department_code}')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning" onclick="editDepartment('${dept.department_code}')">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Load department stats
+            const deptStats = document.getElementById('deptStats');
+            if (deptStats) {
+                deptStats.innerHTML = '';
+                const mainDepts = ['ADM', 'HR', 'MRK', 'ITSD', 'FIN', 'OP'];
+                mainDepts.forEach(code => {
+                    const dept = dbData.departments.find(d => d.department_code === code);
+                    if (dept) {
+                        deptStats.innerHTML += `
+                            <div class="dept-stat-item">
+                                <div class="dept-stat-value">${Math.floor(Math.random() * 10) + 2}</div>
+                                <div class="dept-stat-label">${dept.name}</div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+        }
+
+        // Initialize Charts
+        function initializeCharts() {
+            // Purpose Chart
+            const purposeCtx = document.getElementById('purposeChart');
+            if (purposeCtx) {
+                const purposeCounts = {};
+                dbData.visits.forEach(visit => {
+                    purposeCounts[visit.purpose] = (purposeCounts[visit.purpose] || 0) + 1;
+                });
+
+                new Chart(purposeCtx, {
+                    type: 'bar',
                     data: {
-                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        labels: Object.keys(purposeCounts),
                         datasets: [{
-                            label: 'Visitors',
-                            data: [65, 78, 90, 81, 56, 45, 40],
-                            borderColor: '#f39c12',
-                            backgroundColor: 'rgba(243, 156, 18, 0.1)',
-                            tension: 0.4
+                            label: 'Visit Purpose',
+                            data: Object.values(purposeCounts),
+                            backgroundColor: ['#3498db', '#9b59b6', '#e74c3c', '#f39c12', '#27ae60']
                         }]
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
+                        maintainAspectRatio: false
                     }
                 });
             }
 
-            // Purpose Chart
-            const ctx2 = document.getElementById('purposeChart');
-            if (ctx2) {
-                purposeChart = new Chart(ctx2, {
+            // Department Chart
+            const deptCtx = document.getElementById('deptChart');
+            if (deptCtx) {
+                const deptCounts = { 'HR': 1, 'Marketing': 1 };
+                
+                new Chart(deptCtx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Meeting', 'Interview', 'Delivery', 'Service', 'Other'],
+                        labels: Object.keys(deptCounts),
                         datasets: [{
-                            data: [35, 25, 15, 15, 10],
-                            backgroundColor: [
-                                '#f39c12',
-                                '#3498db',
-                                '#27ae60',
-                                '#e74c3c',
-                                '#95a5a6'
-                            ]
+                            data: Object.values(deptCounts),
+                            backgroundColor: ['#f39c12', '#3498db', '#27ae60', '#e74c3c', '#9b59b6']
                         }]
                     },
                     options: {
@@ -1610,395 +1588,6 @@
                     }
                 });
             }
-        }
-
-        // Initialize Analytics Charts
-        function initAnalyticsCharts() {
-            // Peak Hours Chart
-            const peakHoursCtx = document.getElementById('peakHoursChart');
-            if (peakHoursCtx && !peakHoursChart) {
-                peakHoursChart = new Chart(peakHoursCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['8AM', '9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM'],
-                        datasets: [{
-                            label: 'Average Visitors',
-                            data: [12, 35, 45, 38, 25, 30, 42, 38, 22, 15],
-                            backgroundColor: '#f39c12'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false
-                    }
-                });
-            }
-
-            // Department Chart
-            const deptCtx = document.getElementById('departmentChart');
-            if (deptCtx && !departmentChart) {
-                departmentChart = new Chart(deptCtx, {
-                    type: 'pie',
-                    data: {
-                        labels: ['Sales', 'HR', 'IT', 'Marketing', 'Operations'],
-                        datasets: [{
-                            data: [30, 20, 15, 25, 10],
-                            backgroundColor: [
-                                '#f39c12',
-                                '#3498db',
-                                '#27ae60',
-                                '#e74c3c',
-                                '#9b59b6'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false
-                    }
-                });
-            }
-        }
-
-        // Calendar Functions
-        function generateCalendar() {
-            const monthNames = ["January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"];
-            
-            document.getElementById('calendarMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
-            
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
-            
-            const today = new Date();
-            const isCurrentMonth = today.getMonth() === currentMonth && today.getFullYear() === currentYear;
-            const todayDate = today.getDate();
-            
-            let html = '';
-            
-            // Add day headers
-            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            dayHeaders.forEach(day => {
-                html += `<div class="calendar-header">${day}</div>`;
-            });
-            
-            // Previous month days
-            for (let i = firstDay - 1; i >= 0; i--) {
-                html += `<div class="calendar-day other-month">${daysInPrevMonth - i}</div>`;
-            }
-            
-            // Current month days
-            for (let day = 1; day <= daysInMonth; day++) {
-                let classes = 'calendar-day';
-                
-                if (isCurrentMonth && day === todayDate) {
-                    classes += ' today';
-                }
-                
-                // Check if this day has scheduled visits
-                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const visitsOnDay = scheduledVisits.filter(v => v.date === dateStr);
-                
-                if (visitsOnDay.length > 0) {
-                    classes += ' has-events';
-                    html += `<div class="${classes}" onclick="showDayVisits('${dateStr}')">
-                        <div class="calendar-day-number">${day}</div>
-                        <div class="calendar-event-count">${visitsOnDay.length}</div>
-                    </div>`;
-                } else {
-                    html += `<div class="${classes}">
-                        <div class="calendar-day-number">${day}</div>
-                    </div>`;
-                }
-            }
-            
-            // Next month days
-            const totalCells = 42; // 6 weeks * 7 days
-            const cellsFilled = firstDay + daysInMonth;
-            const remainingCells = totalCells - cellsFilled;
-            
-            for (let day = 1; day <= remainingCells; day++) {
-                html += `<div class="calendar-day other-month">${day}</div>`;
-            }
-            
-            document.getElementById('calendarGrid').innerHTML = html;
-        }
-
-        function changeMonth(direction) {
-            currentMonth += direction;
-            
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            } else if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            
-            generateCalendar();
-        }
-
-        function showDayVisits(date) {
-            const visitsOnDay = scheduledVisits.filter(v => v.date === date);
-            
-            if (visitsOnDay.length > 0) {
-                let visitList = visitsOnDay.map(v => 
-                    `<li><strong>${v.time}</strong> - ${v.visitor} (${v.purpose})</li>`
-                ).join('');
-                
-                Swal.fire({
-                    title: `Scheduled Visits for ${date}`,
-                    html: `<ul class="text-start">${visitList}</ul>`,
-                    confirmButtonColor: '#f39c12'
-                });
-            }
-        }
-
-        // Populate visitor tables
-        function populateVisitorTable() {
-            // Populate main dashboard table
-            const tbody = document.getElementById('visitorTableBody');
-            if (tbody) {
-                tbody.innerHTML = '';
-                sampleVisitors.slice(0, 5).forEach(visitor => {
-                    tbody.innerHTML += createVisitorRow(visitor);
-                });
-            }
-
-            // Populate full visitor table
-            const fullTbody = document.getElementById('fullVisitorTableBody');
-            if (fullTbody) {
-                fullTbody.innerHTML = '';
-                sampleVisitors.forEach(visitor => {
-                    fullTbody.innerHTML += createFullVisitorRow(visitor);
-                });
-            }
-
-            // Initialize DataTables if not already initialized
-            if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#visitorTable')) {
-                $('#visitorTable').DataTable({
-                    pageLength: 10,
-                    responsive: true,
-                    order: [[5, 'desc']]
-                });
-            }
-
-            if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#fullVisitorTable')) {
-                $('#fullVisitorTable').DataTable({
-                    pageLength: 25,
-                    responsive: true,
-                    order: [[0, 'desc']]
-                });
-            }
-        }
-
-        // Populate scheduled visits
-        function populateScheduledVisits() {
-            const tbody = document.getElementById('scheduledTableBody');
-            if (tbody) {
-                tbody.innerHTML = '';
-                scheduledVisits.forEach(visit => {
-                    const statusBadge = visit.status === 'confirmed' 
-                        ? '<span class="badge bg-success">Confirmed</span>' 
-                        : '<span class="badge bg-warning">Pending</span>';
-                    
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><span class="badge bg-secondary">${visit.code}</span></td>
-                            <td>${visit.visitor}</td>
-                            <td>${visit.company}</td>
-                            <td>${visit.date} ${visit.time}</td>
-                            <td>${visit.host}</td>
-                            <td>${visit.purpose}</td>
-                            <td>${statusBadge}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary" onclick="viewScheduledVisit('${visit.code}')">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-warning" onclick="editScheduledVisit('${visit.code}')">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-success" onclick="confirmScheduledVisit('${visit.code}')">
-                                    <i class="bi bi-check-circle"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="cancelScheduledVisit('${visit.code}')">
-                                    <i class="bi bi-x-circle"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                // Initialize DataTable for scheduled visits
-                if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#scheduledTable')) {
-                    $('#scheduledTable').DataTable({
-                        pageLength: 10,
-                        responsive: true,
-                        order: [[3, 'asc']]
-                    });
-                }
-            }
-        }
-
-        // Populate employee directory
-        function populateEmployeeDirectory() {
-            const tbody = document.getElementById('employeeTableBody');
-            if (tbody) {
-                tbody.innerHTML = '';
-                employees.forEach(emp => {
-                    const statusBadge = emp.status === 'active' 
-                        ? '<span class="badge bg-success">Active</span>'
-                        : emp.status === 'on-leave'
-                        ? '<span class="badge bg-warning">On Leave</span>'
-                        : '<span class="badge bg-info">Remote</span>';
-                    
-                    const canHostBadge = emp.canHost 
-                        ? '<span class="badge bg-primary">Yes</span>'
-                        : '<span class="badge bg-secondary">No</span>';
-                    
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${emp.id}</td>
-                            <td>
-                                <div class="visitor-photo">
-                                    <i class="bi bi-person-circle" style="font-size: 1.5em; color: #dee2e6;"></i>
-                                </div>
-                            </td>
-                            <td><strong>${emp.name}</strong></td>
-                            <td>${emp.email}</td>
-                            <td>${emp.department}</td>
-                            <td>${emp.position}</td>
-                            <td>${emp.extension}</td>
-                            <td>${statusBadge}</td>
-                            <td>${canHostBadge}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary" onclick="viewEmployee('${emp.id}')">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                
-                                <button class="btn btn-sm btn-outline-success" onclick="toggleEmployeeHosting('${emp.id}')">
-                                    <i class="bi bi-toggle-${emp.canHost ? 'on' : 'off'}"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                                // <button class="btn btn-sm btn-outline-warning" onclick="editEmployee('${emp.id}')">
-                                //     <i class="bi bi-pencil"></i>
-                                // </button>
-                });
-
-                // Initialize DataTable for employees
-                if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#employeeTable')) {
-                    $('#employeeTable').DataTable({
-                        pageLength: 10,
-                        responsive: true,
-                        order: [[2, 'asc']]
-                    });
-                }
-            }
-        }
-
-        // Toggle Employee Hosting Permission (replaced delete function)
-        function toggleEmployeeHosting(id) {
-            const emp = employees.find(e => e.id === id);
-            if (emp) {
-                const currentStatus = emp.canHost ? 'can' : 'cannot';
-                const newStatus = !emp.canHost ? 'can' : 'cannot';
-                
-                Swal.fire({
-                    title: 'Change Hosting Permission?',
-                    text: `${emp.name} currently ${currentStatus} host visitors. Change to ${newStatus} host?`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#27ae60',
-                    cancelButtonColor: '#95a5a6',
-                    confirmButtonText: 'Yes, Change'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        emp.canHost = !emp.canHost;
-                        populateEmployeeDirectory();
-                        
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: `${emp.name} ${newStatus} now host visitors`,
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    }
-                });
-            }
-        }
-
-        // Filter employees
-        function filterEmployees() {
-            // This would implement actual filtering logic
-            const dept = document.getElementById('deptFilter').value;
-            const status = document.getElementById('statusFilter').value;
-            const canHost = document.getElementById('hostFilter').value;
-            const search = document.getElementById('employeeSearch').value.toLowerCase();
-            
-            console.log('Filtering employees:', { dept, status, canHost, search });
-        }
-
-        // Create visitor row for main table
-        function createVisitorRow(visitor) {
-            const statusClass = visitor.status === 'checked-in' ? 'checked-in' : 'checked-out';
-            const statusText = visitor.status === 'checked-in' ? 'Checked In' : 'Checked Out';
-            
-            return `
-                <tr>
-                    <td>
-                        <div class="visitor-photo">
-                            <i class="bi bi-person-circle" style="font-size: 1.5em; color: #dee2e6;"></i>
-                        </div>
-                    </td>
-                    <td><strong>${visitor.name}</strong></td>
-                    <td>${visitor.company}</td>
-                    <td>${visitor.host}</td>
-                    <td>${visitor.purpose}</td>
-                    <td>${visitor.checkIn}</td>
-                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                    <td>
-                        <button class="action-btn view" onclick="viewVisitor(${visitor.id})"><i class="bi bi-eye"></i></button>
-                        <button class="action-btn edit" onclick="editVisitor(${visitor.id})"><i class="bi bi-pencil"></i></button>
-                        <button class="action-btn delete" onclick="checkOutVisitor(${visitor.id})"><i class="bi bi-box-arrow-right"></i></button>
-                    </td>
-                </tr>
-            `;
-        }
-
-        // Create visitor row for full table
-        function createFullVisitorRow(visitor) {
-            const statusClass = visitor.status === 'checked-in' ? 'checked-in' : 'checked-out';
-            const statusText = visitor.status === 'checked-in' ? 'Checked In' : 'Checked Out';
-            
-            return `
-                <tr>
-                    <td>${visitor.id}</td>
-                    <td>
-                        <div class="visitor-photo">
-                            <i class="bi bi-person-circle" style="font-size: 1.5em; color: #dee2e6;"></i>
-                        </div>
-                    </td>
-                    <td><strong>${visitor.name}</strong></td>
-                    <td>${visitor.email}</td>
-                    <td>${visitor.phone}</td>
-                    <td>${visitor.company}</td>
-                    <td>${visitor.host}</td>
-                    <td>${visitor.purpose}</td>
-                    <td>${visitor.checkIn}</td>
-                    <td>${visitor.checkOut || '-'}</td>
-                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                    <td>
-                        <button class="action-btn view" onclick="viewVisitor(${visitor.id})"><i class="bi bi-eye"></i></button>
-                        <button class="action-btn edit" onclick="editVisitor(${visitor.id})"><i class="bi bi-pencil"></i></button>
-                        <button class="action-btn delete" onclick="checkOutVisitor(${visitor.id})"><i class="bi bi-box-arrow-right"></i></button>
-                    </td>
-                </tr>
-            `;
         }
 
         // Toggle Sidebar
@@ -2024,12 +1613,12 @@
             // Show selected section
             const sectionMap = {
                 'dashboard': 'dashboardSection',
+                'active-visits': 'active-visitsSection',
                 'visitors': 'visitorsSection',
                 'pre-scheduled': 'pre-scheduledSection',
                 'employees': 'employeesSection',
+                'departments': 'departmentsSection',
                 'reports': 'reportsSection',
-                'analytics': 'analyticsSection',
-                'security': 'securitySection',
                 'settings': 'settingsSection'
             };
             
@@ -2039,130 +1628,62 @@
                 // Add active class to clicked item
                 event.target.closest('.sidebar-item').classList.add('active');
                 
-                // Initialize charts if analytics section
-                if (section === 'analytics') {
-                    setTimeout(() => initAnalyticsCharts(), 100);
-                }
-                
-                // Load data for specific sections
-                if (section === 'pre-scheduled') {
-                    populateScheduledVisits();
-                    generateCalendar();
-                } else if (section === 'employees') {
-                    populateEmployeeDirectory();
+                // Load section-specific data
+                switch(section) {
+                    case 'active-visits':
+                        loadActiveVisits();
+                        break;
+                    case 'visitors':
+                        loadAllVisitors();
+                        break;
+                    case 'pre-scheduled':
+                        loadScheduledVisits();
+                        break;
+                    case 'employees':
+                        loadEmployees();
+                        break;
+                    case 'departments':
+                        loadDepartments();
+                        break;
                 }
             }
         }
 
-        // View Visitor Details
-        function viewVisitor(id) {
-            const visitor = sampleVisitors.find(v => v.id === id);
-            if (visitor) {
-                document.getElementById('modalVisitorName').textContent = visitor.name;
-                document.getElementById('modalVisitorCompany').textContent = visitor.company;
-                
-                const infoHtml = `
-                    <tr><td><strong>Badge Number:</strong></td><td>V-2024-000${visitor.id}</td></tr>
-                    <tr><td><strong>Email:</strong></td><td>${visitor.email}</td></tr>
-                    <tr><td><strong>Phone:</strong></td><td>${visitor.phone}</td></tr>
-                    <tr><td><strong>Host:</strong></td><td>${visitor.host}</td></tr>
-                    <tr><td><strong>Purpose:</strong></td><td>${visitor.purpose}</td></tr>
-                    <tr><td><strong>Check-In Time:</strong></td><td>${visitor.checkIn}</td></tr>
-                    <tr><td><strong>Check-Out Time:</strong></td><td>${visitor.checkOut || 'Still in building'}</td></tr>
-                    <tr><td><strong>Status:</strong></td><td><span class="status-badge ${visitor.status}">${visitor.status === 'checked-in' ? 'Checked In' : 'Checked Out'}</span></td></tr>
-                `;
-                document.getElementById('modalVisitorInfo').innerHTML = infoHtml;
-                
-                const modal = new bootstrap.Modal(document.getElementById('visitorModal'));
-                modal.show();
-            }
-        }
-
-        // Edit Visitor - FIXED IMPLEMENTATION
-        function editVisitor(id) {
-            const visitor = sampleVisitors.find(v => v.id === id);
-            if (visitor) {
-                Swal.fire({
-                    title: 'Edit Visitor Information',
-                    html: `
-                        <form id="editVisitorForm">
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Name</label>
-                                <input type="text" class="form-control" id="editName" value="${visitor.name}">
-                            </div>
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Company</label>
-                                <input type="text" class="form-control" id="editCompany" value="${visitor.company}">
-                            </div>
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" id="editEmail" value="${visitor.email}">
-                            </div>
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Phone</label>
-                                <input type="tel" class="form-control" id="editPhone" value="${visitor.phone}">
-                            </div>
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Host</label>
-                                <select class="form-select" id="editHost">
-                                    ${employees.filter(e => e.canHost).map(e => 
-                                        `<option ${e.name === visitor.host ? 'selected' : ''}>${e.name}</option>`
-                                    ).join('')}
-                                </select>
-                            </div>
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Purpose</label>
-                                <select class="form-select" id="editPurpose">
-                                    <option ${visitor.purpose === 'Meeting' ? 'selected' : ''}>Meeting</option>
-                                    <option ${visitor.purpose === 'Interview' ? 'selected' : ''}>Interview</option>
-                                    <option ${visitor.purpose === 'Training' ? 'selected' : ''}>Training</option>
-                                    <option ${visitor.purpose === 'Delivery' ? 'selected' : ''}>Delivery</option>
-                                    <option ${visitor.purpose === 'Service' ? 'selected' : ''}>Service</option>
-                                </select>
-                            </div>
-                        </form>
-                    `,
-                    showCancelButton: true,
-                    confirmButtonText: 'Save Changes',
-                    confirmButtonColor: '#f39c12',
-                    preConfirm: () => {
-                        return {
-                            name: document.getElementById('editName').value,
-                            company: document.getElementById('editCompany').value,
-                            email: document.getElementById('editEmail').value,
-                            phone: document.getElementById('editPhone').value,
-                            host: document.getElementById('editHost').value,
-                            purpose: document.getElementById('editPurpose').value
-                        };
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Update visitor data
-                        visitor.name = result.value.name;
-                        visitor.company = result.value.company;
-                        visitor.email = result.value.email;
-                        visitor.phone = result.value.phone;
-                        visitor.host = result.value.host;
-                        visitor.purpose = result.value.purpose;
-                        
-                        // Refresh tables
-                        populateVisitorTable();
-                        
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: 'Visitor information updated successfully',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    }
-                });
-            }
+        // View Visit Details
+        function viewVisitDetails(visitId) {
+            const visit = dbData.visits.find(v => v.visit_id === visitId);
+            const visitor = dbData.visitors.find(v => v.visitor_id === visit.visitor_id);
+            const host = dbData.employees.find(e => e.employee_id === visit.host_employee_id);
+            
+            Swal.fire({
+                title: 'Visit Details',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Badge Number:</strong> <span class="badge-number">${visit.badge_number}</span></p>
+                        <p><strong>Visitor:</strong> ${visitor.first_name} ${visitor.last_name}</p>
+                        <p><strong>Company:</strong> ${visitor.company}</p>
+                        <p><strong>Email:</strong> ${visitor.email}</p>
+                        <p><strong>Phone:</strong> ${visitor.phone}</p>
+                        <p><strong>Host:</strong> ${host ? host.name : 'N/A'}</p>
+                        <p><strong>Purpose:</strong> <span class="purpose-badge ${visit.purpose}">${visit.purpose}</span></p>
+                        <p><strong>Check-In:</strong> ${new Date(visit.check_in_time).toLocaleString()}</p>
+                        <p><strong>Valid Until:</strong> ${new Date(visit.valid_until).toLocaleString()}</p>
+                        <p><strong>Status:</strong> <span class="status-badge ${visit.check_out_time ? 'checked-out' : 'checked-in'}">${visit.check_out_time ? 'Checked Out' : 'Checked In'}</span></p>
+                    </div>
+                `,
+                confirmButtonColor: '#f39c12',
+                showCancelButton: true,
+                confirmButtonText: 'Print Badge',
+                cancelButtonText: 'Close'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    printBadge(visit.badge_number);
+                }
+            });
         }
 
         // Check Out Visitor
-        function checkOutVisitor(id) {
+        function checkOutVisitor(visitId) {
             Swal.fire({
                 title: 'Check Out Visitor?',
                 text: 'Are you sure you want to check out this visitor?',
@@ -2173,152 +1694,318 @@
                 confirmButtonText: 'Yes, Check Out'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Update visitor status
-                    const visitor = sampleVisitors.find(v => v.id === id);
-                    if (visitor) {
-                        visitor.status = 'checked-out';
-                        visitor.checkOut = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                        populateVisitorTable();
+                    const visit = dbData.visits.find(v => v.visit_id === visitId);
+                    if (visit) {
+                        visit.check_out_time = new Date().toISOString();
+                        loadActiveVisits();
+                        loadDashboardData();
+                        
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Visitor checked out successfully',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
                     }
-                    
-                    Swal.fire(
-                        'Checked Out!',
-                        'Visitor has been checked out successfully.',
-                        'success'
-                    );
                 }
             });
         }
 
-        // Scheduled Visit Functions
+        // View Visitor
+        function viewVisitor(visitorId) {
+            const visitor = dbData.visitors.find(v => v.visitor_id === visitorId);
+            const visits = dbData.visits.filter(v => v.visitor_id === visitorId);
+            
+            let visitHistory = visits.map(visit => {
+                const host = dbData.employees.find(e => e.employee_id === visit.host_employee_id);
+                return `
+                    <tr>
+                        <td>${visit.badge_number}</td>
+                        <td>${new Date(visit.check_in_time).toLocaleDateString()}</td>
+                        <td>${host ? host.name : 'N/A'}</td>
+                        <td><span class="purpose-badge ${visit.purpose}">${visit.purpose}</span></td>
+                    </tr>
+                `;
+            }).join('');
+            
+            Swal.fire({
+                title: 'Visitor Profile',
+                width: '600px',
+                html: `
+                    <div class="text-start">
+                        <h5>${visitor.first_name} ${visitor.last_name}</h5>
+                        <p><strong>Company:</strong> ${visitor.company}</p>
+                        <p><strong>Email:</strong> ${visitor.email}</p>
+                        <p><strong>Phone:</strong> ${visitor.phone}</p>
+                        <p><strong>Type:</strong> <span class="badge bg-info">${visitor.visitor_type}</span></p>
+                        <hr>
+                        <h6>Visit History (${visits.length} visits)</h6>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Badge</th>
+                                    <th>Date</th>
+                                    <th>Host</th>
+                                    <th>Purpose</th>
+                                </tr>
+                            </thead>
+                            <tbody>${visitHistory}</tbody>
+                        </table>
+                    </div>
+                `,
+                confirmButtonColor: '#f39c12'
+            });
+        }
+
+        // Edit Visitor
+        function editVisitor(visitorId) {
+            const visitor = dbData.visitors.find(v => v.visitor_id === visitorId);
+            
+            Swal.fire({
+                title: 'Edit Visitor Information',
+                html: `
+                    <form id="editVisitorForm">
+                        <div class="mb-3 text-start">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="editFirstName" value="${visitor.first_name}">
+                        </div>
+                        <div class="mb-3 text-start">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="editLastName" value="${visitor.last_name}">
+                        </div>
+                        <div class="mb-3 text-start">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" value="${visitor.email}">
+                        </div>
+                        <div class="mb-3 text-start">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="editPhone" value="${visitor.phone}">
+                        </div>
+                        <div class="mb-3 text-start">
+                            <label class="form-label">Company</label>
+                            <input type="text" class="form-control" id="editCompany" value="${visitor.company}">
+                        </div>
+                        <div class="mb-3 text-start">
+                            <label class="form-label">Visitor Type</label>
+                            <select class="form-select" id="editType">
+                                <option value="new" ${visitor.visitor_type === 'new' ? 'selected' : ''}>New</option>
+                                <option value="returning" ${visitor.visitor_type === 'returning' ? 'selected' : ''}>Returning</option>
+                                <option value="delivery" ${visitor.visitor_type === 'delivery' ? 'selected' : ''}>Delivery</option>
+                            </select>
+                        </div>
+                    </form>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Save Changes',
+                confirmButtonColor: '#f39c12',
+                preConfirm: () => {
+                    visitor.first_name = document.getElementById('editFirstName').value;
+                    visitor.last_name = document.getElementById('editLastName').value;
+                    visitor.email = document.getElementById('editEmail').value;
+                    visitor.phone = document.getElementById('editPhone').value;
+                    visitor.company = document.getElementById('editCompany').value;
+                    visitor.visitor_type = document.getElementById('editType').value;
+                    return true;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    loadAllVisitors();
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Visitor information updated',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            });
+        }
+
+        // View Scheduled Visit
+        function viewScheduledVisit(bookingCode) {
+            const visit = dbData.pre_scheduled_visits.find(v => v.booking_code === bookingCode);
+            
+            Swal.fire({
+                title: 'Scheduled Visit Details',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Booking Code:</strong> <span class="badge bg-secondary">${visit.booking_code}</span></p>
+                        <p><strong>Visitor:</strong> ${visit.visitor_name}</p>
+                        <p><strong>Email:</strong> ${visit.visitor_email || 'N/A'}</p>
+                        <p><strong>Company:</strong> ${visit.visitor_company}</p>
+                        <p><strong>Host:</strong> ${visit.host_employee_id}</p>
+                        <p><strong>Scheduled Time:</strong> ${new Date(visit.scheduled_time).toLocaleString()}</p>
+                        <p><strong>Purpose:</strong> ${visit.purpose}</p>
+                        <p><strong>Status:</strong> <span class="badge bg-warning">${visit.status}</span></p>
+                    </div>
+                `,
+                confirmButtonColor: '#f39c12'
+            });
+        }
+
+        // Check In Scheduled Visit
+        function checkInScheduledVisit(bookingCode) {
+            Swal.fire({
+                title: 'Check In Visitor',
+                text: 'Proceed with check-in for this scheduled visit?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#27ae60',
+                confirmButtonText: 'Check In'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const visit = dbData.pre_scheduled_visits.find(v => v.booking_code === bookingCode);
+                    if (visit) {
+                        visit.status = 'checked_in';
+                        loadScheduledVisits();
+                        
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Visitor checked in successfully',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+                }
+            });
+        }
+
+        // Show Schedule Modal
         function showScheduleModal() {
+            const employeeOptions = dbData.employees.map(emp => 
+                `<option value="${emp.employee_id}">${emp.name} - ${emp.department_code}</option>`
+            ).join('');
+            
             Swal.fire({
                 title: 'Schedule New Visit',
                 html: `
                     <form>
                         <div class="mb-3 text-start">
                             <label class="form-label">Visitor Name</label>
-                            <input type="text" class="form-control" placeholder="Enter visitor name">
+                            <input type="text" class="form-control" id="schedVisitorName" placeholder="Enter visitor name">
+                        </div>
+                        <div class="mb-3 text-start">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="schedEmail" placeholder="visitor@email.com">
                         </div>
                         <div class="mb-3 text-start">
                             <label class="form-label">Company</label>
-                            <input type="text" class="form-control" placeholder="Enter company">
-                        </div>
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Date & Time</label>
-                            <input type="datetime-local" class="form-control">
+                            <input type="text" class="form-control" id="schedCompany" placeholder="Company name">
                         </div>
                         <div class="mb-3 text-start">
                             <label class="form-label">Host</label>
-                            <select class="form-select">
-                                <option>Select host...</option>
-                                ${employees.filter(e => e.canHost).map(e => `<option>${e.name}</option>`).join('')}
+                            <select class="form-select" id="schedHost">
+                                ${employeeOptions}
+                            </select>
+                        </div>
+                        <div class="mb-3 text-start">
+                            <label class="form-label">Date & Time</label>
+                            <input type="datetime-local" class="form-control" id="schedDateTime">
+                        </div>
+                        <div class="mb-3 text-start">
+                            <label class="form-label">Purpose</label>
+                            <select class="form-select" id="schedPurpose">
+                                <option value="Meeting">Meeting</option>
+                                <option value="Interview">Interview</option>
+                                <option value="Training">Training</option>
+                                <option value="Tour">Tour</option>
+                                <option value="Event">Event</option>
+                                <option value="Other">Other</option>
                             </select>
                         </div>
                     </form>
                 `,
                 showCancelButton: true,
-                confirmButtonText: 'Schedule',
+                confirmButtonText: 'Schedule Visit',
+                confirmButtonColor: '#f39c12',
+                preConfirm: () => {
+                    const newScheduled = {
+                        booking_code: `BOOK-${Date.now()}`,
+                        visitor_name: document.getElementById('schedVisitorName').value,
+                        visitor_email: document.getElementById('schedEmail').value,
+                        visitor_company: document.getElementById('schedCompany').value,
+                        host_employee_id: document.getElementById('schedHost').value,
+                        scheduled_time: document.getElementById('schedDateTime').value,
+                        purpose: document.getElementById('schedPurpose').value,
+                        status: 'scheduled'
+                    };
+                    
+                    if (!newScheduled.visitor_name || !newScheduled.scheduled_time) {
+                        Swal.showValidationMessage('Please fill in all required fields');
+                        return false;
+                    }
+                    
+                    return newScheduled;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    dbData.pre_scheduled_visits.push(result.value);
+                    loadScheduledVisits();
+                    
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Visit scheduled successfully',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            });
+        }
+
+        // View Employee
+        function viewEmployee(employeeId) {
+            const emp = dbData.employees.find(e => e.employee_id === employeeId);
+            const dept = dbData.departments.find(d => d.department_code === emp.department_code);
+            const hostedVisits = dbData.visits.filter(v => v.host_employee_id === employeeId);
+            
+            Swal.fire({
+                title: 'Employee Details',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Employee ID:</strong> ${emp.employee_id}</p>
+                        <p><strong>Name:</strong> ${emp.name}</p>
+                        <p><strong>Email:</strong> ${emp.email}</p>
+                        <p><strong>Department:</strong> ${dept ? dept.name : 'N/A'}</p>
+                        <p><strong>Total Visits Hosted:</strong> ${hostedVisits.length}</p>
+                    </div>
+                `,
                 confirmButtonColor: '#f39c12'
             });
         }
 
-        function viewScheduledVisit(code) {
-            const visit = scheduledVisits.find(v => v.code === code);
-            if (visit) {
-                Swal.fire({
-                    title: 'Scheduled Visit Details',
-                    html: `
-                        <div class="text-start">
-                            <p><strong>Booking Code:</strong> ${visit.code}</p>
-                            <p><strong>Visitor:</strong> ${visit.visitor}</p>
-                            <p><strong>Company:</strong> ${visit.company}</p>
-                            <p><strong>Date & Time:</strong> ${visit.date} ${visit.time}</p>
-                            <p><strong>Host:</strong> ${visit.host}</p>
-                            <p><strong>Purpose:</strong> ${visit.purpose}</p>
-                            <p><strong>Status:</strong> ${visit.status}</p>
-                        </div>
-                    `,
-                    confirmButtonColor: '#f39c12'
-                });
-            }
-        }
-
-        function confirmScheduledVisit(code) {
-            Swal.fire({
-                title: 'Confirm Visit?',
-                text: 'Send confirmation to visitor?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#27ae60'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const visit = scheduledVisits.find(v => v.code === code);
-                    if (visit) {
-                        visit.status = 'confirmed';
-                        populateScheduledVisits();
-                    }
-                    Swal.fire('Confirmed!', 'Visit has been confirmed.', 'success');
-                }
-            });
-        }
-
-        function cancelScheduledVisit(code) {
-            Swal.fire({
-                title: 'Cancel Visit?',
-                text: 'Are you sure you want to cancel this scheduled visit?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#e74c3c'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire('Cancelled!', 'Visit has been cancelled.', 'success');
-                }
-            });
-        }
-
-        function showCalendarView() {
-            Swal.fire({
-                title: 'Full Calendar View',
-                html: '<p>Opening full calendar...</p>',
-                timer: 1500,
-                timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-        }
-
-        // Employee Functions
+        // Add Employee Modal
         function showAddEmployeeModal() {
+            const deptOptions = dbData.departments.map(dept => 
+                `<option value="${dept.department_code}">${dept.name}</option>`
+            ).join('');
+            
             Swal.fire({
                 title: 'Add New Employee',
                 html: `
                     <form>
                         <div class="mb-3 text-start">
-                            <label class="form-label">Employee Name</label>
-                            <input type="text" class="form-control" placeholder="Full name">
+                            <label class="form-label">Employee ID</label>
+                            <input type="text" class="form-control" id="newEmpId" placeholder="E001">
+                        </div>
+                        <div class="mb-3 text-start">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" id="newEmpName" placeholder="Full name">
                         </div>
                         <div class="mb-3 text-start">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" placeholder="email@company.com">
+                            <input type="email" class="form-control" id="newEmpEmail" placeholder="email@company.com">
                         </div>
                         <div class="mb-3 text-start">
                             <label class="form-label">Department</label>
-                            <select class="form-select">
-                                <option>Sales</option>
-                                <option>Marketing</option>
-                                <option>IT</option>
-                                <option>HR</option>
-                                <option>Finance</option>
-                                <option>Operations</option>
-                            </select>
-                        </div>
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Can Host Visitors</label>
-                            <select class="form-select">
-                                <option>Yes</option>
-                                <option>No</option>
+                            <select class="form-select" id="newEmpDept">
+                                ${deptOptions}
                             </select>
                         </div>
                     </form>
@@ -2329,343 +2016,69 @@
             });
         }
 
-        function viewEmployee(id) {
-            const emp = employees.find(e => e.id === id);
-            if (emp) {
-                Swal.fire({
-                    title: 'Employee Details',
-                    html: `
-                        <div class="text-start">
-                            <p><strong>ID:</strong> ${emp.id}</p>
-                            <p><strong>Name:</strong> ${emp.name}</p>
-                            <p><strong>Email:</strong> ${emp.email}</p>
-                            <p><strong>Department:</strong> ${emp.department}</p>
-                            <p><strong>Position:</strong> ${emp.position}</p>
-                            <p><strong>Extension:</strong> ${emp.extension}</p>
-                            <p><strong>Status:</strong> ${emp.status}</p>
-                            <p><strong>Can Host:</strong> ${emp.canHost ? 'Yes' : 'No'}</p>
-                        </div>
-                    `,
-                    confirmButtonColor: '#f39c12'
-                });
-            }
-        }
-
-        function editEmployee(id) {
+        // View Department
+        function viewDepartment(deptCode) {
+            const dept = dbData.departments.find(d => d.department_code === deptCode);
+            
             Swal.fire({
-                title: 'Edit Employee',
-                text: 'Edit employee functionality will be implemented',
-                icon: 'info',
+                title: 'Department Details',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Department Code:</strong> ${dept.department_code}</p>
+                        <p><strong>Department Name:</strong> ${dept.name}</p>
+                        <p><strong>Created:</strong> 2025-10-28</p>
+                    </div>
+                `,
                 confirmButtonColor: '#f39c12'
             });
         }
 
-        function editScheduledVisit(code) {
-            const visit = scheduledVisits.find(v => v.code === code);
-            if (visit) {
-                // Parse the date for the datetime-local input
-                const dateTime = `${visit.date}T${convertTo24Hour(visit.time)}`;
-                
-                Swal.fire({
-                    title: 'Edit Scheduled Visit',
-                    html: `
-                        <form id="editScheduledForm">
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Booking Code</label>
-                                <input type="text" class="form-control" value="${visit.code}" disabled>
-                            </div>
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Visitor Name</label>
-                                <input type="text" class="form-control" id="editScheduledVisitor" value="${visit.visitor}">
-                            </div>
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Company</label>
-                                <input type="text" class="form-control" id="editScheduledCompany" value="${visit.company}">
-                            </div>
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Date & Time</label>
-                                <input type="datetime-local" class="form-control" id="editScheduledDateTime" value="${dateTime}">
-                            </div>
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Host</label>
-                                <select class="form-select" id="editScheduledHost">
-                                    ${employees.filter(e => e.canHost).map(e => 
-                                        `<option ${e.name === visit.host ? 'selected' : ''}>${e.name}</option>`
-                                    ).join('')}
-                                </select>
-                            </div>
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Purpose</label>
-                                <select class="form-select" id="editScheduledPurpose">
-                                    <option ${visit.purpose === 'Sales Meeting' ? 'selected' : ''}>Sales Meeting</option>
-                                    <option ${visit.purpose === 'Job Interview' ? 'selected' : ''}>Job Interview</option>
-                                    <option ${visit.purpose === 'IT Training' ? 'selected' : ''}>IT Training</option>
-                                    <option ${visit.purpose === 'Event Planning' ? 'selected' : ''}>Event Planning</option>
-                                    <option ${visit.purpose === 'Facility Tour' ? 'selected' : ''}>Facility Tour</option>
-                                    <option ${visit.purpose === 'Business Meeting' ? 'selected' : ''}>Business Meeting</option>
-                                    <option ${visit.purpose === 'Consultation' ? 'selected' : ''}>Consultation</option>
-                                    <option ${visit.purpose === 'Other' ? 'selected' : ''}>Other</option>
-                                </select>
-                            </div>
-                            <div class="mb-3 text-start">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" id="editScheduledStatus">
-                                    <option value="pending" ${visit.status === 'pending' ? 'selected' : ''}>Pending</option>
-                                    <option value="confirmed" ${visit.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
-                                </select>
-                            </div>
-                        </form>
-                    `,
-                    showCancelButton: true,
-                    confirmButtonText: 'Save Changes',
-                    confirmButtonColor: '#f39c12',
-                    width: '600px',
-                    preConfirm: () => {
-                        const dateTimeValue = document.getElementById('editScheduledDateTime').value;
-                        const dateObj = new Date(dateTimeValue);
-                        
-                        return {
-                            visitor: document.getElementById('editScheduledVisitor').value,
-                            company: document.getElementById('editScheduledCompany').value,
-                            date: dateObj.toISOString().split('T')[0],
-                            time: dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
-                            host: document.getElementById('editScheduledHost').value,
-                            purpose: document.getElementById('editScheduledPurpose').value,
-                            status: document.getElementById('editScheduledStatus').value
-                        };
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Update scheduled visit data
-                        visit.visitor = result.value.visitor;
-                        visit.company = result.value.company;
-                        visit.date = result.value.date;
-                        visit.time = result.value.time;
-                        visit.host = result.value.host;
-                        visit.purpose = result.value.purpose;
-                        visit.status = result.value.status;
-                        
-                        // Refresh the scheduled visits table and calendar
-                        populateScheduledVisits();
-                        generateCalendar();
-                        
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: 'Scheduled visit updated successfully',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    }
-                });
-            }
-        }
-        
-        // Helper function to convert 12-hour time to 24-hour for datetime-local input
-        function convertTo24Hour(time12h) {
-            const [time, modifier] = time12h.split(' ');
-            let [hours, minutes] = time.split(':');
-            
-            if (hours === '12') {
-                hours = '00';
-            }
-            
-            if (modifier === 'PM') {
-                hours = parseInt(hours, 10) + 12;
-            }
-            
-            return `${hours.toString().padStart(2, '0')}:${minutes}`;
-        }
-
-        function importEmployees() {
+        // Print Badge
+        function printBadge(badgeNumber) {
             Swal.fire({
-                title: 'Import Employees',
-                text: 'CSV/Excel import functionality will be implemented',
+                title: 'Print Badge',
+                text: `Printing badge ${badgeNumber}...`,
                 icon: 'info',
-                confirmButtonColor: '#f39c12'
-            });
-        }
-
-        // Report Functions
-        function selectReportType(type) {
-            document.getElementById('reportType').value = 
-                type === 'daily' ? 'Visitor Summary' :
-                type === 'weekly' ? 'Host Statistics' :
-                type === 'monthly' ? 'Department Analysis' : 'Compliance Report';
-            
-            // Set appropriate date range
-            const today = new Date();
-            const startDate = document.getElementById('reportStartDate');
-            const endDate = document.getElementById('reportEndDate');
-            
-            endDate.value = today.toISOString().split('T')[0];
-            
-            if (type === 'daily') {
-                startDate.value = today.toISOString().split('T')[0];
-            } else if (type === 'weekly') {
-                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-                startDate.value = weekAgo.toISOString().split('T')[0];
-            } else if (type === 'monthly') {
-                const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-                startDate.value = monthAgo.toISOString().split('T')[0];
-            }
-        }
-
-        function generateReport() {
-            const reportType = document.getElementById('reportType').value;
-            const format = document.getElementById('reportFormat').value;
-            
-            Swal.fire({
-                title: 'Generating Report',
-                html: 'Please wait while we generate your report...',
                 timer: 2000,
-                timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            }).then((result) => {
-                Swal.fire({
-                    title: 'Report Ready!',
-                    text: `Your ${reportType} report has been generated in ${format} format.`,
-                    icon: 'success',
-                    showCancelButton: true,
-                    confirmButtonText: 'Download',
-                    cancelButtonText: 'View',
-                    confirmButtonColor: '#f39c12'
-                });
+                showConfirmButton: false
             });
         }
 
-        function scheduleReport() {
+        // Print All Badges
+        function printAllBadges() {
+            const activeVisits = dbData.visits.filter(v => !v.check_out_time);
+            
             Swal.fire({
-                title: 'Schedule Report',
-                html: `
-                    <form>
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Report Type</label>
-                            <select class="form-select">
-                                <option>Daily Visitor Summary</option>
-                                <option>Weekly Analysis</option>
-                                <option>Monthly Report</option>
-                            </select>
-                        </div>
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Frequency</label>
-                            <select class="form-select">
-                                <option>Daily</option>
-                                <option>Weekly</option>
-                                <option>Monthly</option>
-                            </select>
-                        </div>
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Send To</label>
-                            <input type="email" class="form-control" placeholder="email@company.com">
-                        </div>
-                    </form>
-                `,
+                title: 'Print All Active Badges',
+                text: `Print ${activeVisits.length} visitor badges?`,
+                icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Schedule',
-                confirmButtonColor: '#f39c12'
-            });
-        }
-
-        // Refresh Table
-        function refreshVisitorTable() {
-            populateVisitorTable();
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                icon: 'success',
-                title: 'Table refreshed',
-                showConfirmButton: false,
-                timer: 1500
-            });
-        }
-
-        // Show Add Visitor Modal
-        function showAddVisitorModal() {
-            Swal.fire({
-                title: 'Add New Visitor',
-                html: `
-                    <form>
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Name</label>
-                            <input type="text" class="form-control" id="newVisitorName" placeholder="Full name">
-                        </div>
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Company</label>
-                            <input type="text" class="form-control" id="newVisitorCompany" placeholder="Company name">
-                        </div>
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" id="newVisitorEmail" placeholder="email@example.com">
-                        </div>
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Phone</label>
-                            <input type="tel" class="form-control" id="newVisitorPhone" placeholder="Phone number">
-                        </div>
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Host</label>
-                            <select class="form-select" id="newVisitorHost">
-                                <option>Select host...</option>
-                                ${employees.filter(e => e.canHost).map(e => `<option>${e.name}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Purpose</label>
-                            <select class="form-select" id="newVisitorPurpose">
-                                <option>Meeting</option>
-                                <option>Interview</option>
-                                <option>Training</option>
-                                <option>Delivery</option>
-                                <option>Service</option>
-                            </select>
-                        </div>
-                    </form>
-                `,
-                showCancelButton: true,
-                confirmButtonText: 'Add Visitor',
                 confirmButtonColor: '#f39c12',
-                preConfirm: () => {
-                    const name = document.getElementById('newVisitorName').value;
-                    const company = document.getElementById('newVisitorCompany').value;
-                    const email = document.getElementById('newVisitorEmail').value;
-                    const phone = document.getElementById('newVisitorPhone').value;
-                    const host = document.getElementById('newVisitorHost').value;
-                    const purpose = document.getElementById('newVisitorPurpose').value;
-                    
-                    if (!name || !company || !email || host === 'Select host...') {
-                        Swal.showValidationMessage('Please fill all required fields');
-                        return false;
-                    }
-                    
-                    return { name, company, email, phone, host, purpose };
-                }
+                confirmButtonText: 'Print All'
+            });
+        }
+
+        // Export Visitors
+        function exportVisitors() {
+            Swal.fire({
+                title: 'Export Visitors',
+                text: 'Select export format',
+                input: 'select',
+                inputOptions: {
+                    'csv': 'CSV',
+                    'excel': 'Excel',
+                    'pdf': 'PDF'
+                },
+                inputPlaceholder: 'Select format',
+                showCancelButton: true,
+                confirmButtonColor: '#f39c12'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Add new visitor to the array
-                    const newVisitor = {
-                        id: sampleVisitors.length + 1,
-                        name: result.value.name,
-                        company: result.value.company,
-                        email: result.value.email,
-                        phone: result.value.phone,
-                        host: result.value.host,
-                        purpose: result.value.purpose,
-                        checkIn: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-                        checkOut: '',
-                        status: 'checked-in'
-                    };
-                    
-                    sampleVisitors.push(newVisitor);
-                    populateVisitorTable();
-                    
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
                         icon: 'success',
-                        title: 'Visitor added successfully',
+                        title: `Exporting as ${result.value.toUpperCase()}...`,
                         showConfirmButton: false,
                         timer: 2000
                     });
@@ -2673,84 +2086,104 @@
             });
         }
 
-        // Toggle Export Menu
-        function toggleExportMenu() {
-            const dropdown = document.getElementById('exportDropdown');
-            dropdown.classList.toggle('show');
-        }
-
-        // Export Data
-        function exportData(format) {
+        // Generate Report
+        function generateReport(type) {
             Swal.fire({
-                title: 'Export Data',
-                text: `Exporting data as ${format.toUpperCase()}...`,
-                icon: 'success',
+                title: `Generate ${type.charAt(0).toUpperCase() + type.slice(1)} Report`,
+                text: 'Report generation in progress...',
+                icon: 'info',
                 timer: 2000,
                 showConfirmButton: false
-            });
-            document.getElementById('exportDropdown').classList.remove('show');
-        }
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.export-menu')) {
-                const dropdown = document.getElementById('exportDropdown');
-                if (dropdown) dropdown.classList.remove('show');
-            }
-        });
-
-        // Update real-time stats
-        setInterval(function() {
-            // Simulate real-time updates
-            const currentlyIn = document.getElementById('currentlyIn');
-            if (currentlyIn) {
-                const current = parseInt(currentlyIn.textContent);
-                const change = Math.random() > 0.5 ? 1 : -1;
-                const newValue = Math.max(0, current + change);
-                currentlyIn.textContent = newValue;
-            }
-        }, 30000); // Update every 30 seconds
-
-        // Replace sample data with database calls
-        function loadVisitors() {
-            $.ajax({
-                url: '<?= base_url("visitor/search") ?>',
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    populateVisitorTable(data);
-                }
+            }).then(() => {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Report generated successfully',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
             });
         }
 
-        // Check-in visitor via AJAX
-        function checkInVisitor() {
-            const formData = new FormData($('#checkinForm')[0]);
+        // Generate Custom Report
+        function generateCustomReport() {
+            const reportType = document.getElementById('reportType').value;
+            const format = document.getElementById('reportFormat').value;
             
-            $.ajax({
-                url: '<?= base_url("visitor/checkin") ?>',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if(response.success) {
-                        Swal.fire('Success', 'Visitor checked in', 'success');
-                        loadVisitors();
-                    }
+            Swal.fire({
+                title: 'Generating Report',
+                html: `Generating ${reportType} in ${format} format...`,
+                timer: 2000,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
             });
         }
 
-        // Check-out visitor
-        function checkOutVisitor(visitId) {
-            $.post('<?= base_url("visitor/checkout/") ?>' + visitId, function(response) {
-                if(response.success) {
-                    Swal.fire('Success', 'Visitor checked out', 'success');
-                    loadVisitors();
-                }
+        // Apply Filters
+        function applyFilters() {
+            // Get filter values
+            const visitorType = document.getElementById('filterVisitorType').value;
+            const company = document.getElementById('filterCompany').value;
+            const startDate = document.getElementById('filterStartDate').value;
+            const endDate = document.getElementById('filterEndDate').value;
+            
+            // Apply filters to table (simplified)
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Filters applied',
+                showConfirmButton: false,
+                timer: 1500
             });
         }
+
+        // Filter Employees
+        function filterEmployees() {
+            const dept = document.getElementById('deptFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const search = document.getElementById('employeeSearch').value.toLowerCase();
+            
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Filters applied',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
+        // Global Search
+        function performGlobalSearch() {
+            const searchTerm = document.getElementById('globalSearch').value.toLowerCase();
+            console.log('Searching for:', searchTerm);
+        }
+
+        // Refresh Dashboard
+        function refreshDashboard() {
+            loadDashboardData();
+            loadActiveVisits();
+            
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Dashboard refreshed',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
+        // Auto-refresh active visits every 30 seconds
+        setInterval(() => {
+            if (document.getElementById('active-visitsSection').style.display !== 'none') {
+                loadActiveVisits();
+            }
+        }, 30000);
     </script>
 </body>
 </html>

@@ -5,7 +5,7 @@
         <!-- Header -->
         <div class="kiosk-header">
             <div class="company-logo">
-                <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" 
+                <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" 
                     alt="Pan-Asia" 
                 style="width: 40px; height: 40px; object-fit: contain; border-radius: 50%;">
             </div>
