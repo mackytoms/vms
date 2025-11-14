@@ -111,6 +111,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			<a href="<?php echo base_url('main/admin'); ?>">Go to Admin</a>
 			<a href="<?php echo base_url('main/tw'); ?>">Go to TW</a>
 			<a href="<?php echo base_url('main/pa'); ?>">Go to PA</a>
+			<a href="<?php echo base_url('main/revisit'); ?>">Go to Revisit</a>
 			<a href="<?php echo base_url('main/login'); ?>">Go to Login</a>
 		</div>
 	</div>

@@ -38,4 +38,13 @@ function updateDashboardStats() {
     });
 }
 
+// In Admin controller constructor
+public function __construct() {
+    parent::__construct();
+    // Add authentication check
+    if(!$this->session->userdata('admin_logged_in')) {
+        redirect('login');
+    }
+}
+
 </script>

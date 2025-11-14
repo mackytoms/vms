@@ -125,6 +125,15 @@ class Main extends CI_Controller {
         $this->render_template_pa('main/pa', $data);
     }
 
+    public function revisit() {
+        $data = array(
+            'page_title' => 'PAN-ASIA INTERNATIONAL Portal',
+            'theme' => 'green'
+        );
+        $this->render_template_pa('main/revisit', $data);
+    }
+
+
     // Login page - NO header/footer
     public function login() {
         $data = array(
