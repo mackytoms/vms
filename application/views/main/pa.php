@@ -6,7 +6,7 @@
         <div class="kiosk-header">
             <div class="company-logo">
                 <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" 
-                    alt="Pan-Asia" 
+                    alt="Pan-asia" 
                 style="width: 40px; height: 40px; object-fit: contain; border-radius: 50%;">
             </div>
             <h1 data-translate="companyName">Welcome to PAN-ASIA</h1>
@@ -47,13 +47,13 @@
                                 <p data-translate="firstTimeDesc">I'm visiting for the first time</p>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <div class="action-card" onclick="startCheckIn('returning')">
                                 <i class="bi bi-person-check text-success"></i>
                                 <h3 data-translate="returningVisitor">Returning Visitor</h3>
                                 <p data-translate="returningDesc">I've been here before</p>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-md-4">
                             <div class="action-card" onclick="startCheckIn('delivery')">
                                 <i class="bi bi-truck text-warning"></i>
@@ -170,13 +170,17 @@
                             <div class="face-guide"></div>
                             <div class="camera-overlay"></div>
                         </div>
-                        <button class="btn-large btn-next" onclick="capturePhoto()" id="captureBtn">
-                            <i class="bi bi-camera"></i> <span data-translate="takePhoto">Take Photo</span>
-                        </button>
-                        <button class="btn-large btn-next" onclick="retakePhoto()" id="retakeBtn" style="display: none;">
-                            <i class="bi bi-arrow-clockwise"></i> <span data-translate="retakePhoto">Retake Photo</span>
-                        </button>
+                        <div style="display: flex; justify-content: center;">
+                            <button class="btn-large btn-next" onclick="capturePhoto()" id="captureBtn">
+                                <i class="bi bi-camera"></i> <span data-translate="takePhoto">Take Photo</span>
+                            </button>
+                            
+                            <button class="btn-large btn-next" onclick="retakePhoto()" id="retakeBtn" style="display: none;">
+                                <i class="bi bi-arrow-clockwise"></i> <span data-translate="retakePhoto">Retake Photo</span>
+                            </button>
+                        </div>                            
                         <p class="text-muted mt-2" data-translate="photoGuide">Position your face within the oval guide</p>
+
                     </div>
 
                     <div class="nav-buttons">
@@ -1276,24 +1280,6 @@
         //         showScreen(3);
         //     }
         // }
-        // Alternative approach: Modify the startCheckIn function to store the initial selection
-        function startCheckIn(type) {
-            visitorData.type = type;
-            currentFlow = screenFlow[type];
-            currentFlowIndex = 1;
-            
-            // Store the initial purpose if it's a delivery type
-            if (type === 'delivery') {
-                visitorData.initialPurpose = 'delivery';
-            }
-            
-            if (type === 'returning') {
-                showScreen(2);
-                initQRScanner();
-            } else {
-                showScreen(3);
-            }
-        }
 
         // Initialize QR Scanner
         function initQRScanner() {
@@ -1499,18 +1485,24 @@
             currentScreen = screenNumber;
         }
 
-        // function nextScreen() {
-        //     if (validateCurrentScreen()) {
-        //         if (currentFlow.length > 0) {
-        //             currentFlowIndex++;
-        //             if (currentFlowIndex < currentFlow.length) {
-        //                 showScreen(currentFlow[currentFlowIndex]);
-        //             }
-        //         } else {
-        //             showScreen(currentScreen + 1);
-        //         }
-        //     }
-        // }
+        // Alternative approach: Modify the startCheckIn function to store the initial selection
+        function startCheckIn(type) {
+            visitorData.type = type;
+            currentFlow = screenFlow[type];
+            currentFlowIndex = 1;
+            
+            // Store the initial purpose if it's a delivery type
+            if (type === 'delivery') {
+                visitorData.initialPurpose = 'delivery';
+            }
+            
+            if (type === 'returning') {
+                showScreen(2);
+                initQRScanner();
+            } else {
+                showScreen(3);
+            }
+        }
 
         // Enhanced nextScreen function to handle auto-selection
         function nextScreen() {
@@ -1533,6 +1525,41 @@
                 }
             }
         }
+
+        // Optional: Modify the selectPurpose function to handle pre-selection better
+        function selectPurpose(purpose, element) {
+            // Clear all selections
+            document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
+            
+            // Add selection to clicked element
+            if (element) {
+                element.classList.add('selected');
+            } else {
+                // If no element provided (auto-selection), find and select the card
+                const card = Array.from(document.querySelectorAll('.purpose-card'))
+                    .find(c => c.getAttribute('onclick').includes(`'${purpose}'`));
+                if (card) {
+                    card.classList.add('selected');
+                }
+            }
+            
+            selectedPurpose = purpose;
+            visitorData.purpose = purpose;
+            document.getElementById('purposeNextBtn').disabled = false;
+        }
+
+        // function nextScreen() {
+        //     if (validateCurrentScreen()) {
+        //         if (currentFlow.length > 0) {
+        //             currentFlowIndex++;
+        //             if (currentFlowIndex < currentFlow.length) {
+        //                 showScreen(currentFlow[currentFlowIndex]);
+        //             }
+        //         } else {
+        //             showScreen(currentScreen + 1);
+        //         }
+        //     }
+        // }
 
         function previousScreen() {
             if (currentFlow.length > 0 && currentFlowIndex > 0) {
@@ -1777,28 +1804,6 @@
         //     visitorData.purpose = purpose;
         //     document.getElementById('purposeNextBtn').disabled = false;
         // }
-
-        // Optional: Modify the selectPurpose function to handle pre-selection better
-        function selectPurpose(purpose, element) {
-            // Clear all selections
-            document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
-            
-            // Add selection to clicked element
-            if (element) {
-                element.classList.add('selected');
-            } else {
-                // If no element provided (auto-selection), find and select the card
-                const card = Array.from(document.querySelectorAll('.purpose-card'))
-                    .find(c => c.getAttribute('onclick').includes(`'${purpose}'`));
-                if (card) {
-                    card.classList.add('selected');
-                }
-            }
-            
-            selectedPurpose = purpose;
-            visitorData.purpose = purpose;
-            document.getElementById('purposeNextBtn').disabled = false;
-        }
 
         // Agreement check
         function checkAgreement() {
@@ -2103,6 +2108,8 @@
 
         // Prevent context menu for kiosk mode
         // document.addEventListener('contextmenu', e => e.preventDefault());
+
+
 
         // Updated completeCheckIn function to connect with database
         function completeCheckIn() {

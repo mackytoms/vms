@@ -579,6 +579,14 @@ $activeVisits = getActiveVisits($conn);
             margin-bottom: 20px;
         }
 
+        .table td, .table tr, .table th {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+        }
+
         .visitor-photo {
             width: 40px;
             height: 40px;

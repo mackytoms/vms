@@ -47,13 +47,13 @@
                                 <p data-translate="firstTimeDesc">I'm visiting for the first time</p>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <div class="action-card" onclick="startCheckIn('returning')">
                                 <i class="bi bi-person-check text-success"></i>
                                 <h3 data-translate="returningVisitor">Returning Visitor</h3>
                                 <p data-translate="returningDesc">I've been here before</p>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-md-4">
                             <div class="action-card" onclick="startCheckIn('delivery')">
                                 <i class="bi bi-truck text-warning"></i>
@@ -170,12 +170,15 @@
                             <div class="face-guide"></div>
                             <div class="camera-overlay"></div>
                         </div>
-                        <button class="btn-large btn-next" onclick="capturePhoto()" id="captureBtn">
-                            <i class="bi bi-camera"></i> <span data-translate="takePhoto">Take Photo</span>
-                        </button>
-                        <button class="btn-large btn-next" onclick="retakePhoto()" id="retakeBtn" style="display: none;">
-                            <i class="bi bi-arrow-clockwise"></i> <span data-translate="retakePhoto">Retake Photo</span>
-                        </button>
+                        <div style="display: flex; justify-content: center;">
+                            <button class="btn-large btn-next" onclick="capturePhoto()" id="captureBtn">
+                                <i class="bi bi-camera"></i> <span data-translate="takePhoto">Take Photo</span>
+                            </button>
+                            
+                            <button class="btn-large btn-next" onclick="retakePhoto()" id="retakeBtn" style="display: none;">
+                                <i class="bi bi-arrow-clockwise"></i> <span data-translate="retakePhoto">Retake Photo</span>
+                            </button>
+                        </div> 
                         <p class="text-muted mt-2" data-translate="photoGuide">Position your face within the oval guide</p>
                     </div>
 

@@ -387,8 +387,8 @@
             border: 3px dashed rgba(255,255,255,0.5);
             border-radius: 50%;
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 10%;
+            left: 25%;
             transform: translate(-50%, -50%);
             animation: pulse 2s infinite;
         }
