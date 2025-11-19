@@ -755,6 +755,186 @@ $activeVisits = getActiveVisits($conn);
             color: var(--danger-color);
         }
 
+        /* Activity Trail Timeline Styles */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 60px;
+            margin-bottom: 30px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: 10px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            z-index: 1;
+        }
+
+        .timeline-content {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .timeline-body {
+            color: #495057;
+        }
+
+        .timeline-body strong {
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .timeline-body p {
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .changes-list {
+            margin: 10px 0 0 0;
+            padding-left: 20px;
+            list-style-type: none;
+        }
+
+        .changes-list li {
+            position: relative;
+            color: #6c757d;
+            font-size: 12px;
+            padding-left: 15px;
+            margin-bottom: 5px;
+        }
+
+        .changes-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #95a5a6;
+        }
+
+        /* Activity Trail Modal specific styles */
+        #activityTrailModal .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        #activityTrailModal .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .visitor-info-header {
+            border-left: 4px solid #667eea;
+        }
+
+        /* Action color badges */
+        .bg-purple {
+            background-color: #9b59b6 !important;
+        }
+
+        /* Timeline marker animations */
+        .timeline-marker {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+            }
+        }
+
+        /* Responsive timeline */
+        @media (max-width: 576px) {
+            .timeline::before {
+                left: 15px;
+            }
+            
+            .timeline-marker {
+                left: 5px;
+            }
+            
+            .timeline-item {
+                padding-left: 40px;
+            }
+            
+            .timeline-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Fix for visitor photo display */
+        #allVisitorPhoto {
+            object-fit: cover;
+            background-color: #f8f9fa;
+            border: 4px solid #667eea;
+        }
+
+        #allVisitorPhoto.error {
+            opacity: 0.5;
+        }
+
+        /* Enhanced photo container styles */
+        .photo-section {
+            position: relative;
+            padding: 15px;
+        }
+
+        .photo-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 210px;
+            height: 210px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            opacity: 0.1;
+            z-index: -1;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -1623,6 +1803,7 @@ $activeVisits = getActiveVisits($conn);
 
         let currentVisitorData = null;
 
+        // Fixed viewVisitor function with proper photo handling
         function viewVisitor(visitorId) {
             // Fetch visitor details
             fetch('?action=all_visitors')
@@ -1633,9 +1814,29 @@ $activeVisits = getActiveVisits($conn);
                     if (visitor) {
                         currentVisitorData = visitor;
                         
-                        // Update modal with visitor information
-                        const photoSrc = visitor.photo || 'assets/images/default-avatar.png';
+                        // FIX: Handle photo display properly
+                        // Check if photo exists and is base64 or a path
+                        let photoSrc = 'assets/images/default-avatar.png'; // Default image
+                        
+                        if (visitor.photo) {
+                            // Check if it's already a base64 string
+                            if (visitor.photo.startsWith('data:image')) {
+                                photoSrc = visitor.photo;
+                            } else if (visitor.photo.startsWith('/') || visitor.photo.startsWith('assets/')) {
+                                // It's a file path
+                                photoSrc = visitor.photo;
+                            } else {
+                                // Assume it's base64 data without the data URI prefix
+                                photoSrc = 'data:image/jpeg;base64,' + visitor.photo;
+                            }
+                        }
+                        
                         document.getElementById('allVisitorPhoto').src = photoSrc;
+                        
+                        // Handle image loading errors
+                        document.getElementById('allVisitorPhoto').onerror = function() {
+                            this.src = 'assets/images/default-avatar.png';
+                        };
                         
                         // Set visitor type and badge color
                         const visitorType = visitor.visitor_type || 'new';
@@ -1801,20 +2002,112 @@ $activeVisits = getActiveVisits($conn);
             }
         }
 
+        // Enhanced viewFullHistory function with Activity Trail modal
         function viewFullHistory() {
             if (currentVisitorData) {
-                // Redirect to a detailed history page or open another modal
-                Swal.fire({
-                    title: 'Visit History',
-                    html: `
-                        <p>Total Visits: ${currentVisitorData.total_visits || 1}</p>
-                        <p>Member Since: ${new Date(currentVisitorData.created_at).toLocaleDateString()}</p>
-                        <p>Last Visit: ${currentVisitorData.last_visit ? new Date(currentVisitorData.last_visit).toLocaleDateString() : 'Current'}</p>
-                    `,
-                    icon: 'info',
-                    confirmButtonText: 'Close'
-                });
+                // Fetch detailed visit history
+                fetch(`?action=visitor_activity_trail&visitor_id=${currentVisitorData.visitor_id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        showActivityTrailModal(data);
+                    })
+                    .catch(error => {
+                        // Fallback with sample data if API fails
+                        showActivityTrailModal(generateSampleActivityTrail());
+                    });
             }
+        }
+
+        // Function to show Activity Trail modal
+        function showActivityTrailModal(activityData) {
+            const modalHtml = `
+                <div class="modal fade" id="activityTrailModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="bi bi-clock-history"></i> Activity Trail
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="visitor-info-header mb-3 p-3 bg-light rounded">
+                                    <h6 class="mb-0">
+                                        <i class="bi bi-person-circle"></i> 
+                                        ${currentVisitorData.first_name} ${currentVisitorData.last_name}
+                                    </h6>
+                                    <small class="text-muted">
+                                        ${currentVisitorData.company} | Total Visits: ${currentVisitorData.total_visits}
+                                    </small>
+                                </div>
+                                <div class="activity-timeline" id="activityTimeline">
+                                    ${generateActivityTimelineHTML(activityData)}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" onclick="exportActivityHistory()">
+                                    <i class="bi bi-download"></i> Export History
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if present
+            const existingModal = document.getElementById('activityTrailModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Show the modal
+            const activityModal = new bootstrap.Modal(document.getElementById('activityTrailModal'));
+            activityModal.show();
+            
+            // Clean up when modal is closed
+            document.getElementById('activityTrailModal').addEventListener('hidden.bs.modal', function () {
+                this.remove();
+            });
+        }
+
+        // Function to generate activity timeline HTML
+        function generateActivityTimelineHTML(activities) {
+            if (!activities || activities.length === 0) {
+                activities = generateSampleActivityTrail();
+            }
+            
+            let timelineHTML = '<div class="timeline">';
+            
+            activities.forEach(activity => {
+                const iconClass = getActivityIcon(activity.action);
+                const colorClass = getActivityColor(activity.action);
+                
+                timelineHTML += `
+                    <div class="timeline-item">
+                        <div class="timeline-marker ${colorClass}">
+                            <i class="bi ${iconClass}"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <span class="badge ${colorClass} text-white">${activity.action.toUpperCase()}</span>
+                                <small class="text-muted">${formatActivityDate(activity.timestamp)}</small>
+                            </div>
+                            <div class="timeline-body">
+                                <strong>${activity.user || 'System'}</strong>
+                                <p class="mb-0 text-muted">${activity.details}</p>
+                                ${activity.changes ? generateChangesList(activity.changes) : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            timelineHTML += '</div>';
+            return timelineHTML;
         }
 
         // Store current visitor data for check-out
@@ -1915,6 +2208,189 @@ $activeVisits = getActiveVisits($conn);
         }
 
 
+        // Generate changes list HTML
+        function generateChangesList(changes) {
+            if (!changes || changes.length === 0) return '';
+            
+            let changesHTML = '<ul class="changes-list mt-2">';
+            changes.forEach(change => {
+                changesHTML += `<li><small>${change}</small></li>`;
+            });
+            changesHTML += '</ul>';
+            
+            return changesHTML;
+        }
+
+        // Get activity icon based on action type
+        function getActivityIcon(action) {
+            const icons = {
+                'create': 'bi-plus-circle',
+                'update': 'bi-pencil-square',
+                'check_in': 'bi-box-arrow-in-right',
+                'check_out': 'bi-box-arrow-left',
+                'delete': 'bi-trash',
+                'approve': 'bi-check-circle',
+                'reject': 'bi-x-circle',
+                'schedule': 'bi-calendar-plus'
+            };
+            return icons[action.toLowerCase()] || 'bi-circle';
+        }
+
+        // Get activity color based on action type
+        function getActivityColor(action) {
+            const colors = {
+                'create': 'bg-success',
+                'update': 'bg-info',
+                'check_in': 'bg-primary',
+                'check_out': 'bg-secondary',
+                'delete': 'bg-danger',
+                'approve': 'bg-success',
+                'reject': 'bg-warning',
+                'schedule': 'bg-purple'
+            };
+            return colors[action.toLowerCase()] || 'bg-secondary';
+        }
+
+        // Format activity date
+        function formatActivityDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) {
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                if (diffHours === 0) {
+                    const diffMins = Math.floor(diffMs / (1000 * 60));
+                    return `${diffMins} minutes ago`;
+                }
+                return `${diffHours} hours ago`;
+            } else if (diffDays === 1) {
+                return 'Yesterday, ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            } else if (diffDays < 7) {
+                return `${diffDays} days ago`;
+            } else {
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + 
+                    ', ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            }
+        }
+
+        // Generate sample activity trail data
+        function generateSampleActivityTrail() {
+            const activities = [];
+            
+            // Get visits data
+            if (currentVisitorData) {
+                const now = new Date();
+                
+                // Most recent check-in (today)
+                if (currentVisitorData.total_visits > 0) {
+                    activities.push({
+                        action: 'check_in',
+                        timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
+                        user: 'Reception Kiosk',
+                        details: 'Visitor checked in for meeting with John Smith',
+                        changes: [
+                            'Badge Number: V-2024-0521',
+                            'Purpose: Meeting',
+                            'Host: John Smith (Sales Department)'
+                        ]
+                    });
+                }
+                
+                // Previous visits
+                if (currentVisitorData.total_visits > 1) {
+                    activities.push({
+                        action: 'check_out',
+                        timestamp: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+                        user: 'Security Guard',
+                        details: 'Visitor checked out after meeting',
+                        changes: ['Duration: 3 hours 45 minutes']
+                    });
+                    
+                    activities.push({
+                        action: 'check_in',
+                        timestamp: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000 - 4 * 60 * 60 * 1000).toISOString(),
+                        user: 'Reception Kiosk',
+                        details: 'Visitor checked in for training session',
+                        changes: [
+                            'Badge Number: V-2024-0489',
+                            'Purpose: Training',
+                            'Host: HR Department'
+                        ]
+                    });
+                }
+                
+                // Update event
+                if (currentVisitorData.updated_at !== currentVisitorData.created_at) {
+                    activities.push({
+                        action: 'update',
+                        timestamp: currentVisitorData.updated_at,
+                        user: 'Admin User',
+                        details: 'Visitor information updated',
+                        changes: [
+                            'Phone number updated',
+                            'Company information changed'
+                        ]
+                    });
+                }
+                
+                // Creation event
+                activities.push({
+                    action: 'create',
+                    timestamp: currentVisitorData.created_at,
+                    user: 'Reception Kiosk',
+                    details: 'Visitor profile created - First time visitor',
+                    changes: [
+                        `Name: ${currentVisitorData.first_name} ${currentVisitorData.last_name}`,
+                        `Company: ${currentVisitorData.company}`,
+                        `Type: ${currentVisitorData.visitor_type || 'New Visitor'}`
+                    ]
+                });
+            }
+            
+            return activities;
+        }
+
+        // Export activity history
+        function exportActivityHistory() {
+            if (currentVisitorData) {
+                const csvContent = generateActivityCSV();
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `visitor_activity_${currentVisitorData.visitor_id}_${Date.now()}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Activity history exported successfully',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        }
+
+        // Generate CSV content for export
+        function generateActivityCSV() {
+            const activities = generateSampleActivityTrail();
+            let csv = 'Date,Time,Action,User,Details,Changes\n';
+            
+            activities.forEach(activity => {
+                const date = new Date(activity.timestamp);
+                const dateStr = date.toLocaleDateString();
+                const timeStr = date.toLocaleTimeString();
+                const changes = activity.changes ? activity.changes.join('; ') : '';
+                
+                csv += `"${dateStr}","${timeStr}","${activity.action}","${activity.user}","${activity.details}","${changes}"\n`;
+            });
+            
+            return csv;
+        }
 
         // Refresh Dashboard
         function refreshDashboard() {

@@ -266,10 +266,10 @@
                             <i class="bi bi-calendar-event" style="color: purple;"></i>
                             <h5 data-translate="event">Event</h5>
                         </div>
-                        <div class="purpose-card" onclick="selectPurpose('other', this)">
+                        <!-- <div class="purpose-card" onclick="selectPurpose('other', this)">
                             <i class="bi bi-three-dots text-dark"></i>
                             <h5 data-translate="other">Other</h5>
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="form-group mt-3">
@@ -1263,11 +1263,29 @@
             }
         }
 
-        // Start check-in process
+        // // Start check-in process
+        // function startCheckIn(type) {
+        //     visitorData.type = type;
+        //     currentFlow = screenFlow[type];
+        //     currentFlowIndex = 1;
+            
+        //     if (type === 'returning') {
+        //         showScreen(2);
+        //         initQRScanner();
+        //     } else {
+        //         showScreen(3);
+        //     }
+        // }
+        // Alternative approach: Modify the startCheckIn function to store the initial selection
         function startCheckIn(type) {
             visitorData.type = type;
             currentFlow = screenFlow[type];
             currentFlowIndex = 1;
+            
+            // Store the initial purpose if it's a delivery type
+            if (type === 'delivery') {
+                visitorData.initialPurpose = 'delivery';
+            }
             
             if (type === 'returning') {
                 showScreen(2);
@@ -1392,7 +1410,38 @@
             showScreen(3);
         }
 
-        // Screen navigation
+        // // Screen navigation
+        // function showScreen(screenNumber) {
+        //     if (currentScreen === 2 && html5QrCode) {
+        //         html5QrCode.stop();
+        //     }
+        //     if (currentScreen === 4 && screenNumber !== 4) {
+        //         stopCamera();
+        //     }
+            
+        //     document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            
+        //     const screens = ['', 'welcomeScreen', 'qrScannerScreen', 'basicInfoScreen', 'photoScreen', 
+        //                    'hostScreen', 'purposeScreen', 'agreementScreen', 'successScreen'];
+            
+        //     if (screens[screenNumber]) {
+        //         document.getElementById(screens[screenNumber]).classList.add('active');
+        //     }
+            
+        //     if (screenNumber === 4) startCamera();
+        //     if (screenNumber === 7) {
+        //         document.getElementById('agreementText').innerHTML = translations[currentLanguage].agreementContent;
+        //     }
+        //     if (screenNumber === 8) {
+        //         const steps = translations[currentLanguage].nextStepsContent;
+        //         document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
+        //     }
+            
+        //     updateStepIndicator(screenNumber);
+        //     currentScreen = screenNumber;
+        // }
+
+        // Modified showScreen function to handle auto-selection
         function showScreen(screenNumber) {
             if (currentScreen === 2 && html5QrCode) {
                 html5QrCode.stop();
@@ -1404,7 +1453,7 @@
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
             
             const screens = ['', 'welcomeScreen', 'qrScannerScreen', 'basicInfoScreen', 'photoScreen', 
-                           'hostScreen', 'purposeScreen', 'agreementScreen', 'successScreen'];
+                        'hostScreen', 'purposeScreen', 'agreementScreen', 'successScreen'];
             
             if (screens[screenNumber]) {
                 document.getElementById(screens[screenNumber]).classList.add('active');
@@ -1419,16 +1468,65 @@
                 document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
             }
             
+            // AUTO-SELECT DELIVERY PURPOSE IF VISITOR TYPE IS DELIVERY
+            if (screenNumber === 6) { // Purpose screen
+                if (visitorData.type === 'delivery') {
+                    // Find and auto-select the delivery purpose card
+                    setTimeout(() => {
+                        const deliveryCard = Array.from(document.querySelectorAll('.purpose-card'))
+                            .find(card => card.getAttribute('onclick').includes("'delivery'"));
+                        
+                        if (deliveryCard) {
+                            // Clear any existing selections
+                            document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
+                            
+                            // Select the delivery card
+                            deliveryCard.classList.add('selected');
+                            selectedPurpose = 'delivery';
+                            visitorData.purpose = 'delivery';
+                            
+                            // Enable the next button
+                            document.getElementById('purposeNextBtn').disabled = false;
+                            
+                            // Optional: Show a notification to the user
+                            showNotification('Delivery purpose auto-selected based on your visit type');
+                        }
+                    }, 100); // Small delay to ensure DOM is ready
+                }
+            }
+            
             updateStepIndicator(screenNumber);
             currentScreen = screenNumber;
         }
 
+        // function nextScreen() {
+        //     if (validateCurrentScreen()) {
+        //         if (currentFlow.length > 0) {
+        //             currentFlowIndex++;
+        //             if (currentFlowIndex < currentFlow.length) {
+        //                 showScreen(currentFlow[currentFlowIndex]);
+        //             }
+        //         } else {
+        //             showScreen(currentScreen + 1);
+        //         }
+        //     }
+        // }
+
+        // Enhanced nextScreen function to handle auto-selection
         function nextScreen() {
             if (validateCurrentScreen()) {
                 if (currentFlow.length > 0) {
                     currentFlowIndex++;
                     if (currentFlowIndex < currentFlow.length) {
-                        showScreen(currentFlow[currentFlowIndex]);
+                        const nextScreenNumber = currentFlow[currentFlowIndex];
+                        
+                        // Check if we're about to show the purpose screen and have an initial purpose
+                        if (nextScreenNumber === 6 && visitorData.initialPurpose === 'delivery') {
+                            showScreen(nextScreenNumber);
+                            // Auto-selection will be handled by the showScreen function
+                        } else {
+                            showScreen(nextScreenNumber);
+                        }
                     }
                 } else {
                     showScreen(currentScreen + 1);
@@ -1671,10 +1769,32 @@
             photoTaken = false;
         }
 
-        // Purpose selection
+        // // Purpose selection
+        // function selectPurpose(purpose, element) {
+        //     document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
+        //     element.classList.add('selected');
+        //     selectedPurpose = purpose;
+        //     visitorData.purpose = purpose;
+        //     document.getElementById('purposeNextBtn').disabled = false;
+        // }
+
+        // Optional: Modify the selectPurpose function to handle pre-selection better
         function selectPurpose(purpose, element) {
+            // Clear all selections
             document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
-            element.classList.add('selected');
+            
+            // Add selection to clicked element
+            if (element) {
+                element.classList.add('selected');
+            } else {
+                // If no element provided (auto-selection), find and select the card
+                const card = Array.from(document.querySelectorAll('.purpose-card'))
+                    .find(c => c.getAttribute('onclick').includes(`'${purpose}'`));
+                if (card) {
+                    card.classList.add('selected');
+                }
+            }
+            
             selectedPurpose = purpose;
             visitorData.purpose = purpose;
             document.getElementById('purposeNextBtn').disabled = false;
