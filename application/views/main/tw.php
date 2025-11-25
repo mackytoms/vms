@@ -40,7 +40,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="action-card" onclick="startCheckIn('new')">
                                 <i class="bi bi-person-plus text-primary"></i>
                                 <h3 data-translate="firstTimeVisitor">First Time Visitor</h3>
@@ -54,7 +54,7 @@
                                 <p data-translate="returningDesc">I've been here before</p>
                             </div>
                         </div> -->
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="action-card" onclick="startCheckIn('delivery')">
                                 <i class="bi bi-truck text-warning"></i>
                                 <h3 data-translate="deliveryPickup">Delivery / Pickup</h3>
