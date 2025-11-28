@@ -1549,6 +1549,7 @@
                 if (html5QrCode) {
                     try {
                         const state = html5QrCode.getState();
+                        // Only stop if scanner is running (state 2) or paused (state 3)
                         if (state === 2 || state === 3) {
                             html5QrCode.stop().catch(() => {});
                         }
@@ -1610,126 +1611,22 @@
                         if (html5QrCode) {
                             try {
                                 const state = html5QrCode.getState();
+                                // Only stop if scanner is running (state 2) or paused (state 3)
                                 if (state === 2 || state === 3) {
                                     html5QrCode.stop().catch(() => {});
                                 }
                             } catch (e) {
-                                // ignore
+                                // Scanner not initialized or already stopped, ignore
                             }
                         }
-                        visitorData.type = 'returning';
-                        currentFlow = screenFlow['new'];
+                        visitorData.type = 'returning'; // Keep as returning but needs manual entry
+                        currentFlow = screenFlow['new']; // Use new visitor flow
                         currentFlowIndex = 1;
-                        showScreen(3);
+                        showScreen(3); // Go to basic info screen
                     }
                 });
             }
         }
-
-        // UPDATED: Handle QR code success for returning visitors
-        // function handleQRCodeSuccess(decodedText) {
-        //     try {
-        //         let qrData;
-                
-        //         // Try to parse as JSON first
-        //         try {
-        //             qrData = JSON.parse(decodedText);
-        //         } catch (e) {
-        //             // Try base64 decode if JSON parse fails
-        //             try {
-        //                 qrData = JSON.parse(atob(decodedText));
-        //             } catch (e2) {
-        //                 throw new Error('Invalid QR format');
-        //             }
-        //         }
-                
-        //         // Validate QR data has required fields
-        //         if (!qrData.email || !qrData.firstName || !qrData.lastName) {
-        //             throw new Error('Missing required fields in QR code');
-        //         }
-                
-        //         // Stop QR scanner
-        //         if (html5QrCode) {
-        //             try {
-        //                 const state = html5QrCode.getState();
-        //                 // Only stop if scanner is running (state 2) or paused (state 3)
-        //                 if (state === 2 || state === 3) {
-        //                     html5QrCode.stop().catch(() => {});
-        //                 }
-        //             } catch (e) {
-        //                 // Scanner not initialized or already stopped, ignore
-        //             }
-        //         }
-                
-        //         // Retrieve stored photo from localStorage
-        //         const storedPhoto = localStorage.getItem(`visitor_photo_${qrData.email}`);
-                
-        //         // Populate visitor data from QR code
-        //         visitorData = {
-        //             ...visitorData,
-        //             firstName: qrData.firstName,
-        //             lastName: qrData.lastName,
-        //             email: qrData.email,
-        //             phone: qrData.phone || '',
-        //             company: qrData.company || '',
-        //             photo: storedPhoto || null,
-        //             type: 'returning'
-        //         };
-                
-        //         // Show success message
-        //         Swal.fire({
-        //             title: translations[currentLanguage].qrScanSuccess || 'QR Code Scanned!',
-        //             html: `<p>${translations[currentLanguage].welcomeBackQR || 'Welcome back!'}</p>
-        //                 <p><strong>${qrData.firstName} ${qrData.lastName}</strong></p>
-        //                 <p>${qrData.company || ''}</p>`,
-        //             icon: 'success',
-        //             confirmButtonColor: '#27ae60',
-        //             timer: 3000,
-        //             timerProgressBar: true
-        //         }).then(() => {
-        //             // Update flow to skip to host screen
-        //             currentFlow = [1, 2, 5, 6, 7, 8]; // Returning visitor flow
-        //             currentFlowIndex = 2; // Set to index of host screen (5)
-        //             showScreen(5); // Go directly to host selection
-        //         });
-                
-        //     } catch (e) {
-        //         console.error('QR decode error:', e);
-                
-        //         Swal.fire({
-        //             title: translations[currentLanguage].invalidQRMessage || 'Invalid QR Code',
-        //             text: translations[currentLanguage].qrScanFailed || 'Could not read QR code. Please try again or continue manually.',
-        //             icon: 'error',
-        //             showCancelButton: true,
-        //             confirmButtonColor: '#3498db',
-        //             cancelButtonColor: '#95a5a6',
-        //             confirmButtonText: translations[currentLanguage].tryAgain || 'Try Again',
-        //             cancelButtonText: translations[currentLanguage].continueManually || 'Continue Manually'
-        //         }).then((result) => {
-        //             if (result.isConfirmed) {
-        //                 // Restart QR scanner
-        //                 initQRScanner();
-        //             } else {
-        //                 // Redirect to basic info screen like first-time visitor
-        //                 if (html5QrCode) {
-        //                     try {
-        //                         const state = html5QrCode.getState();
-        //                         // Only stop if scanner is running (state 2) or paused (state 3)
-        //                         if (state === 2 || state === 3) {
-        //                             html5QrCode.stop().catch(() => {});
-        //                         }
-        //                     } catch (e) {
-        //                         // Scanner not initialized or already stopped, ignore
-        //                     }
-        //                 }
-        //                 visitorData.type = 'returning'; // Keep as returning but needs manual entry
-        //                 currentFlow = screenFlow['new']; // Use new visitor flow
-        //                 currentFlowIndex = 1;
-        //                 showScreen(3); // Go to basic info screen
-        //             }
-        //         });
-        //     }
-        // }
 
         // UPDATED: Handle QR upload for returning visitors
         function handleQRUpload(input) {

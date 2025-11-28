@@ -273,29 +273,29 @@ class Kiosk extends CI_Controller {
     //     }
     // }
     
-    // Search for returning visitors by QR code data
-    public function search_visitor() {
-        $json = file_get_contents('php://input');
-        $data = json_decode($json, true);
+    // // Search for returning visitors by QR code data
+    // public function search_visitor() {
+    //     $json = file_get_contents('php://input');
+    //     $data = json_decode($json, true);
         
-        if (!isset($data['email'])) {
-            echo json_encode(['status' => 'error', 'message' => 'Email required']);
-            return;
-        }
+    //     if (!isset($data['email'])) {
+    //         echo json_encode(['status' => 'error', 'message' => 'Email required']);
+    //         return;
+    //     }
         
-        $visitor = $this->db->select('v.*, 
-                                     (SELECT COUNT(*) FROM visits WHERE visitor_id = v.visitor_id) as total_visits')
-                           ->from('visitors v')
-                           ->where('email', $data['email'])
-                           ->get()
-                           ->row_array();
+    //     $visitor = $this->db->select('v.*, 
+    //                                  (SELECT COUNT(*) FROM visits WHERE visitor_id = v.visitor_id) as total_visits')
+    //                        ->from('visitors v')
+    //                        ->where('email', $data['email'])
+    //                        ->get()
+    //                        ->row_array();
         
-        if ($visitor) {
-            echo json_encode(['status' => 'success', 'visitor' => $visitor]);
-        } else {
-            echo json_encode(['status' => 'not_found', 'message' => 'Visitor not found']);
-        }
-    }
+    //     if ($visitor) {
+    //         echo json_encode(['status' => 'success', 'visitor' => $visitor]);
+    //     } else {
+    //         echo json_encode(['status' => 'not_found', 'message' => 'Visitor not found']);
+    //     }
+    // }
     
     // Get pre-scheduled visits
     public function get_prescheduled() {
@@ -386,5 +386,72 @@ class Kiosk extends CI_Controller {
         ];
         
         echo json_encode(['status' => 'success', 'stats' => $stats]);
+    }
+
+    /**
+     * Search for a visitor by email (for QR code returning visitors)
+     */
+    public function search_visitor()
+    {
+        // Set JSON header
+        header('Content-Type: application/json');
+        
+        // Only accept POST requests
+        if ($this->input->method() !== 'post') {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Invalid request method'
+            ]);
+            return;
+        }
+        
+        // Get JSON input
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        
+        if (!$data || !isset($data['email'])) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Email is required'
+            ]);
+            return;
+        }
+        
+        $email = strtolower(trim($data['email']));
+        
+        // Search for visitor by email
+        $this->db->where('LOWER(email)', $email);
+        $query = $this->db->get('visitors');
+        
+        if ($query->num_rows() > 0) {
+            $visitor = $query->row();
+            
+            // Get total visits count
+            $this->db->where('visitor_id', $visitor->visitor_id);
+            $visits_query = $this->db->get('visits');
+            $total_visits = $visits_query->num_rows();
+            
+            // Return visitor data
+            echo json_encode([
+                'status' => 'success',
+                'visitor' => [
+                    'visitor_id' => $visitor->visitor_id,
+                    'first_name' => $visitor->first_name,
+                    'last_name' => $visitor->last_name,
+                    'email' => $visitor->email,
+                    'phone' => $visitor->phone,
+                    'company' => $visitor->company,
+                    'photo' => $visitor->photo,
+                    'visitor_type' => $visitor->visitor_type,
+                    'company_visited' => $visitor->company_visited,
+                    'total_visits' => $total_visits
+                ]
+            ]);
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Visitor not found'
+            ]);
+        }
     }
 }
