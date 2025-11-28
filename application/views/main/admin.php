@@ -17,22 +17,14 @@ if ($conn->connect_error) {
 function getDashboardStats($conn) {
     $stats = array();
     
-    // Total visitors today
     $sql = "SELECT COUNT(DISTINCT visitor_id) as today_total FROM visits WHERE DATE(check_in_time) = CURDATE()";
     $result = $conn->query($sql);
     $stats['today_total'] = $result->fetch_assoc()['today_total'];
     
-    // Currently in building (active visits)
     $sql = "SELECT COUNT(*) as currently_in FROM visits WHERE check_out_time IS NULL";
     $result = $conn->query($sql);
     $stats['currently_in'] = $result->fetch_assoc()['currently_in'];
     
-    // Scheduled today
-    $sql = "SELECT COUNT(*) as scheduled_today FROM pre_scheduled_visits WHERE DATE(scheduled_time) = CURDATE()";
-    $result = $conn->query($sql);
-    $stats['scheduled_today'] = $result->fetch_assoc()['scheduled_today'];
-    
-    // Average visit duration
     $sql = "SELECT AVG(TIMESTAMPDIFF(HOUR, check_in_time, IFNULL(check_out_time, NOW()))) as avg_duration 
             FROM visits WHERE DATE(check_in_time) = CURDATE()";
     $result = $conn->query($sql);
@@ -42,9 +34,8 @@ function getDashboardStats($conn) {
     return $stats;
 }
 
-// Fetch recent activity
 function getRecentActivity($conn) {
-    $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, e.name as host_name 
+    $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, e.name as host_name, v.company_visited
             FROM visits v 
             JOIN visitors vi ON v.visitor_id = vi.visitor_id 
             JOIN employees e ON v.host_employee_id = e.employee_id 
@@ -58,14 +49,12 @@ function getRecentActivity($conn) {
             $activities[] = $row;
         }
     }
-    
     return $activities;
 }
 
-// Fetch active visits
 function getActiveVisits($conn) {
-    $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, vi.email, vi.phone,
-            e.name as host_name, d.name as department_name
+    $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, vi.email, vi.phone, vi.photo,
+            e.name as host_name, d.name as department_name, v.company_visited
             FROM visits v 
             JOIN visitors vi ON v.visitor_id = vi.visitor_id 
             JOIN employees e ON v.host_employee_id = e.employee_id
@@ -80,11 +69,9 @@ function getActiveVisits($conn) {
             $visits[] = $row;
         }
     }
-    
     return $visits;
 }
 
-// Fetch all visitors
 function getAllVisitors($conn) {
     $sql = "SELECT vi.*, COUNT(v.visit_id) as total_visits, MAX(v.check_in_time) as last_visit 
             FROM visitors vi 
@@ -99,31 +86,35 @@ function getAllVisitors($conn) {
             $visitors[] = $row;
         }
     }
-    
     return $visitors;
 }
 
-// Fetch scheduled visits
-function getScheduledVisits($conn) {
-    $sql = "SELECT ps.*, e.name as host_name 
-            FROM pre_scheduled_visits ps 
-            JOIN employees e ON ps.host_employee_id = e.employee_id 
-            WHERE ps.status = 'scheduled' 
-            ORDER BY ps.scheduled_time";
+function getDashboardStatsByCompany($conn) {
+    $stats = array();
     
+    $sql = "SELECT COUNT(DISTINCT visitor_id) as count FROM visits 
+            WHERE DATE(check_in_time) = CURDATE() AND company_visited = 'Toms World'";
     $result = $conn->query($sql);
-    $visits = array();
+    $stats['toms_world_today'] = $result->fetch_assoc()['count'];
     
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $visits[] = $row;
-        }
-    }
+    $sql = "SELECT COUNT(*) as count FROM visits 
+            WHERE check_out_time IS NULL AND company_visited = 'Toms World'";
+    $result = $conn->query($sql);
+    $stats['toms_world_active'] = $result->fetch_assoc()['count'];
     
-    return $visits;
+    $sql = "SELECT COUNT(DISTINCT visitor_id) as count FROM visits 
+            WHERE DATE(check_in_time) = CURDATE() AND company_visited = 'Pan Asia'";
+    $result = $conn->query($sql);
+    $stats['pan_asia_today'] = $result->fetch_assoc()['count'];
+    
+    $sql = "SELECT COUNT(*) as count FROM visits 
+            WHERE check_out_time IS NULL AND company_visited = 'Pan Asia'";
+    $result = $conn->query($sql);
+    $stats['pan_asia_active'] = $result->fetch_assoc()['count'];
+    
+    return $stats;
 }
 
-// Fetch employees
 function getEmployees($conn) {
     $sql = "SELECT e.*, d.name as department_name, COUNT(v.visit_id) as total_visits 
             FROM employees e 
@@ -139,11 +130,9 @@ function getEmployees($conn) {
             $employees[] = $row;
         }
     }
-    
     return $employees;
 }
 
-// Fetch departments
 function getDepartments($conn) {
     $sql = "SELECT d.*, COUNT(DISTINCT e.employee_id) as employee_count, 
             COUNT(DISTINCT v.visit_id) as visit_count
@@ -160,24 +149,39 @@ function getDepartments($conn) {
             $departments[] = $row;
         }
     }
-    
     return $departments;
 }
 
-// Get visit purpose statistics
-function getVisitPurposeStats($conn) {
-    $sql = "SELECT purpose, COUNT(*) as count FROM visits GROUP BY purpose";
+function getVisitorById($conn, $visitor_id) {
+    $visitor_id = $conn->real_escape_string($visitor_id);
+    $sql = "SELECT vi.*, COUNT(v.visit_id) as total_visits, MAX(v.check_in_time) as last_visit 
+            FROM visitors vi 
+            LEFT JOIN visits v ON vi.visitor_id = v.visitor_id 
+            WHERE vi.visitor_id = $visitor_id
+            GROUP BY vi.visitor_id";
     
     $result = $conn->query($sql);
-    $stats = array();
-    
     if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $stats[$row['purpose']] = $row['count'];
-        }
+        return $result->fetch_assoc();
     }
+    return null;
+}
+
+function getVisitById($conn, $visit_id) {
+    $visit_id = $conn->real_escape_string($visit_id);
+    $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, vi.email, vi.phone, vi.photo,
+            e.name as host_name, d.name as department_name, v.company_visited
+            FROM visits v 
+            JOIN visitors vi ON v.visitor_id = vi.visitor_id 
+            JOIN employees e ON v.host_employee_id = e.employee_id
+            JOIN departments d ON e.department_code = d.department_code
+            WHERE v.visit_id = $visit_id";
     
-    return $stats;
+    $result = $conn->query($sql);
+    if ($result->num_rows > 0) {
+        return $result->fetch_assoc();
+    }
+    return null;
 }
 
 // Handle AJAX requests
@@ -197,8 +201,17 @@ if(isset($_GET['action'])) {
         case 'all_visitors':
             echo json_encode(getAllVisitors($conn));
             break;
-        case 'scheduled_visits':
-            echo json_encode(getScheduledVisits($conn));
+        case 'get_visitor':
+            if(isset($_GET['visitor_id'])) {
+                $visitor = getVisitorById($conn, $_GET['visitor_id']);
+                echo json_encode($visitor ? $visitor : ['error' => 'Visitor not found']);
+            }
+            break;
+        case 'get_visit':
+            if(isset($_GET['visit_id'])) {
+                $visit = getVisitById($conn, $_GET['visit_id']);
+                echo json_encode($visit ? $visit : ['error' => 'Visit not found']);
+            }
             break;
         case 'employees':
             echo json_encode(getEmployees($conn));
@@ -206,13 +219,48 @@ if(isset($_GET['action'])) {
         case 'departments':
             echo json_encode(getDepartments($conn));
             break;
-        case 'visit_purpose_stats':
-            echo json_encode(getVisitPurposeStats($conn));
+        case 'dashboard_stats_by_company':
+            echo json_encode(getDashboardStatsByCompany($conn));
             break;
         case 'checkout':
             if(isset($_POST['visit_id'])) {
                 $visit_id = $conn->real_escape_string($_POST['visit_id']);
-                $sql = "UPDATE visits SET check_out_time = NOW() WHERE visit_id = $visit_id";
+                $sql = "UPDATE visits SET check_out_time = NOW() WHERE visit_id = $visit_id AND check_out_time IS NULL";
+                if($conn->query($sql) && $conn->affected_rows > 0) {
+                    echo json_encode(['success' => true]);
+                } else {
+                    echo json_encode(['success' => false, 'error' => $conn->error ?: 'Already checked out or invalid visit']);
+                }
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Visit ID required']);
+            }
+            break;
+        case 'add_employee':
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $name = $conn->real_escape_string($_POST['name']);
+                $email = $conn->real_escape_string($_POST['email']);
+                $department_code = $conn->real_escape_string($_POST['department_code']);
+                $is_active = isset($_POST['is_active']) ? 1 : 0;
+                
+                $sql = "INSERT INTO employees (name, email, department_code, is_active, created_at) 
+                        VALUES ('$name', '$email', '$department_code', $is_active, NOW())";
+                
+                if($conn->query($sql)) {
+                    echo json_encode(['success' => true, 'employee_id' => $conn->insert_id]);
+                } else {
+                    echo json_encode(['success' => false, 'error' => $conn->error]);
+                }
+            }
+            break;
+        case 'add_department':
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $department_code = $conn->real_escape_string($_POST['department_code']);
+                $name = $conn->real_escape_string($_POST['name']);
+                $description = $conn->real_escape_string($_POST['description'] ?? '');
+                
+                $sql = "INSERT INTO departments (department_code, name, description, created_at) 
+                        VALUES ('$department_code', '$name', '$description', NOW())";
+                
                 if($conn->query($sql)) {
                     echo json_encode(['success' => true]);
                 } else {
@@ -224,19 +272,16 @@ if(isset($_GET['action'])) {
     exit;
 }
 
-// Get initial data for page load
 $dashboardStats = getDashboardStats($conn);
 $recentActivity = getRecentActivity($conn);
 $activeVisits = getActiveVisits($conn);
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VMS Admin Dashboard - Tom's World & Pan-Asia</title>
+    <title>Kiosk V-Pass Admin - Tom's World & Pan-Asia</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
@@ -251,769 +296,115 @@ $activeVisits = getActiveVisits($conn);
             --danger-color: #e74c3c;
             --info-color: #3498db;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f6fa;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 250px;
-            background: var(--sidebar-bg);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .sidebar.collapsed {
-            width: 70px;
-        }
-
-        .sidebar-header {
-            background: linear-gradient(135deg, #f39c12, #1e9338);
-            padding: 20px;
-            text-align: center;
-            color: white;
-        }
-
-        .sidebar-header h3 {
-            margin: 0;
-            font-size: 1.5em;
-            font-weight: 600;
-        }
-
-        .sidebar.collapsed .sidebar-header h3 {
-            display: none;
-        }
-
-        .sidebar-logo {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .sidebar-logo img {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 10px;
-            padding: 5px;
-            object-fit: contain;
-        }
-
-        .sidebar-menu {
-            padding: 20px 0;
-        }
-
-        .sidebar-item {
-            padding: 15px 20px;
-            color: #ecf0f1;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .sidebar-item:hover {
-            background: var(--sidebar-hover);
-            padding-left: 25px;
-        }
-
-        .sidebar-item.active {
-            background: var(--sidebar-hover);
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .sidebar-item i {
-            font-size: 1.3em;
-            width: 30px;
-            text-align: center;
-        }
-
-        .sidebar.collapsed .sidebar-item span {
-            display: none;
-        }
-
-        .sidebar-badge {
-            background: var(--danger-color);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.75em;
-            margin-left: auto;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 250px;
-            transition: all 0.3s ease;
-            min-height: 100vh;
-        }
-
-        .main-content.expanded {
-            margin-left: 70px;
-        }
-
-        /* Top Bar */
-        .topbar {
-            background: white;
-            padding: 15px 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .topbar-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .menu-toggle {
-            font-size: 1.5em;
-            cursor: pointer;
-            color: var(--sidebar-bg);
-        }
-
-        .search-box {
-            position: relative;
-            width: 300px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 8px 40px 8px 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 20px;
-            font-size: 0.95em;
-        }
-
-        .search-box i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #95a5a6;
-        }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .notification-icon {
-            position: relative;
-            cursor: pointer;
-            font-size: 1.3em;
-            color: #7f8c8d;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--danger-color);
-            color: white;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7em;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 20px;
-            transition: background 0.3s ease;
-        }
-
-        .user-profile:hover {
-            background: #f8f9fa;
-        }
-
-        .user-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        /* Dashboard Content */
-        .dashboard-content {
-            padding: 30px;
-        }
-
-        .page-title {
-            font-size: 2em;
-            color: var(--sidebar-bg);
-            margin-bottom: 10px;
-        }
-
-        .page-subtitle {
-            color: #7f8c8d;
-            margin-bottom: 30px;
-        }
-
-        /* Stats Cards */
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .stat-card-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 3em;
-            opacity: 0.1;
-        }
-
-        .stat-value {
-            font-size: 2.5em;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            color: #7f8c8d;
-            font-size: 0.95em;
-        }
-
-        .stat-change {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            margin-top: 10px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.85em;
-        }
-
-        .stat-change.positive {
-            background: rgba(39, 174, 96, 0.1);
-            color: var(--success-color);
-        }
-
-        .stat-change.negative {
-            background: rgba(231, 76, 60, 0.1);
-            color: var(--danger-color);
-        }
-
-        /* Quick Stats Bar */
-        .quick-stats {
-            display: flex;
-            gap: 20px;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            border-radius: 12px;
-            color: white;
-            margin-bottom: 20px;
-        }
-
-        .quick-stat-item {
-            text-align: center;
-            flex: 1;
-        }
-
-        .quick-stat-value {
-            font-size: 1.8em;
-            font-weight: 600;
-        }
-
-        .quick-stat-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        /* Table Container */
-        .table-container {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .table td, .table tr, .table th {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            word-wrap: break-word;
-            word-break: break-word;
-            white-space: normal;
-        }
-
-        .visitor-photo {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            overflow: hidden;
-            background: #f8f9fa;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .visitor-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 500;
-        }
-
-        .status-badge.checked-in {
-            background: rgba(39, 174, 96, 0.1);
-            color: var(--success-color);
-        }
-
-        .status-badge.checked-out {
-            background: rgba(52, 152, 219, 0.1);
-            color: var(--info-color);
-        }
-
-        .status-badge.pending {
-            background: rgba(243, 156, 18, 0.1);
-            color: var(--primary-color);
-        }
-
-        /* Purpose Badge Colors */
-        .purpose-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 500;
-        }
-
-        .purpose-badge.meeting {
-            background: rgba(52, 152, 219, 0.1);
-            color: var(--info-color);
-        }
-
-        .purpose-badge.interview {
-            background: rgba(155, 89, 182, 0.1);
-            color: #9b59b6;
-        }
-
-        .purpose-badge.delivery {
-            background: rgba(243, 156, 18, 0.1);
-            color: var(--primary-color);
-        }
-        
-        .purpose-badge.service {
-            background: rgba(13, 202, 240, 0.1);
-            color: #0dcaf0;
-        }
-        
-        .purpose-badge.training {
-            background: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-        }
-        
-        .purpose-badge.tour {
-            background: rgba(108, 117, 125, 0.1);
-            color: #6c757d;
-        }
-        
-        .purpose-badge.event {
-            background: rgba(128, 0, 128, 0.1);
-            color: #800080;
-        }
-
-        .badge-number {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        /* Visitor Modal Styles */
-        #viewVisitorModal .visitor-photo-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        #viewVisitorModal .info-grid {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        #viewVisitorModal .info-grid .row {
-            padding: 5px 0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        #viewVisitorModal .info-grid .row:last-child {
-            border-bottom: none;
-        }
-
-        #viewVisitorModal .modal-header {
-            background: linear-gradient(135deg, #f39c12, #1e9338);
-        }
-
-        /* All Visitors Modal Styles */
-        #viewAllVisitorModal .info-section {
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        #viewAllVisitorModal .stat-item {
-            padding: 5px 0;
-            font-size: 14px;
-        }
-
-        #viewAllVisitorModal .visit-history-section {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .photo-section {
-            position: relative;
-        }
-
-        .visitor-type-badge {
-            margin: 10px 0;
-        }
-
-        /* Hover effect for action buttons */
-        .action-btn.view:hover {
-            color: #3498db;
-            transform: scale(1.2);
-            transition: all 0.3s ease;
-        }
-
-        /* Action Buttons */
-        .action-btn {
-            padding: 5px 10px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-size: 1.1em;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn:hover {
-            transform: scale(1.2);
-        }
-
-        .action-btn.view {
-            color: var(--info-color);
-        }
-
-        .action-btn.edit {
-            color: var(--primary-color);
-        }
-
-        .action-btn.delete {
-            color: var(--danger-color);
-        }
-
-        /* Activity Trail Timeline Styles */
-        .timeline {
-            position: relative;
-            padding: 20px 0;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 20px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #dee2e6;
-        }
-
-        .timeline-item {
-            position: relative;
-            padding-left: 60px;
-            margin-bottom: 30px;
-        }
-
-        .timeline-marker {
-            position: absolute;
-            left: 10px;
-            top: 0;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 10px;
-            z-index: 1;
-        }
-
-        .timeline-content {
-            background: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
-
-        .timeline-content:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transform: translateX(5px);
-        }
-
-        .timeline-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .timeline-body {
-            color: #495057;
-        }
-
-        .timeline-body strong {
-            color: #2c3e50;
-            font-size: 14px;
-        }
-
-        .timeline-body p {
-            font-size: 13px;
-            margin-top: 5px;
-        }
-
-        .changes-list {
-            margin: 10px 0 0 0;
-            padding-left: 20px;
-            list-style-type: none;
-        }
-
-        .changes-list li {
-            position: relative;
-            color: #6c757d;
-            font-size: 12px;
-            padding-left: 15px;
-            margin-bottom: 5px;
-        }
-
-        .changes-list li::before {
-            content: '→';
-            position: absolute;
-            left: 0;
-            color: #95a5a6;
-        }
-
-        /* Activity Trail Modal specific styles */
-        #activityTrailModal .modal-header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        #activityTrailModal .modal-header .btn-close {
-            filter: brightness(0) invert(1);
-        }
-
-        .visitor-info-header {
-            border-left: 4px solid #667eea;
-        }
-
-        /* Action color badges */
-        .bg-purple {
-            background-color: #9b59b6 !important;
-        }
-
-        /* Timeline marker animations */
-        .timeline-marker {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
-            }
-        }
-
-        /* Responsive timeline */
-        @media (max-width: 576px) {
-            .timeline::before {
-                left: 15px;
-            }
-            
-            .timeline-marker {
-                left: 5px;
-            }
-            
-            .timeline-item {
-                padding-left: 40px;
-            }
-            
-            .timeline-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-
-        /* Fix for visitor photo display */
-        #allVisitorPhoto {
-            object-fit: cover;
-            background-color: #f8f9fa;
-            border: 4px solid #667eea;
-        }
-
-        #allVisitorPhoto.error {
-            opacity: 0.5;
-        }
-
-        /* Enhanced photo container styles */
-        .photo-section {
-            position: relative;
-            padding: 15px;
-        }
-
-        .photo-section::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 210px;
-            height: 210px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
-            opacity: 0.1;
-            z-index: -1;
-        }
-
-        /* Responsive */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f5f6fa; }
+        .sidebar { position: fixed; top: 0; left: 0; height: 100vh; width: 250px; background: var(--sidebar-bg); transition: all 0.3s ease; z-index: 1000; overflow-y: auto; }
+        .sidebar.collapsed { width: 70px; }
+        .sidebar-header { background: linear-gradient(135deg, #f39c12, #1e9338); padding: 20px; text-align: center; color: white; }
+        .sidebar-header h3 { margin: 0; font-size: 1.5em; font-weight: 600; }
+        .sidebar.collapsed .sidebar-header h3 { display: none; }
+        .sidebar-logo { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 10px; }
+        .sidebar-logo img { width: 40px; height: 40px; background: white; border-radius: 10px; padding: 5px; object-fit: contain; }
+        .sidebar-menu { padding: 20px 0; }
+        .sidebar-item { padding: 15px 20px; color: #ecf0f1; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.3s ease; position: relative; }
+        .sidebar-item:hover { background: var(--sidebar-hover); padding-left: 25px; }
+        .sidebar-item.active { background: var(--sidebar-hover); border-left: 4px solid var(--primary-color); }
+        .sidebar-item i { font-size: 1.3em; width: 30px; text-align: center; }
+        .sidebar.collapsed .sidebar-item span { display: none; }
+        .sidebar-badge { background: var(--danger-color); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: auto; }
+        .main-content { margin-left: 250px; transition: all 0.3s ease; min-height: 100vh; }
+        .main-content.expanded { margin-left: 70px; }
+        .topbar { background: white; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .topbar-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { font-size: 1.5em; cursor: pointer; color: var(--sidebar-bg); }
+        .search-box { position: relative; width: 300px; }
+        .search-box input { width: 100%; padding: 8px 40px 8px 15px; border: 1px solid #dee2e6; border-radius: 20px; font-size: 0.95em; }
+        .search-box i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #95a5a6; }
+        .topbar-right { display: flex; align-items: center; gap: 20px; }
+        .notification-icon { position: relative; cursor: pointer; font-size: 1.3em; color: #7f8c8d; }
+        .notification-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7em; }
+        .user-profile { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 10px; border-radius: 20px; transition: background 0.3s ease; }
+        .user-profile:hover { background: #f8f9fa; }
+        .user-avatar { width: 35px; height: 35px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
+        .dashboard-content { padding: 30px; }
+        .page-title { font-size: 2em; color: var(--sidebar-bg); margin-bottom: 10px; }
+        .page-subtitle { color: #7f8c8d; margin-bottom: 30px; }
+        .stat-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; overflow: hidden; transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .stat-card-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 3em; opacity: 0.1; }
+        .stat-value { font-size: 2.5em; font-weight: 600; margin-bottom: 5px; }
+        .stat-label { color: #7f8c8d; font-size: 0.95em; }
+        .quick-stats { display: flex; gap: 20px; padding: 15px; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); border-radius: 12px; color: white; margin-bottom: 20px; }
+        .quick-stat-item { text-align: center; flex: 1; }
+        .quick-stat-value { font-size: 1.8em; font-weight: 600; }
+        .quick-stat-label { font-size: 0.9em; opacity: 0.9; }
+        .table-container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .table td, .table tr, .table th { overflow: hidden; text-overflow: ellipsis; word-wrap: break-word; word-break: break-word; white-space: normal; }
+        .visitor-photo { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #f8f9fa; display: inline-flex; align-items: center; justify-content: center; }
+        .visitor-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
+        .status-badge.checked-in { background: rgba(39, 174, 96, 0.1); color: var(--success-color); }
+        .status-badge.checked-out { background: rgba(52, 152, 219, 0.1); color: var(--info-color); }
+        .purpose-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
+        .purpose-badge.meeting { background: rgba(52, 152, 219, 0.1); color: var(--info-color); }
+        .purpose-badge.interview { background: rgba(155, 89, 182, 0.1); color: #9b59b6; }
+        .purpose-badge.delivery { background: rgba(243, 156, 18, 0.1); color: var(--primary-color); }
+        .purpose-badge.service { background: rgba(13, 202, 240, 0.1); color: #0dcaf0; }
+        .purpose-badge.training { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+        .badge-number { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 2px 8px; border-radius: 6px; font-size: 0.85em; font-weight: 600; }
+        .action-btn { padding: 5px 10px; border: none; background: none; cursor: pointer; font-size: 1.1em; transition: all 0.3s ease; }
+        .action-btn:hover { transform: scale(1.2); }
+        .action-btn.view { color: var(--info-color); }
+        .action-btn.edit { color: var(--primary-color); }
+        .action-btn.delete { color: var(--danger-color); }
+        .company-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; display: inline-block; }
+        .company-badge.toms-world { background: rgba(243, 156, 18, 0.15); color: #f39c12; border: 1px solid #f39c12; }
+        .company-badge.pan-asia { background: rgba(30, 147, 56, 0.15); color: #1e9338; border: 1px solid #1e9338; }
+        .info-grid { background: #f8f9fa; padding: 15px; border-radius: 8px; }
+        .info-grid .row { padding: 5px 0; border-bottom: 1px solid #e0e0e0; }
+        .info-grid .row:last-child { border-bottom: none; }
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .search-box {
-                width: 150px;
-            }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .search-box { width: 150px; }
         }
     </style>
 </head>
-
 <body>
-    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" alt="TOMS WORLD">
-                <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" alt="PAN-ASIA">
+                <img src="assets/images/icons/stufftoy.png" alt="TOMS WORLD" onerror="this.style.display='none'">
+                <img src="assets/images/icons/pan-asia.jpg" alt="PAN-ASIA" onerror="this.style.display='none'">
             </div>
-            <h3>VMS ADMIN</h3>
+            <h3>KIOSK V-PASS</h3>
         </div>
         <div class="sidebar-menu">
             <div class="sidebar-item active" onclick="showSection('dashboard')">
-                <i class="bi bi-speedometer2"></i>
-                <span>Dashboard</span>
+                <i class="bi bi-speedometer2"></i><span>Dashboard</span>
             </div>
             <div class="sidebar-item" onclick="showSection('active-visits')">
-                <i class="bi bi-person-check"></i>
-                <span>Active Visits</span>
+                <i class="bi bi-person-check"></i><span>Active Visits</span>
                 <span class="sidebar-badge" id="activeVisitCount"><?php echo $dashboardStats['currently_in']; ?></span>
             </div>
             <div class="sidebar-item" onclick="showSection('visitors')">
-                <i class="bi bi-people"></i>
-                <span>All Visitors</span>
-            </div>
-            <div class="sidebar-item" onclick="showSection('pre-scheduled')">
-                <i class="bi bi-calendar-check"></i>
-                <span>Pre-Scheduled</span>
+                <i class="bi bi-people"></i><span>All Visitors</span>
             </div>
             <div class="sidebar-item" onclick="showSection('employees')">
-                <i class="bi bi-person-badge"></i>
-                <span>Employees</span>
+                <i class="bi bi-person-badge"></i><span>Employees</span>
             </div>
             <div class="sidebar-item" onclick="showSection('departments')">
-                <i class="bi bi-building"></i>
-                <span>Departments</span>
-            </div>
-            <div class="sidebar-item" onclick="showSection('reports')">
-                <i class="bi bi-file-earmark-text"></i>
-                <span>Reports</span>
+                <i class="bi bi-building"></i><span>Departments</span>
             </div>
             <div class="sidebar-item" onclick="showSection('settings')">
-                <i class="bi bi-gear"></i>
-                <span>Settings</span>
+                <i class="bi bi-gear"></i><span>Settings</span>
             </div>
         </div>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <!-- Top Bar -->
         <div class="topbar">
             <div class="topbar-left">
                 <i class="bi bi-list menu-toggle" onclick="toggleSidebar()"></i>
@@ -1039,8 +430,6 @@ $activeVisits = getActiveVisits($conn);
         <div class="dashboard-content" id="dashboardSection">
             <h1 class="page-title">Visitor Management Dashboard</h1>
             <p class="page-subtitle">Welcome back! Here's what's happening today at Tom's World & Pan-Asia.</p>
-
-            <!-- Quick Stats Bar -->
             <div class="quick-stats">
                 <div class="quick-stat-item">
                     <div class="quick-stat-value" id="todayTotal"><?php echo $dashboardStats['today_total']; ?></div>
@@ -1051,53 +440,43 @@ $activeVisits = getActiveVisits($conn);
                     <div class="quick-stat-label">Currently In Building</div>
                 </div>
                 <div class="quick-stat-item">
-                    <div class="quick-stat-value" id="scheduledToday"><?php echo $dashboardStats['scheduled_today']; ?></div>
-                    <div class="quick-stat-label">Scheduled Today</div>
-                </div>
-                <div class="quick-stat-item">
                     <div class="quick-stat-value" id="avgDuration"><?php echo $dashboardStats['avg_duration']; ?></div>
                     <div class="quick-stat-label">Avg. Visit Duration</div>
                 </div>
             </div>
-
-            <!-- Recent Activity Table -->
             <div class="table-container mb-4">
                 <div class="table-header">
                     <h3 class="chart-title">Recent Check-ins</h3>
-                    <div class="table-actions">
-                        <button class="btn btn-outline-secondary btn-sm" onclick="refreshDashboard()">
-                            <i class="bi bi-arrow-clockwise"></i> Refresh
-                        </button>
-                    </div>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="refreshDashboard()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
                 </div>
-                <table class="table table-hover">
+                <table class="table table-hover" id="recentActivityTable">
                     <thead>
                         <tr>
-                            <th>Badge #</th>
-                            <th>Visitor</th>
-                            <th>Company</th>
-                            <th>Host</th>
-                            <th>Purpose</th>
-                            <th>Check-In</th>
-                            <th>Status</th>
+                            <th>Badge #</th><th>Visitor</th><th>Company</th><th>Host</th><th>Purpose</th><th>Visiting</th><th>Check-In</th><th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="recentActivityTable">
-                        <?php foreach($recentActivity as $activity): ?>
+                    <tbody id="recentActivityTableBody">
+                        <?php foreach($recentActivity as $activity): 
+                            $companyBadge = '';
+                            if ($activity['company_visited'] == 'Toms World') {
+                                $companyBadge = '<span class="company-badge toms-world"><i class="bi bi-building"></i> Tom\'s World</span>';
+                            } elseif ($activity['company_visited'] == 'Pan Asia') {
+                                $companyBadge = '<span class="company-badge pan-asia"><i class="bi bi-building"></i> Pan-Asia</span>';
+                            } else {
+                                $companyBadge = '<span class="badge bg-secondary">' . ($activity['company_visited'] ?? 'N/A') . '</span>';
+                            }
+                        ?>
                         <tr>
                             <td><span class="badge-number"><?php echo $activity['badge_number']; ?></span></td>
                             <td><?php echo $activity['first_name'] . ' ' . $activity['last_name']; ?></td>
                             <td><?php echo $activity['company']; ?></td>
                             <td><?php echo $activity['host_name']; ?></td>
-                            <td><span class="purpose-badge <?php echo $activity['purpose']; ?>"><?php echo $activity['purpose']; ?></span></td>
+                            <td><span class="purpose-badge <?php echo strtolower($activity['purpose']); ?>"><?php echo $activity['purpose']; ?></span></td>
+                            <td><?php echo $companyBadge; ?></td>
                             <td><?php echo date('H:i:s', strtotime($activity['check_in_time'])); ?></td>
-                            <td>
-                                <?php if($activity['check_out_time']): ?>
-                                    <span class="status-badge checked-out">Checked Out</span>
-                                <?php else: ?>
-                                    <span class="status-badge checked-in">Checked In</span>
-                                <?php endif; ?>
-                            </td>
+                            <td><?php echo $activity['check_out_time'] ? '<span class="status-badge checked-out">Checked Out</span>' : '<span class="status-badge checked-in">Checked In</span>'; ?></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -1109,28 +488,20 @@ $activeVisits = getActiveVisits($conn);
         <div class="dashboard-content" id="active-visitsSection" style="display: none;">
             <h1 class="page-title">Active Visits</h1>
             <p class="page-subtitle">Visitors currently in the building</p>
-
             <div class="table-container">
                 <div class="table-header">
                     <h3 class="chart-title">Currently Checked In</h3>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="loadActiveVisits()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
                 </div>
                 <table class="table table-hover" id="activeVisitsTable">
                     <thead>
                         <tr>
-                            <th>Badge Number</th>
-                            <th>Visitor Name</th>
-                            <th>Company</th>
-                            <th>Host</th>
-                            <th>Department</th>
-                            <th>Purpose</th>
-                            <th>Check-In Time</th>
-                            <th>Valid Until</th>
-                            <th>Actions</th>
+                            <th>Badge #</th><th>Visitor</th><th>Company</th><th>Host</th><th>Department</th><th>Purpose</th><th>Visiting</th><th>Check-In</th><th>Valid Until</th><th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="activeVisitsTableBody">
-                        <!-- Will be populated via AJAX -->
-                    </tbody>
+                    <tbody id="activeVisitsTableBody"></tbody>
                 </table>
             </div>
         </div>
@@ -1139,7 +510,6 @@ $activeVisits = getActiveVisits($conn);
         <div class="dashboard-content" id="visitorsSection" style="display: none;">
             <h1 class="page-title">Visitor Management</h1>
             <p class="page-subtitle">Complete visitor records</p>
-
             <div class="table-container">
                 <div class="table-header">
                     <h3 class="chart-title">All Visitors</h3>
@@ -1147,48 +517,10 @@ $activeVisits = getActiveVisits($conn);
                 <table class="table table-hover" id="allVisitorsTable">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Company</th>
-                            <th>Type</th>
-                            <th>Total Visits</th>
-                            <th>Last Visit</th>
-                            <th>Actions</th>
+                            <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Type</th><th>Total Visits</th><th>Last Visit</th><th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="allVisitorsTableBody">
-                        <!-- Will be populated via AJAX -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Pre-Scheduled Section -->
-        <div class="dashboard-content" id="pre-scheduledSection" style="display: none;">
-            <h1 class="page-title">Pre-Scheduled Visits</h1>
-            <p class="page-subtitle">Manage upcoming scheduled visits</p>
-
-            <div class="table-container">
-                <div class="table-header">
-                    <h3 class="chart-title">Scheduled Visits</h3>
-                </div>
-                <table class="table table-hover" id="scheduledTable">
-                    <thead>
-                        <tr>
-                            <th>Booking Code</th>
-                            <th>Visitor</th>
-                            <th>Company</th>
-                            <th>Scheduled Time</th>
-                            <th>Host</th>
-                            <th>Purpose</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="scheduledTableBody">
-                        <!-- Will be populated via AJAX -->
-                    </tbody>
+                    <tbody id="allVisitorsTableBody"></tbody>
                 </table>
             </div>
         </div>
@@ -1197,23 +529,20 @@ $activeVisits = getActiveVisits($conn);
         <div class="dashboard-content" id="employeesSection" style="display: none;">
             <h1 class="page-title">Employee Directory</h1>
             <p class="page-subtitle">Manage employee records and host assignments</p>
-
             <div class="table-container">
-                <h4>Employee List</h4>
+                <div class="table-header">
+                    <h4>Employee List</h4>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                        <i class="bi bi-plus-circle"></i> Add Employee
+                    </button>
+                </div>
                 <table class="table table-hover" id="employeeTable">
                     <thead>
                         <tr>
-                            <th>Employee ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Department</th>
-                            <th>Status</th>
-                            <th>Total Visits Hosted</th>
+                            <th>Employee ID</th><th>Name</th><th>Email</th><th>Department</th><th>Status</th><th>Total Visits Hosted</th>
                         </tr>
                     </thead>
-                    <tbody id="employeeTableBody">
-                        <!-- Will be populated via AJAX -->
-                    </tbody>
+                    <tbody id="employeeTableBody"></tbody>
                 </table>
             </div>
         </div>
@@ -1222,60 +551,21 @@ $activeVisits = getActiveVisits($conn);
         <div class="dashboard-content" id="departmentsSection" style="display: none;">
             <h1 class="page-title">Department Management</h1>
             <p class="page-subtitle">Manage organizational departments</p>
-
             <div class="table-container">
-                <h3 class="chart-title">All Departments</h3>
+                <div class="table-header">
+                    <h3 class="chart-title">All Departments</h3>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">
+                        <i class="bi bi-plus-circle"></i> Add Department
+                    </button>
+                </div>
                 <table class="table table-hover" id="departmentTable">
                     <thead>
                         <tr>
-                            <th>Department Code</th>
-                            <th>Department Name</th>
-                            <th>Total Employees</th>
-                            <th>Total Visits</th>
-                            <th>Created</th>
+                            <th>Department Code</th><th>Department Name</th><th>Total Employees</th><th>Total Visits</th><th>Created</th>
                         </tr>
                     </thead>
-                    <tbody id="departmentTableBody">
-                        <!-- Will be populated via AJAX -->
-                    </tbody>
+                    <tbody id="departmentTableBody"></tbody>
                 </table>
-            </div>
-        </div>
-
-        <!-- Reports Section -->
-        <div class="dashboard-content" id="reportsSection" style="display: none;">
-            <h1 class="page-title">Reports & Analytics</h1>
-            <p class="page-subtitle">Generate comprehensive reports</p>
-
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <i class="bi bi-calendar-day stat-card-icon"></i>
-                        <h4>Daily Report</h4>
-                        <p class="text-muted">Today's visitor summary</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <i class="bi bi-calendar-week stat-card-icon"></i>
-                        <h4>Weekly Report</h4>
-                        <p class="text-muted">7-day visitor analysis</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <i class="bi bi-calendar-month stat-card-icon"></i>
-                        <h4>Monthly Report</h4>
-                        <p class="text-muted">Monthly statistics</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <i class="bi bi-shield-check stat-card-icon"></i>
-                        <h4>Security Report</h4>
-                        <p class="text-muted">Security audit log</p>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -1283,7 +573,6 @@ $activeVisits = getActiveVisits($conn);
         <div class="dashboard-content" id="settingsSection" style="display: none;">
             <h1 class="page-title">System Settings</h1>
             <p class="page-subtitle">Configure visitor management system</p>
-
             <div class="table-container">
                 <h4>General Settings</h4>
                 <form>
@@ -1299,234 +588,166 @@ $activeVisits = getActiveVisits($conn);
                 </form>
             </div>
         </div>
+    </div>
 
-        <!-- Add this modal structure before closing body tag or after your main content -->
-        <div class="modal fade" id="viewVisitorModal" tabindex="-1" aria-labelledby="viewVisitorModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="viewVisitorModalLabel">
-                            <i class="bi bi-person-badge"></i> Visitor Details
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <!-- Photo Column -->
-                            <div class="col-md-4 text-center">
-                                <div class="visitor-photo-container mb-3">
-                                    <img id="modalVisitorPhoto" src="" alt="Visitor Photo" class="img-fluid rounded-circle border border-3 border-primary" style="max-width: 200px; height: 200px; object-fit: cover;">
-                                </div>
-                                <div class="badge bg-primary text-white p-2 mb-2">
-                                    <i class="bi bi-card-text"></i> Badge: <span id="modalBadgeNumber"></span>
-                                </div>
+    <!-- View Visitor Modal (Active Visits) -->
+    <div class="modal fade" id="viewVisitorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #f39c12, #1e9338); color: white;">
+                    <h5 class="modal-title"><i class="bi bi-person-badge"></i> Visitor Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <img id="modalVisitorPhoto" src="" alt="Visitor Photo" class="img-fluid rounded-circle border border-3 border-primary mb-3" style="width: 200px; height: 200px; object-fit: cover;">
+                            <div class="badge bg-primary text-white p-2">
+                                <i class="bi bi-card-text"></i> Badge: <span id="modalBadgeNumber"></span>
                             </div>
-                            
-                            <!-- Information Column -->
-                            <div class="col-md-8">
-                                <div class="visitor-info">
-                                    <h4 class="mb-3 text-primary" id="modalVisitorName"></h4>
-                                    
-                                    <div class="info-grid">
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-envelope"></i> Email:
-                                            </div>
-                                            <div class="col-sm-8" id="modalEmail"></div>
-                                        </div>
-                                        
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-telephone"></i> Phone:
-                                            </div>
-                                            <div class="col-sm-8" id="modalPhone"></div>
-                                        </div>
-                                        
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-building"></i> Company:
-                                            </div>
-                                            <div class="col-sm-8" id="modalCompany"></div>
-                                        </div>
-                                        
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-person-check"></i> Host:
-                                            </div>
-                                            <div class="col-sm-8" id="modalHost"></div>
-                                        </div>
-                                        
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-flag"></i> Purpose:
-                                            </div>
-                                            <div class="col-sm-8">
-                                                <span class="badge bg-info text-white" id="modalPurpose"></span>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-clock"></i> Check-In:
-                                            </div>
-                                            <div class="col-sm-8" id="modalCheckIn"></div>
-                                        </div>
-                                        
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-hourglass-split"></i> Valid Until:
-                                            </div>
-                                            <div class="col-sm-8" id="modalValidUntil"></div>
-                                        </div>
-                                        
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-card-checklist"></i> Status:
-                                            </div>
-                                            <div class="col-sm-8" id="modalStatus"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h4 class="mb-3 text-primary" id="modalVisitorName"></h4>
+                            <div class="info-grid">
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-envelope"></i> Email:</div><div class="col-sm-8" id="modalEmail"></div></div>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-telephone"></i> Phone:</div><div class="col-sm-8" id="modalPhone"></div></div>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-building"></i> Company:</div><div class="col-sm-8" id="modalCompany"></div></div>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-person-check"></i> Host:</div><div class="col-sm-8" id="modalHost"></div></div>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-flag"></i> Purpose:</div><div class="col-sm-8"><span class="badge bg-info" id="modalPurpose"></span></div></div>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-geo-alt"></i> Visiting:</div><div class="col-sm-8" id="modalCompanyVisited"></div></div>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-clock"></i> Check-In:</div><div class="col-sm-8" id="modalCheckIn"></div></div>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-hourglass-split"></i> Valid Until:</div><div class="col-sm-8" id="modalValidUntil"></div></div>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-card-checklist"></i> Status:</div><div class="col-sm-8" id="modalStatus"></div></div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-danger" id="checkOutVisitorBtn" onclick="checkOutVisitor()" style="display: none;">
-                            <i class="bi bi-box-arrow-right"></i> Check Out
-                        </button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="checkOutVisitorBtn" onclick="performCheckout()">
+                        <i class="bi bi-box-arrow-right"></i> Check Out
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Add this modal for All Visitors section -->
-        <div class="modal fade" id="viewAllVisitorModal" tabindex="-1" aria-labelledby="viewAllVisitorModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header" style="background: linear-gradient(135deg, #f39c12, #1e9338); color: white;">
-                        <h5 class="modal-title" id="viewAllVisitorModalLabel">
-                            <i class="bi bi-person-vcard"></i> Visitor Information
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <!-- Photo Section -->
-                            <div class="col-md-4 text-center">
-                                <div class="photo-section mb-3">
-                                    <img id="allVisitorPhoto" src="" alt="Visitor Photo" class="rounded-circle shadow" style="width: 200px; height: 200px; object-fit: cover; border: 4px solid #667eea;">
-                                </div>
-                                <div class="visitor-type-badge mb-2">
-                                    <span class="badge bg-primary p-2" id="allVisitorType">
-                                        <i class="bi bi-person-badge"></i> Type: <span id="visitorTypeText"></span>
-                                    </span>
-                                </div>
-                                <div class="visit-stats p-3 bg-light rounded">
-                                    <h6 class="text-muted mb-2">Visit Statistics</h6>
-                                    <div class="stat-item">
-                                        <i class="bi bi-bar-chart"></i>
-                                        <strong>Total Visits:</strong> <span id="allVisitorTotalVisits">0</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <i class="bi bi-calendar-check"></i>
-                                        <strong>Last Visit:</strong> <span id="allVisitorLastVisit">N/A</span>
-                                    </div>
-                                </div>
+    <!-- View All Visitor Modal -->
+    <div class="modal fade" id="viewAllVisitorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #f39c12, #1e9338); color: white;">
+                    <h5 class="modal-title"><i class="bi bi-person-vcard"></i> Visitor Information</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <img id="allVisitorPhoto" src="" alt="Visitor Photo" class="rounded-circle shadow mb-3" style="width: 200px; height: 200px; object-fit: cover; border: 4px solid #667eea;">
+                            <div class="badge bg-primary p-2 mb-2" id="allVisitorType">
+                                <i class="bi bi-person-badge"></i> Type: <span id="visitorTypeText"></span>
                             </div>
-                            
-                            <!-- Details Section -->
-                            <div class="col-md-8">
-                                <div class="visitor-details">
-                                    <h4 class="mb-3 text-primary border-bottom pb-2">
-                                        <span id="allVisitorFullName"></span>
-                                    </h4>
-                                    
-                                    <!-- Contact Information -->
-                                    <div class="info-section mb-3">
-                                        <h6 class="text-muted mb-2">Contact Information</h6>
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-envelope-fill text-primary"></i> Email:
-                                            </div>
-                                            <div class="col-sm-8">
-                                                <a href="#" id="allVisitorEmail" class="text-decoration-none"></a>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-telephone-fill text-primary"></i> Phone:
-                                            </div>
-                                            <div class="col-sm-8">
-                                                <a href="#" id="allVisitorPhone" class="text-decoration-none"></a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Company Information -->
-                                    <div class="info-section mb-3">
-                                        <h6 class="text-muted mb-2">Organization</h6>
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-building text-primary"></i> Company:
-                                            </div>
-                                            <div class="col-sm-8" id="allVisitorCompany"></div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Additional Information -->
-                                    <div class="info-section mb-3">
-                                        <h6 class="text-muted mb-2">Additional Details</h6>
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-calendar-plus text-primary"></i> First Registered:
-                                            </div>
-                                            <div class="col-sm-8" id="allVisitorCreated"></div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4 fw-bold">
-                                                <i class="bi bi-clock-history text-primary"></i> Last Updated:
-                                            </div>
-                                            <div class="col-sm-8" id="allVisitorUpdated"></div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Visit History Preview -->
-                                    <div class="visit-history-section" id="visitHistorySection" style="display: none;">
-                                        <h6 class="text-muted mb-2">Recent Visit History</h6>
-                                        <div class="table-responsive">
-                                            <table class="table table-sm table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Date</th>
-                                                        <th>Purpose</th>
-                                                        <th>Host</th>
-                                                        <th>Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="recentVisitsTable">
-                                                    <!-- Dynamic content -->
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="text-muted mb-2">Visit Statistics</h6>
+                                <div><i class="bi bi-bar-chart"></i> <strong>Total Visits:</strong> <span id="allVisitorTotalVisits">0</span></div>
+                                <div><i class="bi bi-calendar-check"></i> <strong>Last Visit:</strong> <span id="allVisitorLastVisit">N/A</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h4 class="mb-3 text-primary border-bottom pb-2" id="allVisitorFullName"></h4>
+                            <div class="info-section mb-3">
+                                <h6 class="text-muted mb-2">Contact Information</h6>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-envelope-fill text-primary"></i> Email:</div><div class="col-sm-8"><a href="#" id="allVisitorEmail" class="text-decoration-none"></a></div></div>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-telephone-fill text-primary"></i> Phone:</div><div class="col-sm-8"><a href="#" id="allVisitorPhone" class="text-decoration-none"></a></div></div>
+                            </div>
+                            <div class="info-section mb-3">
+                                <h6 class="text-muted mb-2">Organization</h6>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-building text-primary"></i> Company:</div><div class="col-sm-8" id="allVisitorCompany"></div></div>
+                            </div>
+                            <div class="info-section mb-3">
+                                <h6 class="text-muted mb-2">Additional Details</h6>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-calendar-plus text-primary"></i> First Registered:</div><div class="col-sm-8" id="allVisitorCreated"></div></div>
+                                <div class="row mb-2"><div class="col-sm-4 fw-bold"><i class="bi bi-clock-history text-primary"></i> Last Updated:</div><div class="col-sm-8" id="allVisitorUpdated"></div></div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" onclick="printVisitorCard()" title="Print Visitor Card">
-                            <i class="bi bi-printer"></i> Print Card
-                        </button>
-                        <button type="button" class="btn btn-info" onclick="viewFullHistory()" id="viewHistoryBtn" title="View Full History">
-                            <i class="bi bi-clock-history"></i> Full History
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
+    </div>
 
+    <!-- Add Employee Modal -->
+    <div class="modal fade" id="addEmployeeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-person-plus"></i> Add New Employee</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addEmployeeForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Department <span class="text-danger">*</span></label>
+                            <select class="form-select" name="department_code" id="employeeDepartmentSelect" required>
+                                <option value="">Select Department</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" name="is_active" id="isActiveCheck" checked>
+                            <label class="form-check-label" for="isActiveCheck">Active Employee</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save Employee</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Department Modal -->
+    <div class="modal fade" id="addDepartmentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-building-add"></i> Add New Department</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addDepartmentForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Department Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="department_code" placeholder="e.g., IT, HR, SALES" required maxlength="20">
+                            <small class="text-muted">Unique identifier for the department</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Department Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="name" placeholder="e.g., Information Technology" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="3" placeholder="Brief description of the department"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save Department</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -1536,227 +757,249 @@ $activeVisits = getActiveVisits($conn);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
-        // Toggle Sidebar
+        let currentVisitId = null;
+        let currentVisitorData = null;
+        let dataTableInstances = {};
+
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('mainContent').classList.toggle('expanded');
         }
 
-        // Show Section
         function showSection(section) {
-            // Hide all sections
-            document.querySelectorAll('.dashboard-content').forEach(content => {
-                content.style.display = 'none';
-            });
+            document.querySelectorAll('.dashboard-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
             
-            // Remove active from all sidebar items
-            document.querySelectorAll('.sidebar-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Show selected section
             const sectionMap = {
                 'dashboard': 'dashboardSection',
                 'active-visits': 'active-visitsSection',
                 'visitors': 'visitorsSection',
-                'pre-scheduled': 'pre-scheduledSection',
                 'employees': 'employeesSection',
                 'departments': 'departmentsSection',
-                'reports': 'reportsSection',
                 'settings': 'settingsSection'
             };
             
             if (sectionMap[section]) {
                 document.getElementById(sectionMap[section]).style.display = 'block';
-                
-                // Add active class to clicked item
                 event.target.closest('.sidebar-item').classList.add('active');
                 
-                // Load section-specific data
                 switch(section) {
-                    case 'active-visits':
-                        loadActiveVisits();
-                        break;
-                    case 'visitors':
-                        loadAllVisitors();
-                        break;
-                    case 'pre-scheduled':
-                        loadScheduledVisits();
-                        break;
-                    case 'employees':
-                        loadEmployees();
-                        break;
-                    case 'departments':
-                        loadDepartments();
-                        break;
+                    case 'active-visits': loadActiveVisits(); break;
+                    case 'visitors': loadAllVisitors(); break;
+                    case 'employees': loadEmployees(); break;
+                    case 'departments': loadDepartments(); break;
                 }
             }
         }
 
-        // Load Active Visits
+        function initDataTable(tableId, data, columns) {
+            if (dataTableInstances[tableId]) {
+                dataTableInstances[tableId].destroy();
+            }
+            
+            const tbody = document.getElementById(tableId + 'Body');
+            tbody.innerHTML = '';
+            
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = columns(row);
+                tbody.appendChild(tr);
+            });
+            
+            dataTableInstances[tableId] = $('#' + tableId).DataTable({
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                order: [],
+                language: {
+                    emptyTable: "No data available",
+                    zeroRecords: "No matching records found"
+                }
+            });
+        }
+
         function loadActiveVisits() {
             fetch('?action=active_visits')
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
-                    const tbody = document.getElementById('activeVisitsTableBody');
-                    tbody.innerHTML = '';
-                    
-                    data.forEach(visit => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td><span class="badge-number">${visit.badge_number}</span></td>
-                                <td><strong>${visit.first_name} ${visit.last_name}</strong></td>
-                                <td>${visit.company}</td>
-                                <td>${visit.host_name}</td>
-                                <td>${visit.department_name}</td>
-                                <td><span class="purpose-badge ${visit.purpose}">${visit.purpose}</span></td>
-                                <td>${new Date(visit.check_in_time).toLocaleString()}</td>
-                                <td>${new Date(visit.valid_until).toLocaleString()}</td>
-                                <td>
-                                    <!-- To this: -->
-                                    <button class="action-btn view" onclick="viewVisitorDetails(${visit.visit_id})" title="View Details">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button class="action-btn delete" onclick="checkOutVisitor(${visit.visit_id})">
-                                        <i class="bi bi-box-arrow-right"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    
-                    // Update badge count
+                    initDataTable('activeVisitsTable', data, (v) => `
+                        <td><span class="badge-number">${v.badge_number}</span></td>
+                        <td><strong>${v.first_name} ${v.last_name}</strong></td>
+                        <td>${v.company}</td>
+                        <td>${v.host_name}</td>
+                        <td>${v.department_name}</td>
+                        <td><span class="purpose-badge ${(v.purpose||'').toLowerCase()}">${v.purpose}</span></td>
+                        <td>${getCompanyBadgeHTML(v.company_visited)}</td>
+                        <td>${new Date(v.check_in_time).toLocaleString()}</td>
+                        <td>${new Date(v.valid_until).toLocaleString()}</td>
+                        <td>
+                            <button class="action-btn view" onclick="viewVisitDetails(${v.visit_id})" title="View"><i class="bi bi-eye"></i></button>
+                            <button class="action-btn delete" onclick="checkOutVisitor(${v.visit_id})" title="Check Out"><i class="bi bi-box-arrow-right"></i></button>
+                        </td>
+                    `);
                     document.getElementById('activeVisitCount').textContent = data.length;
-                });
+                })
+                .catch(e => console.error('Error loading active visits:', e));
         }
 
-        // Load All Visitors
         function loadAllVisitors() {
             fetch('?action=all_visitors')
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
-                    const tbody = document.getElementById('allVisitorsTableBody');
-                    tbody.innerHTML = '';
-                    
-                    data.forEach(visitor => {
-                        tbody.innerHTML +=
-                            // <tr>
-                            //     <td>${visitor.visitor_id}</td>
-                            //     <td><strong>${visitor.first_name} ${visitor.last_name}</strong></td>
-                            //     <td>${visitor.email}</td>
-                            //     <td>${visitor.phone}</td>
-                            //     <td>${visitor.company}</td>
-                            //     <td><span class="badge bg-info">${visitor.visitor_type}</span></td>
-                            //     <td>${visitor.total_visits}</td>
-                            //     <td>${visitor.last_visit ? new Date(visitor.last_visit).toLocaleDateString() : 'N/A'}</td>
-                            //     <td>
-                            //         <button class="action-btn view" onclick="viewVisitor(${visitor.visitor_id})">
-                            //             <i class="bi bi-eye"></i>
-                            //         </button>
-                            //     </td>
-                            // </tr>
-                         `
-                            <tr>
-                                <td>${visitor.visitor_id}</td>
-                                <td><strong>${visitor.first_name} ${visitor.last_name}</strong></td>
-                                <td>${visitor.email}</td>
-                                <td>${visitor.phone}</td>
-                                <td>${visitor.company}</td>
-                                <td><span class="badge bg-info">${visitor.visitor_type}</span></td>
-                                <td>${visitor.total_visits}</td>
-                                <td>${visitor.last_visit ? new Date(visitor.last_visit).toLocaleDateString() : 'N/A'}</td>
-                                <td>
-                                    <button class="action-btn view" onclick="viewVisitor(${visitor.visitor_id})" title="View Details">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    
-                    // Initialize DataTable if not already
-                    if (!$.fn.DataTable.isDataTable('#allVisitorsTable')) {
-                        $('#allVisitorsTable').DataTable();
-                    }
-                });
+                    initDataTable('allVisitorsTable', data, (v) => `
+                        <td>${v.visitor_id}</td>
+                        <td><strong>${v.first_name} ${v.last_name}</strong></td>
+                        <td>${v.email || 'N/A'}</td>
+                        <td>${v.phone || 'N/A'}</td>
+                        <td>${v.company || 'N/A'}</td>
+                        <td><span class="badge bg-info">${v.visitor_type || 'new'}</span></td>
+                        <td>${v.total_visits || 0}</td>
+                        <td>${v.last_visit ? new Date(v.last_visit).toLocaleDateString() : 'N/A'}</td>
+                        <td><button class="action-btn view" onclick="viewVisitor(${v.visitor_id})" title="View"><i class="bi bi-eye"></i></button></td>
+                    `);
+                })
+                .catch(e => console.error('Error loading visitors:', e));
         }
 
-        // Load Scheduled Visits
-        function loadScheduledVisits() {
-            fetch('?action=scheduled_visits')
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('scheduledTableBody');
-                    tbody.innerHTML = '';
-                    
-                    data.forEach(visit => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td><span class="badge bg-secondary">${visit.booking_code}</span></td>
-                                <td>${visit.visitor_name}</td>
-                                <td>${visit.visitor_company || 'N/A'}</td>
-                                <td>${new Date(visit.scheduled_time).toLocaleString()}</td>
-                                <td>${visit.host_name}</td>
-                                <td>${visit.purpose}</td>
-                                <td><span class="badge bg-warning">Scheduled</span></td>
-                            </tr>
-                        `;
-                    });
-                });
-        }
-
-        // Load Employees
         function loadEmployees() {
+            loadDepartmentsForSelect();
             fetch('?action=employees')
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
-                    const tbody = document.getElementById('employeeTableBody');
-                    tbody.innerHTML = '';
-                    
-                    data.forEach(emp => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${emp.employee_id}</td>
-                                <td><strong>${emp.name}</strong></td>
-                                <td>${emp.email}</td>
-                                <td>${emp.department_name}</td>
-                                <td>
-                                    <span class="badge ${emp.is_active == 1 ? 'bg-success' : 'bg-secondary'}">
-                                        ${emp.is_active == 1 ? 'Active' : 'Inactive'}
-                                    </span>
-                                </td>
-                                <td>${emp.total_visits || 0}</td>
-                            </tr>
-                        `;
-                    });
-                });
+                    initDataTable('employeeTable', data, (e) => `
+                        <td>${e.employee_id}</td>
+                        <td><strong>${e.name}</strong></td>
+                        <td>${e.email}</td>
+                        <td>${e.department_name}</td>
+                        <td><span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}">${e.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
+                        <td>${e.total_visits || 0}</td>
+                    `);
+                })
+                .catch(e => console.error('Error loading employees:', e));
         }
 
-        // Load Departments
         function loadDepartments() {
             fetch('?action=departments')
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
-                    const tbody = document.getElementById('departmentTableBody');
-                    tbody.innerHTML = '';
-                    
-                    data.forEach(dept => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td><span class="badge bg-secondary">${dept.department_code}</span></td>
-                                <td><strong>${dept.name}</strong></td>
-                                <td>${dept.employee_count || 0}</td>
-                                <td>${dept.visit_count || 0}</td>
-                                <td>${dept.created_at}</td>
-                            </tr>
-                        `;
+                    initDataTable('departmentTable', data, (d) => `
+                        <td><span class="badge bg-secondary">${d.department_code}</span></td>
+                        <td><strong>${d.name}</strong></td>
+                        <td>${d.employee_count || 0}</td>
+                        <td>${d.visit_count || 0}</td>
+                        <td>${d.created_at || 'N/A'}</td>
+                    `);
+                })
+                .catch(e => console.error('Error loading departments:', e));
+        }
+
+        function loadDepartmentsForSelect() {
+            fetch('?action=departments')
+                .then(r => r.json())
+                .then(data => {
+                    const select = document.getElementById('employeeDepartmentSelect');
+                    select.innerHTML = '<option value="">Select Department</option>';
+                    data.forEach(d => {
+                        select.innerHTML += `<option value="${d.department_code}">${d.name}</option>`;
                     });
                 });
         }
 
-        // Check Out Visitor
+        function getCompanyBadgeHTML(companyVisited) {
+            if (companyVisited === 'Toms World') {
+                return `<span class="company-badge toms-world"><i class="bi bi-building"></i> Tom's World</span>`;
+            } else if (companyVisited === 'Pan Asia') {
+                return `<span class="company-badge pan-asia"><i class="bi bi-building"></i> Pan-Asia</span>`;
+            }
+            return `<span class="badge bg-secondary">${companyVisited || 'Unknown'}</span>`;
+        }
+
+        function viewVisitDetails(visitId) {
+            fetch(`?action=get_visit&visit_id=${visitId}`)
+                .then(r => r.json())
+                .then(visit => {
+                    if (visit.error) {
+                        Swal.fire('Error', visit.error, 'error');
+                        return;
+                    }
+                    
+                    currentVisitId = visit.visit_id;
+                    
+                    let photoSrc = 'assets/images/default-avatar.png';
+                    if (visit.photo) {
+                        photoSrc = visit.photo.startsWith('data:image') ? visit.photo : 
+                                   (visit.photo.startsWith('/') || visit.photo.startsWith('assets/')) ? visit.photo :
+                                   'data:image/jpeg;base64,' + visit.photo;
+                    }
+                    
+                    document.getElementById('modalVisitorPhoto').src = photoSrc;
+                    document.getElementById('modalVisitorPhoto').onerror = function() { this.src = 'assets/images/default-avatar.png'; };
+                    document.getElementById('modalBadgeNumber').textContent = visit.badge_number;
+                    document.getElementById('modalVisitorName').textContent = `${visit.first_name} ${visit.last_name}`;
+                    document.getElementById('modalEmail').textContent = visit.email || 'N/A';
+                    document.getElementById('modalPhone').textContent = visit.phone || 'N/A';
+                    document.getElementById('modalCompany').textContent = visit.company || 'N/A';
+                    document.getElementById('modalHost').textContent = visit.host_name;
+                    document.getElementById('modalPurpose').textContent = visit.purpose;
+                    document.getElementById('modalCompanyVisited').innerHTML = getCompanyBadgeHTML(visit.company_visited);
+                    document.getElementById('modalCheckIn').textContent = new Date(visit.check_in_time).toLocaleString();
+                    document.getElementById('modalValidUntil').textContent = new Date(visit.valid_until).toLocaleString();
+                    
+                    if (visit.check_out_time) {
+                        document.getElementById('modalStatus').innerHTML = '<span class="badge bg-secondary">Checked Out</span>';
+                        document.getElementById('checkOutVisitorBtn').style.display = 'none';
+                    } else {
+                        document.getElementById('modalStatus').innerHTML = '<span class="badge bg-success">Active</span>';
+                        document.getElementById('checkOutVisitorBtn').style.display = 'inline-block';
+                    }
+                    
+                    new bootstrap.Modal(document.getElementById('viewVisitorModal')).show();
+                })
+                .catch(e => {
+                    console.error('Error:', e);
+                    Swal.fire('Error', 'Failed to load visitor details', 'error');
+                });
+        }
+
+        function viewVisitor(visitorId) {
+            fetch(`?action=get_visitor&visitor_id=${visitorId}`)
+                .then(r => r.json())
+                .then(visitor => {
+                    if (visitor.error) {
+                        Swal.fire('Error', visitor.error, 'error');
+                        return;
+                    }
+                    
+                    currentVisitorData = visitor;
+                    
+                    let photoSrc = 'assets/images/default-avatar.png';
+                    if (visitor.photo) {
+                        photoSrc = visitor.photo.startsWith('data:image') ? visitor.photo : 
+                                   (visitor.photo.startsWith('/') || visitor.photo.startsWith('assets/')) ? visitor.photo :
+                                   'data:image/jpeg;base64,' + visitor.photo;
+                    }
+                    
+                    document.getElementById('allVisitorPhoto').src = photoSrc;
+                    document.getElementById('allVisitorPhoto').onerror = function() { this.src = 'assets/images/default-avatar.png'; };
+                    document.getElementById('visitorTypeText').textContent = (visitor.visitor_type || 'new').charAt(0).toUpperCase() + (visitor.visitor_type || 'new').slice(1);
+                    document.getElementById('allVisitorFullName').textContent = `${visitor.first_name} ${visitor.last_name}`;
+                    document.getElementById('allVisitorEmail').textContent = visitor.email || 'Not provided';
+                    document.getElementById('allVisitorEmail').href = `mailto:${visitor.email || ''}`;
+                    document.getElementById('allVisitorPhone').textContent = visitor.phone || 'Not provided';
+                    document.getElementById('allVisitorPhone').href = `tel:${visitor.phone || ''}`;
+                    document.getElementById('allVisitorCompany').textContent = visitor.company || 'Not specified';
+                    document.getElementById('allVisitorTotalVisits').textContent = visitor.total_visits || '0';
+                    document.getElementById('allVisitorLastVisit').textContent = visitor.last_visit ? new Date(visitor.last_visit).toLocaleDateString() : 'N/A';
+                    document.getElementById('allVisitorCreated').textContent = visitor.created_at ? new Date(visitor.created_at).toLocaleString() : 'N/A';
+                    document.getElementById('allVisitorUpdated').textContent = visitor.updated_at ? new Date(visitor.updated_at).toLocaleString() : 'N/A';
+                    
+                    new bootstrap.Modal(document.getElementById('viewAllVisitorModal')).show();
+                })
+                .catch(e => {
+                    console.error('Error:', e);
+                    Swal.fire('Error', 'Failed to load visitor details', 'error');
+                });
+        }
+
         function checkOutVisitor(visitId) {
             Swal.fire({
                 title: 'Check Out Visitor?',
@@ -1768,408 +1011,12 @@ $activeVisits = getActiveVisits($conn);
                 confirmButtonText: 'Yes, Check Out'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('?action=checkout', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: 'visit_id=' + visitId
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data.success) {
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'success',
-                                title: 'Visitor checked out successfully',
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                            loadActiveVisits();
-                            refreshDashboard();
-                        } else {
-                            Swal.fire('Error', 'Failed to check out visitor', 'error');
-                        }
-                    });
+                    performCheckoutRequest(visitId);
                 }
             });
         }
 
-        // // View Visit Details
-        // function viewVisitDetails(visitId) {
-        //     // You can expand this function to show more details
-        //     console.log('View details for visit:', visitId);
-        // }
-
-        // // View Visitor
-        // function viewVisitor(visitorId) {
-        //     // You can expand this function to show visitor profile
-        //     console.log('View visitor:', visitorId);
-        // }
-
-
-        let currentVisitorData = null;
-
-        // Fixed viewVisitor function with proper photo handling
-        function viewVisitor(visitorId) {
-            // Fetch visitor details
-            fetch('?action=all_visitors')
-                .then(response => response.json())
-                .then(data => {
-                    const visitor = data.find(v => v.visitor_id == visitorId);
-                    
-                    if (visitor) {
-                        currentVisitorData = visitor;
-                        
-                        // FIX: Handle photo display properly
-                        // Check if photo exists and is base64 or a path
-                        let photoSrc = 'assets/images/default-avatar.png'; // Default image
-                        
-                        if (visitor.photo) {
-                            // Check if it's already a base64 string
-                            if (visitor.photo.startsWith('data:image')) {
-                                photoSrc = visitor.photo;
-                            } else if (visitor.photo.startsWith('/') || visitor.photo.startsWith('assets/')) {
-                                // It's a file path
-                                photoSrc = visitor.photo;
-                            } else {
-                                // Assume it's base64 data without the data URI prefix
-                                photoSrc = 'data:image/jpeg;base64,' + visitor.photo;
-                            }
-                        }
-                        
-                        document.getElementById('allVisitorPhoto').src = photoSrc;
-                        
-                        // Handle image loading errors
-                        document.getElementById('allVisitorPhoto').onerror = function() {
-                            this.src = 'assets/images/default-avatar.png';
-                        };
-                        
-                        // Set visitor type and badge color
-                        const visitorType = visitor.visitor_type || 'new';
-                        document.getElementById('visitorTypeText').textContent = visitorType.charAt(0).toUpperCase() + visitorType.slice(1);
-                        
-                        // Update type badge color based on type
-                        const typeBadge = document.querySelector('#allVisitorType');
-                        typeBadge.className = 'badge p-2';
-                        switch(visitorType) {
-                            case 'returning':
-                                typeBadge.classList.add('bg-success');
-                                break;
-                            case 'delivery':
-                                typeBadge.classList.add('bg-warning');
-                                break;
-                            default:
-                                typeBadge.classList.add('bg-primary');
-                        }
-                        
-                        // Set visitor information
-                        document.getElementById('allVisitorFullName').textContent = 
-                            `${visitor.first_name} ${visitor.last_name}`;
-                        
-                        // Contact Information
-                        const email = visitor.email || 'Not provided';
-                        document.getElementById('allVisitorEmail').textContent = email;
-                        document.getElementById('allVisitorEmail').href = `mailto:${email}`;
-                        
-                        const phone = visitor.phone || 'Not provided';
-                        document.getElementById('allVisitorPhone').textContent = phone;
-                        document.getElementById('allVisitorPhone').href = `tel:${phone}`;
-                        
-                        // Company
-                        document.getElementById('allVisitorCompany').textContent = 
-                            visitor.company || 'Not specified';
-                        
-                        // Statistics
-                        document.getElementById('allVisitorTotalVisits').textContent = 
-                            visitor.total_visits || '1';
-                        
-                        // Format dates
-                        if (visitor.last_visit) {
-                            const lastVisitDate = new Date(visitor.last_visit);
-                            document.getElementById('allVisitorLastVisit').textContent = 
-                                lastVisitDate.toLocaleDateString();
-                        } else {
-                            document.getElementById('allVisitorLastVisit').textContent = 'Current';
-                        }
-                        
-                        const createdDate = new Date(visitor.created_at);
-                        document.getElementById('allVisitorCreated').textContent = 
-                            createdDate.toLocaleString();
-                        
-                        const updatedDate = new Date(visitor.updated_at);
-                        document.getElementById('allVisitorUpdated').textContent = 
-                            updatedDate.toLocaleString();
-                        
-                        // Load recent visits if available
-                        loadRecentVisits(visitorId);
-                        
-                        // Show the modal
-                        const modal = new bootstrap.Modal(document.getElementById('viewAllVisitorModal'));
-                        modal.show();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching visitor details:', error);
-                    Swal.fire('Error', 'Failed to load visitor details', 'error');
-                });
-        }
-
-        function loadRecentVisits(visitorId) {
-            // This would typically fetch from a visits endpoint
-            // For now, showing a placeholder
-            fetch(`?action=visitor_visits&visitor_id=${visitorId}`)
-                .then(response => response.json())
-                .then(visits => {
-                    if (visits && visits.length > 0) {
-                        const tbody = document.getElementById('recentVisitsTable');
-                        tbody.innerHTML = '';
-                        
-                        // Show only last 5 visits
-                        visits.slice(0, 5).forEach(visit => {
-                            const row = `
-                                <tr>
-                                    <td>${new Date(visit.check_in_time).toLocaleDateString()}</td>
-                                    <td><span class="badge bg-info">${visit.purpose}</span></td>
-                                    <td>${visit.host_name || 'N/A'}</td>
-                                    <td>
-                                        ${visit.check_out_time ? 
-                                            '<span class="badge bg-success">Completed</span>' : 
-                                            '<span class="badge bg-warning">Active</span>'}
-                                    </td>
-                                </tr>
-                            `;
-                            tbody.innerHTML += row;
-                        });
-                        
-                        document.getElementById('visitHistorySection').style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    // If error or no visits, hide the section
-                    document.getElementById('visitHistorySection').style.display = 'none';
-                });
-        }
-
-        function printVisitorCard() {
-            if (currentVisitorData) {
-                // Create a printable visitor card
-                const printWindow = window.open('', '_blank');
-                const html = `
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Visitor Card - ${currentVisitorData.first_name} ${currentVisitorData.last_name}</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; }
-                            .card { 
-                                width: 350px; 
-                                margin: 20px auto; 
-                                border: 2px solid #333; 
-                                padding: 20px;
-                                text-align: center;
-                            }
-                            .photo { 
-                                width: 150px; 
-                                height: 150px; 
-                                border-radius: 50%; 
-                                margin: 0 auto 20px;
-                            }
-                            .name { 
-                                font-size: 24px; 
-                                font-weight: bold; 
-                                margin: 10px 0;
-                            }
-                            .detail { 
-                                margin: 5px 0; 
-                                text-align: left;
-                            }
-                            .company { 
-                                font-size: 18px; 
-                                color: #666;
-                                margin: 10px 0;
-                            }
-                        </style>
-                    </head>
-                    <body onload="window.print(); window.close();">
-                        <div class="card">
-                            <img src="${currentVisitorData.photo || 'assets/images/default-avatar.png'}" class="photo">
-                            <div class="name">${currentVisitorData.first_name} ${currentVisitorData.last_name}</div>
-                            <div class="company">${currentVisitorData.company || 'Guest'}</div>
-                            <hr>
-                            <div class="detail"><strong>Email:</strong> ${currentVisitorData.email}</div>
-                            <div class="detail"><strong>Phone:</strong> ${currentVisitorData.phone}</div>
-                            <div class="detail"><strong>Type:</strong> ${currentVisitorData.visitor_type}</div>
-                        </div>
-                    </body>
-                    </html>
-                `;
-                printWindow.document.write(html);
-                printWindow.document.close();
-            }
-        }
-
-        // Enhanced viewFullHistory function with Activity Trail modal
-        function viewFullHistory() {
-            if (currentVisitorData) {
-                // Fetch detailed visit history
-                fetch(`?action=visitor_activity_trail&visitor_id=${currentVisitorData.visitor_id}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        showActivityTrailModal(data);
-                    })
-                    .catch(error => {
-                        // Fallback with sample data if API fails
-                        showActivityTrailModal(generateSampleActivityTrail());
-                    });
-            }
-        }
-
-        // Function to show Activity Trail modal
-        function showActivityTrailModal(activityData) {
-            const modalHtml = `
-                <div class="modal fade" id="activityTrailModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">
-                                    <i class="bi bi-clock-history"></i> Activity Trail
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="visitor-info-header mb-3 p-3 bg-light rounded">
-                                    <h6 class="mb-0">
-                                        <i class="bi bi-person-circle"></i> 
-                                        ${currentVisitorData.first_name} ${currentVisitorData.last_name}
-                                    </h6>
-                                    <small class="text-muted">
-                                        ${currentVisitorData.company} | Total Visits: ${currentVisitorData.total_visits}
-                                    </small>
-                                </div>
-                                <div class="activity-timeline" id="activityTimeline">
-                                    ${generateActivityTimelineHTML(activityData)}
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" onclick="exportActivityHistory()">
-                                    <i class="bi bi-download"></i> Export History
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Remove existing modal if present
-            const existingModal = document.getElementById('activityTrailModal');
-            if (existingModal) {
-                existingModal.remove();
-            }
-            
-            // Add modal to body
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            
-            // Show the modal
-            const activityModal = new bootstrap.Modal(document.getElementById('activityTrailModal'));
-            activityModal.show();
-            
-            // Clean up when modal is closed
-            document.getElementById('activityTrailModal').addEventListener('hidden.bs.modal', function () {
-                this.remove();
-            });
-        }
-
-        // Function to generate activity timeline HTML
-        function generateActivityTimelineHTML(activities) {
-            if (!activities || activities.length === 0) {
-                activities = generateSampleActivityTrail();
-            }
-            
-            let timelineHTML = '<div class="timeline">';
-            
-            activities.forEach(activity => {
-                const iconClass = getActivityIcon(activity.action);
-                const colorClass = getActivityColor(activity.action);
-                
-                timelineHTML += `
-                    <div class="timeline-item">
-                        <div class="timeline-marker ${colorClass}">
-                            <i class="bi ${iconClass}"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-header">
-                                <span class="badge ${colorClass} text-white">${activity.action.toUpperCase()}</span>
-                                <small class="text-muted">${formatActivityDate(activity.timestamp)}</small>
-                            </div>
-                            <div class="timeline-body">
-                                <strong>${activity.user || 'System'}</strong>
-                                <p class="mb-0 text-muted">${activity.details}</p>
-                                ${activity.changes ? generateChangesList(activity.changes) : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            timelineHTML += '</div>';
-            return timelineHTML;
-        }
-
-        // Store current visitor data for check-out
-        let currentVisitId = null;
-
-        function viewVisitorDetails(visitId) {
-            // Fetch visitor details via AJAX
-            fetch('?action=active_visits')
-                .then(response => response.json())
-                .then(data => {
-                    // Find the specific visitor
-                    const visit = data.find(v => v.visit_id == visitId);
-                    
-                    if (visit) {
-                        // Update modal with visitor information
-                        document.getElementById('modalVisitorPhoto').src = visit.photo || 'assets/images/default-avatar.png';
-                        document.getElementById('modalBadgeNumber').textContent = visit.badge_number;
-                        document.getElementById('modalVisitorName').textContent = `${visit.first_name} ${visit.last_name}`;
-                        document.getElementById('modalEmail').textContent = visit.email;
-                        document.getElementById('modalPhone').textContent = visit.phone;
-                        document.getElementById('modalCompany').textContent = visit.company;
-                        document.getElementById('modalHost').textContent = visit.host_name;
-                        document.getElementById('modalPurpose').textContent = visit.purpose.charAt(0).toUpperCase() + visit.purpose.slice(1);
-                        
-                        // Format dates
-                        const checkInTime = new Date(visit.check_in_time);
-                        const validUntil = new Date(visit.valid_until);
-                        
-                        document.getElementById('modalCheckIn').textContent = checkInTime.toLocaleString();
-                        document.getElementById('modalValidUntil').textContent = validUntil.toLocaleString();
-                        
-                        // Set status
-                        if (visit.check_out_time) {
-                            document.getElementById('modalStatus').innerHTML = '<span class="badge bg-secondary">Checked Out</span>';
-                            document.getElementById('checkOutVisitorBtn').style.display = 'none';
-                        } else {
-                            document.getElementById('modalStatus').innerHTML = '<span class="badge bg-success">Active</span>';
-                            document.getElementById('checkOutVisitorBtn').style.display = 'inline-block';
-                            currentVisitId = visit.visit_id;
-                        }
-                        
-                        // Show the modal
-                        const modal = new bootstrap.Modal(document.getElementById('viewVisitorModal'));
-                        modal.show();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching visitor details:', error);
-                    Swal.fire('Error', 'Failed to load visitor details', 'error');
-                });
-        }
-
-        // Function to check out visitor from modal
-        function checkOutVisitor() {
+        function performCheckout() {
             if (currentVisitId) {
                 Swal.fire({
                     title: 'Check Out Visitor?',
@@ -2181,270 +1028,126 @@ $activeVisits = getActiveVisits($conn);
                     confirmButtonText: 'Yes, Check Out'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch('?action=checkout', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: 'visit_id=' + currentVisitId
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if(data.success) {
-                                // Close the modal
-                                bootstrap.Modal.getInstance(document.getElementById('viewVisitorModal')).hide();
-                                
-                                Swal.fire({
-                                    toast: true,
-                                    position: 'top-end',
-                                    icon: 'success',
-                                    title: 'Visitor checked out successfully',
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-                                
-                                // Refresh the active visits
-                                loadActiveVisits();
-                                refreshDashboard();
-                            } else {
-                                Swal.fire('Error', 'Failed to check out visitor', 'error');
-                            }
-                        });
+                        performCheckoutRequest(currentVisitId);
                     }
                 });
             }
         }
 
-
-        // Generate changes list HTML
-        function generateChangesList(changes) {
-            if (!changes || changes.length === 0) return '';
+        function performCheckoutRequest(visitId) {
+            const formData = new FormData();
+            formData.append('visit_id', visitId);
             
-            let changesHTML = '<ul class="changes-list mt-2">';
-            changes.forEach(change => {
-                changesHTML += `<li><small>${change}</small></li>`;
+            fetch('?action=checkout', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('viewVisitorModal'))?.hide();
+                    Swal.fire({
+                        toast: true, position: 'top-end', icon: 'success',
+                        title: 'Visitor checked out successfully',
+                        showConfirmButton: false, timer: 2000
+                    });
+                    loadActiveVisits();
+                    refreshDashboard();
+                } else {
+                    Swal.fire('Error', data.error || 'Failed to check out visitor', 'error');
+                }
+            })
+            .catch(e => {
+                console.error('Error:', e);
+                Swal.fire('Error', 'Failed to check out visitor', 'error');
             });
-            changesHTML += '</ul>';
-            
-            return changesHTML;
         }
 
-        // Get activity icon based on action type
-        function getActivityIcon(action) {
-            const icons = {
-                'create': 'bi-plus-circle',
-                'update': 'bi-pencil-square',
-                'check_in': 'bi-box-arrow-in-right',
-                'check_out': 'bi-box-arrow-left',
-                'delete': 'bi-trash',
-                'approve': 'bi-check-circle',
-                'reject': 'bi-x-circle',
-                'schedule': 'bi-calendar-plus'
-            };
-            return icons[action.toLowerCase()] || 'bi-circle';
-        }
-
-        // Get activity color based on action type
-        function getActivityColor(action) {
-            const colors = {
-                'create': 'bg-success',
-                'update': 'bg-info',
-                'check_in': 'bg-primary',
-                'check_out': 'bg-secondary',
-                'delete': 'bg-danger',
-                'approve': 'bg-success',
-                'reject': 'bg-warning',
-                'schedule': 'bg-purple'
-            };
-            return colors[action.toLowerCase()] || 'bg-secondary';
-        }
-
-        // Format activity date
-        function formatActivityDate(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diffMs = now - date;
-            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-            
-            if (diffDays === 0) {
-                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                if (diffHours === 0) {
-                    const diffMins = Math.floor(diffMs / (1000 * 60));
-                    return `${diffMins} minutes ago`;
-                }
-                return `${diffHours} hours ago`;
-            } else if (diffDays === 1) {
-                return 'Yesterday, ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            } else if (diffDays < 7) {
-                return `${diffDays} days ago`;
-            } else {
-                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + 
-                    ', ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            }
-        }
-
-        // Generate sample activity trail data
-        function generateSampleActivityTrail() {
-            const activities = [];
-            
-            // Get visits data
-            if (currentVisitorData) {
-                const now = new Date();
-                
-                // Most recent check-in (today)
-                if (currentVisitorData.total_visits > 0) {
-                    activities.push({
-                        action: 'check_in',
-                        timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
-                        user: 'Reception Kiosk',
-                        details: 'Visitor checked in for meeting with John Smith',
-                        changes: [
-                            'Badge Number: V-2024-0521',
-                            'Purpose: Meeting',
-                            'Host: John Smith (Sales Department)'
-                        ]
-                    });
-                }
-                
-                // Previous visits
-                if (currentVisitorData.total_visits > 1) {
-                    activities.push({
-                        action: 'check_out',
-                        timestamp: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-                        user: 'Security Guard',
-                        details: 'Visitor checked out after meeting',
-                        changes: ['Duration: 3 hours 45 minutes']
-                    });
-                    
-                    activities.push({
-                        action: 'check_in',
-                        timestamp: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000 - 4 * 60 * 60 * 1000).toISOString(),
-                        user: 'Reception Kiosk',
-                        details: 'Visitor checked in for training session',
-                        changes: [
-                            'Badge Number: V-2024-0489',
-                            'Purpose: Training',
-                            'Host: HR Department'
-                        ]
-                    });
-                }
-                
-                // Update event
-                if (currentVisitorData.updated_at !== currentVisitorData.created_at) {
-                    activities.push({
-                        action: 'update',
-                        timestamp: currentVisitorData.updated_at,
-                        user: 'Admin User',
-                        details: 'Visitor information updated',
-                        changes: [
-                            'Phone number updated',
-                            'Company information changed'
-                        ]
-                    });
-                }
-                
-                // Creation event
-                activities.push({
-                    action: 'create',
-                    timestamp: currentVisitorData.created_at,
-                    user: 'Reception Kiosk',
-                    details: 'Visitor profile created - First time visitor',
-                    changes: [
-                        `Name: ${currentVisitorData.first_name} ${currentVisitorData.last_name}`,
-                        `Company: ${currentVisitorData.company}`,
-                        `Type: ${currentVisitorData.visitor_type || 'New Visitor'}`
-                    ]
-                });
-            }
-            
-            return activities;
-        }
-
-        // Export activity history
-        function exportActivityHistory() {
-            if (currentVisitorData) {
-                const csvContent = generateActivityCSV();
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `visitor_activity_${currentVisitorData.visitor_id}_${Date.now()}.csv`;
-                a.click();
-                window.URL.revokeObjectURL(url);
-                
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Activity history exported successfully',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
-            }
-        }
-
-        // Generate CSV content for export
-        function generateActivityCSV() {
-            const activities = generateSampleActivityTrail();
-            let csv = 'Date,Time,Action,User,Details,Changes\n';
-            
-            activities.forEach(activity => {
-                const date = new Date(activity.timestamp);
-                const dateStr = date.toLocaleDateString();
-                const timeStr = date.toLocaleTimeString();
-                const changes = activity.changes ? activity.changes.join('; ') : '';
-                
-                csv += `"${dateStr}","${timeStr}","${activity.action}","${activity.user}","${activity.details}","${changes}"\n`;
-            });
-            
-            return csv;
-        }
-
-        // Refresh Dashboard
         function refreshDashboard() {
             fetch('?action=dashboard_stats')
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(stats => {
                     document.getElementById('todayTotal').textContent = stats.today_total;
                     document.getElementById('currentlyIn').textContent = stats.currently_in;
-                    document.getElementById('scheduledToday').textContent = stats.scheduled_today;
                     document.getElementById('avgDuration').textContent = stats.avg_duration;
                     document.getElementById('activeVisitCount').textContent = stats.currently_in;
+                    document.querySelector('.notification-badge').textContent = stats.currently_in;
                 });
             
             fetch('?action=recent_activity')
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
-                    const tbody = document.getElementById('recentActivityTable');
+                    const tbody = document.getElementById('recentActivityTableBody');
                     tbody.innerHTML = '';
-                    
-                    data.forEach(activity => {
+                    data.forEach(a => {
                         tbody.innerHTML += `
                             <tr>
-                                <td><span class="badge-number">${activity.badge_number}</span></td>
-                                <td>${activity.first_name} ${activity.last_name}</td>
-                                <td>${activity.company}</td>
-                                <td>${activity.host_name}</td>
-                                <td><span class="purpose-badge ${activity.purpose}">${activity.purpose}</span></td>
-                                <td>${new Date(activity.check_in_time).toLocaleTimeString()}</td>
-                                <td>
-                                    ${activity.check_out_time 
-                                        ? '<span class="status-badge checked-out">Checked Out</span>'
-                                        : '<span class="status-badge checked-in">Checked In</span>'
-                                    }
-                                </td>
+                                <td><span class="badge-number">${a.badge_number}</span></td>
+                                <td>${a.first_name} ${a.last_name}</td>
+                                <td>${a.company}</td>
+                                <td>${a.host_name}</td>
+                                <td><span class="purpose-badge ${(a.purpose||'').toLowerCase()}">${a.purpose}</span></td>
+                                <td>${getCompanyBadgeHTML(a.company_visited)}</td>
+                                <td>${new Date(a.check_in_time).toLocaleTimeString()}</td>
+                                <td>${a.check_out_time ? '<span class="status-badge checked-out">Checked Out</span>' : '<span class="status-badge checked-in">Checked In</span>'}</td>
                             </tr>
                         `;
                     });
                 });
         }
 
-        // Auto-refresh active visits every 30 seconds
+        // Add Employee Form
+        document.getElementById('addEmployeeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch('?action=add_employee', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal')).hide();
+                        this.reset();
+                        Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Employee added successfully', showConfirmButton: false, timer: 2000 });
+                        loadEmployees();
+                    } else {
+                        Swal.fire('Error', data.error || 'Failed to add employee', 'error');
+                    }
+                })
+                .catch(e => Swal.fire('Error', 'Failed to add employee', 'error'));
+        });
+
+        // Add Department Form
+        document.getElementById('addDepartmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch('?action=add_department', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('addDepartmentModal')).hide();
+                        this.reset();
+                        Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Department added successfully', showConfirmButton: false, timer: 2000 });
+                        loadDepartments();
+                    } else {
+                        Swal.fire('Error', data.error || 'Failed to add department', 'error');
+                    }
+                })
+                .catch(e => Swal.fire('Error', 'Failed to add department', 'error'));
+        });
+
+        // Initialize recent activity table with pagination
+        $(document).ready(function() {
+            if (!$.fn.DataTable.isDataTable('#recentActivityTable')) {
+                $('#recentActivityTable').DataTable({ pageLength: 10, order: [] });
+            }
+        });
+
+        // Auto-refresh every 30 seconds
         setInterval(() => {
             if (document.getElementById('active-visitsSection').style.display !== 'none') {
                 loadActiveVisits();
             }
-            // Always refresh dashboard stats
             refreshDashboard();
         }, 30000);
     </script>

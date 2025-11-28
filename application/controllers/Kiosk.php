@@ -43,131 +43,235 @@ class Kiosk extends CI_Controller {
         
         echo json_encode(['status' => 'success', 'employees' => $employees]);
     }
-    
-    // Complete check-in and insert visitor data
+
+    // In your Kiosk.php controller, update the complete_checkin method:
     public function complete_checkin() {
-        // Get JSON data from request
+        // Get JSON input
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
         
         if (!$data) {
-            echo json_encode(['status' => 'error', 'message' => 'Invalid data']);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid data received']);
             return;
         }
         
+        // Get company_visited from request (defaults to 'Toms World' if not provided)
+        $company_visited = isset($data['company_visited']) ? $data['company_visited'] : 'Toms World';
+        
+        // Start transaction
         $this->db->trans_start();
         
-        try {
-            // Check if visitor exists
-            $existing_visitor = $this->db->select('visitor_id')
-                                        ->from('visitors')
-                                        ->where('email', $data['email'])
-                                        ->get()
-                                        ->row();
+        // Check if visitor already exists by email
+        $existing_visitor = $this->db->get_where('visitors', ['email' => $data['email']])->row();
+        
+        if ($existing_visitor) {
+            $visitor_id = $existing_visitor->visitor_id;
             
-            if ($existing_visitor) {
-                // Update existing visitor
-                $visitor_id = $existing_visitor->visitor_id;
-                
-                $visitor_update = [
-                    'first_name' => $data['firstName'],
-                    'last_name' => $data['lastName'],
-                    'phone' => $data['phone'],
-                    'company' => $data['company'],
-                    'visitor_type' => $data['type'] ?? 'new',
-                    'updated_at' => date('Y-m-d H:i:s')
-                ];
-                
-                // Update photo if provided
-                if (isset($data['photo']) && !empty($data['photo'])) {
-                    $visitor_update['photo'] = $data['photo'];
-                }
-                
-                $this->db->where('visitor_id', $visitor_id)
-                        ->update('visitors', $visitor_update);
-            } else {
-                // Insert new visitor
-                $visitor_data = [
-                    'first_name' => $data['firstName'],
-                    'last_name' => $data['lastName'],
-                    'email' => $data['email'],
-                    'phone' => $data['phone'],
-                    'company' => $data['company'],
-                    'photo' => $data['photo'] ?? null,
-                    'visitor_type' => $data['type'] ?? 'new',
-                    'created_at' => date('Y-m-d H:i:s')
-                ];
-                
-                $this->db->insert('visitors', $visitor_data);
-                $visitor_id = $this->db->insert_id();
+            // Update visitor info if needed
+            $visitor_update = [
+                'first_name' => $data['firstName'],
+                'last_name' => $data['lastName'],
+                'phone' => $data['phone'],
+                'company' => $data['company'],
+                'visitor_type' => $data['type'],
+                'company_visited' => $company_visited,  // Update company visited
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+            
+            // Update photo only if new one is provided
+            if (!empty($data['photo'])) {
+                $visitor_update['photo'] = $data['photo'];
             }
             
-            // Generate badge number using stored procedure
-            $this->db->query("CALL generate_badge_number(@badge_number)");
-            $badge_result = $this->db->query("SELECT @badge_number as badge_number")->row();
-            $badge_number = $badge_result->badge_number;
-            
-            // Calculate valid_until (8 hours from check-in)
-            $check_in_time = date('Y-m-d H:i:s');
-            $valid_until = date('Y-m-d H:i:s', strtotime('+8 hours'));
-            
-            // Insert visit record
-            $visit_data = [
-                'visitor_id' => $visitor_id,
-                'host_employee_id' => $data['host']['id'],
-                'badge_number' => $badge_number,
-                'purpose' => $data['purpose'],
-                'additional_notes' => $data['notes'] ?? null,
-                'check_in_time' => $check_in_time,
-                'valid_until' => $valid_until,
-                'terms_accepted' => 1,
-                'photo_consent' => 1,
+            $this->db->where('visitor_id', $visitor_id);
+            $this->db->update('visitors', $visitor_update);
+        } else {
+            // Create new visitor
+            $visitor_data = [
+                'first_name' => $data['firstName'],
+                'last_name' => $data['lastName'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'company' => $data['company'],
+                'photo' => isset($data['photo']) ? $data['photo'] : null,
+                'visitor_type' => $data['type'],
+                'company_visited' => $company_visited,  // Set company visited
                 'created_at' => date('Y-m-d H:i:s')
             ];
             
-            $this->db->insert('visits', $visit_data);
-            $visit_id = $this->db->insert_id();
-            
-            // Check if this is a pre-scheduled visit and update status
-            if (isset($data['booking_code'])) {
-                $this->db->where('booking_code', $data['booking_code'])
-                        ->update('pre_scheduled_visits', [
-                            'status' => 'checked_in',
-                            'visit_id' => $visit_id
-                        ]);
-            }
-            
-            // Send notification email to host (optional)
-            $this->send_host_notification($data, $badge_number);
-            
-            $this->db->trans_complete();
-            
-            if ($this->db->trans_status() === FALSE) {
-                throw new Exception('Transaction failed');
-            }
-            
-            // Return success response with badge details
-            echo json_encode([
-                'status' => 'success',
-                'message' => 'Check-in completed successfully',
-                'data' => [
-                    'badge_number' => $badge_number,
-                    'visit_id' => $visit_id,
-                    'valid_until' => $valid_until,
-                    'visitor_name' => $data['firstName'] . ' ' . $data['lastName'],
-                    'company' => $data['company'],
-                    'host_name' => $data['host']['name']
-                ]
-            ]);
-            
-        } catch (Exception $e) {
-            $this->db->trans_rollback();
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Check-in failed: ' . $e->getMessage()
-            ]);
+            $this->db->insert('visitors', $visitor_data);
+            $visitor_id = $this->db->insert_id();
         }
+        
+        // Create visit record
+        $check_in_time = date('Y-m-d H:i:s');
+        $valid_until = date('Y-m-d H:i:s', strtotime('+8 hours'));
+        
+        $visit_data = [
+            'visitor_id' => $visitor_id,
+            'host_employee_id' => $data['host']['id'],
+            'purpose' => $data['purpose'],
+            'additional_notes' => isset($data['notes']) ? $data['notes'] : null,
+            'check_in_time' => $check_in_time,
+            'valid_until' => $valid_until,
+            'terms_accepted' => 1,
+            'photo_consent' => 1,
+            'company_visited' => $company_visited  // Set company visited for the visit
+        ];
+        
+        $this->db->insert('visits', $visit_data);
+        $visit_id = $this->db->insert_id();
+        
+        // Get the generated badge number
+        $visit = $this->db->get_where('visits', ['visit_id' => $visit_id])->row();
+        
+        $this->db->trans_complete();
+        
+        if ($this->db->trans_status() === FALSE) {
+            echo json_encode(['status' => 'error', 'message' => 'Database error occurred']);
+            return;
+        }
+        
+        // Return success response
+        echo json_encode([
+            'status' => 'success',
+            'data' => [
+                'visit_id' => $visit_id,
+                'visitor_id' => $visitor_id,
+                'badge_number' => $visit->badge_number,
+                'visitor_name' => $data['firstName'] . ' ' . $data['lastName'],
+                'company' => $data['company'],
+                'host_name' => $data['host']['name'],
+                'valid_until' => $valid_until,
+                'company_visited' => $company_visited
+            ]
+        ]);
     }
+    
+    // // Complete check-in and insert visitor data
+    // public function complete_checkin() {
+    //     // Get JSON data from request
+    //     $json = file_get_contents('php://input');
+    //     $data = json_decode($json, true);
+        
+    //     if (!$data) {
+    //         echo json_encode(['status' => 'error', 'message' => 'Invalid data']);
+    //         return;
+    //     }
+        
+    //     $this->db->trans_start();
+        
+    //     try {
+    //         // Check if visitor exists
+    //         $existing_visitor = $this->db->select('visitor_id')
+    //                                     ->from('visitors')
+    //                                     ->where('email', $data['email'])
+    //                                     ->get()
+    //                                     ->row();
+            
+    //         if ($existing_visitor) {
+    //             // Update existing visitor
+    //             $visitor_id = $existing_visitor->visitor_id;
+                
+    //             $visitor_update = [
+    //                 'first_name' => $data['firstName'],
+    //                 'last_name' => $data['lastName'],
+    //                 'phone' => $data['phone'],
+    //                 'company' => $data['company'],
+    //                 'visitor_type' => $data['type'] ?? 'new',
+    //                 'updated_at' => date('Y-m-d H:i:s')
+    //             ];
+                
+    //             // Update photo if provided
+    //             if (isset($data['photo']) && !empty($data['photo'])) {
+    //                 $visitor_update['photo'] = $data['photo'];
+    //             }
+                
+    //             $this->db->where('visitor_id', $visitor_id)
+    //                     ->update('visitors', $visitor_update);
+    //         } else {
+    //             // Insert new visitor
+    //             $visitor_data = [
+    //                 'first_name' => $data['firstName'],
+    //                 'last_name' => $data['lastName'],
+    //                 'email' => $data['email'],
+    //                 'phone' => $data['phone'],
+    //                 'company' => $data['company'],
+    //                 'photo' => $data['photo'] ?? null,
+    //                 'visitor_type' => $data['type'] ?? 'new',
+    //                 'created_at' => date('Y-m-d H:i:s')
+    //             ];
+                
+    //             $this->db->insert('visitors', $visitor_data);
+    //             $visitor_id = $this->db->insert_id();
+    //         }
+            
+    //         // Generate badge number using stored procedure
+    //         $this->db->query("CALL generate_badge_number(@badge_number)");
+    //         $badge_result = $this->db->query("SELECT @badge_number as badge_number")->row();
+    //         $badge_number = $badge_result->badge_number;
+            
+    //         // Calculate valid_until (8 hours from check-in)
+    //         $check_in_time = date('Y-m-d H:i:s');
+    //         $valid_until = date('Y-m-d H:i:s', strtotime('+8 hours'));
+            
+    //         // Insert visit record
+    //         $visit_data = [
+    //             'visitor_id' => $visitor_id,
+    //             'host_employee_id' => $data['host']['id'],
+    //             'badge_number' => $badge_number,
+    //             'purpose' => $data['purpose'],
+    //             'additional_notes' => $data['notes'] ?? null,
+    //             'check_in_time' => $check_in_time,
+    //             'valid_until' => $valid_until,
+    //             'terms_accepted' => 1,
+    //             'photo_consent' => 1,
+    //             'created_at' => date('Y-m-d H:i:s')
+    //         ];
+            
+    //         $this->db->insert('visits', $visit_data);
+    //         $visit_id = $this->db->insert_id();
+            
+    //         // Check if this is a pre-scheduled visit and update status
+    //         if (isset($data['booking_code'])) {
+    //             $this->db->where('booking_code', $data['booking_code'])
+    //                     ->update('pre_scheduled_visits', [
+    //                         'status' => 'checked_in',
+    //                         'visit_id' => $visit_id
+    //                     ]);
+    //         }
+            
+    //         // Send notification email to host (optional)
+    //         $this->send_host_notification($data, $badge_number);
+            
+    //         $this->db->trans_complete();
+            
+    //         if ($this->db->trans_status() === FALSE) {
+    //             throw new Exception('Transaction failed');
+    //         }
+            
+    //         // Return success response with badge details
+    //         echo json_encode([
+    //             'status' => 'success',
+    //             'message' => 'Check-in completed successfully',
+    //             'data' => [
+    //                 'badge_number' => $badge_number,
+    //                 'visit_id' => $visit_id,
+    //                 'valid_until' => $valid_until,
+    //                 'visitor_name' => $data['firstName'] . ' ' . $data['lastName'],
+    //                 'company' => $data['company'],
+    //                 'host_name' => $data['host']['name']
+    //             ]
+    //         ]);
+            
+    //     } catch (Exception $e) {
+    //         $this->db->trans_rollback();
+    //         echo json_encode([
+    //             'status' => 'error',
+    //             'message' => 'Check-in failed: ' . $e->getMessage()
+    //         ]);
+    //     }
+    // }
     
     // Search for returning visitors by QR code data
     public function search_visitor() {

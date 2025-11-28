@@ -40,21 +40,21 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="action-card" onclick="startCheckIn('new')">
                                 <i class="bi bi-person-plus text-primary"></i>
                                 <h3 data-translate="firstTimeVisitor">First Time Visitor</h3>
                                 <p data-translate="firstTimeDesc">I'm visiting for the first time</p>
                             </div>
                         </div>
-                        <!-- <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="action-card" onclick="startCheckIn('returning')">
                                 <i class="bi bi-person-check text-success"></i>
                                 <h3 data-translate="returningVisitor">Returning Visitor</h3>
                                 <p data-translate="returningDesc">I've been here before</p>
                             </div>
-                        </div> -->
-                        <div class="col-md-6">
+                        </div>
+                        <div class="col-md-4">
                             <div class="action-card" onclick="startCheckIn('delivery')">
                                 <i class="bi bi-truck text-warning"></i>
                                 <h3 data-translate="deliveryPickup">Delivery / Pickup</h3>
@@ -63,14 +63,14 @@
                         </div>
                     </div>
 
-                    <div class="quick-actions">
+                    <!-- <div class="quick-actions">
                         <button class="quick-action-btn" onclick="showPreScheduled()">
                             <i class="bi bi-calendar-check"></i> <span data-translate="preScheduled">Pre-Scheduled Visit</span>
                         </button>
                         <button class="quick-action-btn" onclick="checkOut()">
                             <i class="bi bi-box-arrow-right"></i> <span data-translate="checkOut">Check Out</span>
                         </button>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
@@ -357,6 +357,20 @@
                             <strong data-translate="host">Host:</strong> <span id="badgeHost"></span><br>
                             <strong data-translate="validUntil">Valid Until:</strong> <span id="validUntil"></span>
                         </div>
+                        
+                        <!-- QR CODE SECTION - NEW -->
+                        <div style="margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; border: 2px dashed #f39c12;">
+                            <h5 style="color: #495057; margin-bottom: 10px;">
+                                <i class="bi bi-qr-code"></i> <span data-translate="saveQRCode">Save Your QR Code</span>
+                            </h5>
+                            <p style="font-size: 0.9em; color: #6c757d; margin-bottom: 15px;" data-translate="qrCodeDesc">
+                                Scan this QR code on your next visit for faster check-in
+                            </p>
+                            <div id="qrCodeContainer" style="display: flex; justify-content: center; margin-bottom: 10px;"></div>
+                            <button class="btn btn-outline-primary btn-sm" onclick="downloadQRCode()" style="margin-top: 10px;">
+                                <i class="bi bi-download"></i> <span data-translate="downloadQR">Download QR Code</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div style="background: #e8f4fd; border-left: 4px solid #f39c12; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left;">
@@ -369,9 +383,9 @@
                     </div>
 
                     <div class="d-flex justify-content-center gap-3">
-                        <button class="btn-large btn-print" onclick="printBadge()">
+                        <!-- <button class="btn-large btn-print" onclick="printBadge()">
                             <i class="bi bi-printer"></i> <span data-translate="printBadge">Print Badge</span>
-                        </button>
+                        </button> -->
                         <button class="btn-large btn-next" onclick="resetKiosk()">
                             <i class="bi bi-check-circle"></i> <span data-translate="done">Done</span>
                         </button>
@@ -425,9 +439,7 @@
             <div class="loading-text" data-translate="processing">Processing...</div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
         // Department and Employee Data Structure
         const departmentData = {
@@ -647,6 +659,14 @@
                 emergencyMessage: "Help is on the way. Please stay where you are.",
                 checkOutTitle: "Check Out",
                 checkOutMessage: "Check-out functionality coming soon",
+                
+                saveQRCode: "Save Your QR Code",
+                qrCodeDesc: "Scan this QR code on your next visit for faster check-in",
+                downloadQR: "Download QR Code",
+                qrScanSuccess: "QR Code Scanned Successfully!",
+                qrScanFailed: "Could not read QR code. Please try again or continue manually.",
+                welcomeBackQR: "Welcome back! Your information has been loaded.",
+
                 agreementContent: `
                     <h5>Visitor Guidelines</h5>
                     <p>By entering our premises, you agree to:</p>
@@ -750,6 +770,14 @@
                 emergencyMessage: "救援正在路上。請留在原地。",
                 checkOutTitle: "簽出",
                 checkOutMessage: "簽出功能即將推出",
+                
+                saveQRCode: "保存您的二維碼",
+                qrCodeDesc: "下次訪問時掃描此二維碼以快速登記",
+                downloadQR: "下載二維碼",
+                qrScanSuccess: "二維碼掃描成功！",
+                qrScanFailed: "無法讀取二維碼。請重試或手動繼續。",
+                welcomeBackQR: "歡迎回來！您的信息已加載。",
+                
                 agreementContent: `
                     <h5>訪客指引</h5>
                     <p>進入我們的場所，您同意：</p>
@@ -853,6 +881,14 @@
                 emergencyMessage: "救援正在路上。请留在原地。",
                 checkOutTitle: "签出",
                 checkOutMessage: "签出功能即将推出",
+
+                saveQRCode: "保存您的二维码",
+                qrCodeDesc: "下次访问时扫描此二维码以快速登记",
+                downloadQR: "下载二维码",
+                qrScanSuccess: "二维码扫描成功！",
+                qrScanFailed: "无法读取二维码。请重试或手动继续。",
+                welcomeBackQR: "欢迎回来！您的信息已加载。",
+
                 agreementContent: `
                     <h5>访客指引</h5>
                     <p>进入我们的场所，您同意：</p>
@@ -956,6 +992,14 @@
                 emergencyMessage: "Paparating na ang tulong. Mangyaring manatili kung nasaan ka.",
                 checkOutTitle: "Check Out",
                 checkOutMessage: "Paparating na ang check-out functionality",
+                
+                saveQRCode: "I-save ang Iyong QR Code",
+                qrCodeDesc: "I-scan ang QR code na ito sa iyong susunod na pagbisita para sa mas mabilis na pag-check in",
+                downloadQR: "I-download ang QR Code",
+                qrScanSuccess: "Matagumpay na na-scan ang QR Code!",
+                qrScanFailed: "Hindi mabasa ang QR code. Subukan muli o magpatuloy nang manu-mano.",
+                welcomeBackQR: "Maligayang pagbabalik! Na-load na ang iyong impormasyon.",
+    
                 agreementContent: `
                     <h5>Mga Gabay para sa Bisita</h5>
                     <p>Sa pagpasok sa aming lugar, sumasang-ayon ka na:</p>
@@ -1059,6 +1103,14 @@
                 emergencyMessage: "助けが向かっています。その場でお待ちください。",
                 checkOutTitle: "チェックアウト",
                 checkOutMessage: "チェックアウト機能は近日公開予定",
+                            
+                saveQRCode: "QRコードを保存",
+                qrCodeDesc: "次回の訪問時にこのQRコードをスキャンして、より速くチェックインできます",
+                downloadQR: "QRコードをダウンロード",
+                qrScanSuccess: "QRコードのスキャンに成功しました！",
+                qrScanFailed: "QRコードを読み取れませんでした。もう一度お試しいただくか、手動で続行してください。",
+                welcomeBackQR: "おかえりなさい！情報が読み込まれました。",
+                
                 agreementContent: `
                     <h5>訪問者ガイドライン</h5>
                     <p>施設に入場することで、以下に同意します：</p>
@@ -1100,6 +1152,8 @@
         let capturedPhotoData = null;
         let html5QrCode = null;
         let photoTaken = false;
+        // Global variable for QR Code instance
+        let qrCodeInstance = null;
 
         // Screen flow mapping
         const screenFlow = {
@@ -1122,6 +1176,79 @@
                 purpose: 'Sales Meeting'
             }
         ];
+
+        // Function to generate QR code data
+        function generateQRCodeData() {
+            const qrData = {
+                firstName: visitorData.firstName,
+                lastName: visitorData.lastName,
+                email: visitorData.email,
+                phone: visitorData.phone,
+                company: visitorData.company,
+                timestamp: new Date().toISOString()
+            };
+            return JSON.stringify(qrData);
+        }
+
+        // Function to generate and display QR code on success screen
+        function generateVisitorQRCode() {
+            const qrContainer = document.getElementById('qrCodeContainer');
+            if (!qrContainer) return;
+            
+            // Clear previous QR code
+            qrContainer.innerHTML = '';
+            
+            // Generate QR data
+            const qrData = generateQRCodeData();
+            
+            // Store photo separately in localStorage with email as key
+            if (visitorData.photo && visitorData.email) {
+                try {
+                    localStorage.setItem(`visitor_photo_${visitorData.email}`, visitorData.photo);
+                } catch (e) {
+                    console.error('Could not store photo in localStorage:', e);
+                }
+            }
+            
+            // Create QR code
+            try {
+                qrCodeInstance = new QRCode(qrContainer, {
+                    text: qrData,
+                    width: 180,
+                    height: 180,
+                    colorDark: "#2c3e50",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch (e) {
+                console.error('Error generating QR code:', e);
+                qrContainer.innerHTML = '<p class="text-danger">Could not generate QR code</p>';
+            }
+        }
+
+        // Function to download QR code as image
+        function downloadQRCode() {
+            const qrContainer = document.getElementById('qrCodeContainer');
+            const canvas = qrContainer.querySelector('canvas');
+            
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = `visitor-qr-${visitorData.firstName}-${visitorData.lastName}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showNotification(translations[currentLanguage].downloadQR || 'QR Code downloaded!');
+            } else {
+                // Try to get image element if canvas not available
+                const img = qrContainer.querySelector('img');
+                if (img) {
+                    const link = document.createElement('a');
+                    link.download = `visitor-qr-${visitorData.firstName}-${visitorData.lastName}.png`;
+                    link.href = img.src;
+                    link.click();
+                    showNotification(translations[currentLanguage].downloadQR || 'QR Code downloaded!');
+                }
+            }
+        }
 
         // Local storage for visitor data
         const STORAGE_KEY = 'kioskVisitorData';
@@ -1325,75 +1452,234 @@
             });
         }
 
-        // Handle QR code success
+        // // Handle QR code success
+        // function handleQRCodeSuccess(decodedText) {
+        //     try {
+        //         let qrData;
+                
+        //         try {
+        //             qrData = JSON.parse(decodedText);
+        //         } catch (e) {
+        //             qrData = JSON.parse(atob(decodedText));
+        //         }
+                
+        //         if (qrData.email) {
+        //             if (html5QrCode) {
+        //                 html5QrCode.stop();
+        //             }
+                    
+        //             if (qrData.id) {
+        //                 const storedPhoto = localStorage.getItem(`visitor_photo_${qrData.id}`);
+        //                 if (storedPhoto) {
+        //                     qrData.photo = storedPhoto;
+        //                 }
+        //             }
+                    
+        //             visitorData = {
+        //                 ...visitorData,
+        //                 ...qrData
+        //             };
+                    
+        //             Swal.fire({
+        //                 title: translations[currentLanguage].qrValidatedTitle || 'Welcome Back!',
+        //                 text: translations[currentLanguage].qrValidatedMessage || 'Your QR code has been validated successfully',
+        //                 icon: 'success',
+        //                 confirmButtonColor: '#27ae60'
+        //             });
+                    
+        //             showScreen(5);
+        //         }
+        //     } catch (e) {
+        //         console.error('QR decode error:', e);
+        //         showNotification(translations[currentLanguage].invalidQRMessage || 'Invalid QR Code');
+        //     }
+        // }
+
+        // // Handle QR upload
+        // function handleQRUpload(input) {
+        //     const file = input.files[0];
+        //     if (file) {
+        //         const reader = new FileReader();
+        //         reader.onload = function(e) {
+        //             if (html5QrCode) {
+        //                 html5QrCode.scanFile(file, true)
+        //                     .then(decodedText => {
+        //                         handleQRCodeSuccess(decodedText);
+        //                     })
+        //                     .catch(err => {
+        //                         showNotification(translations[currentLanguage].invalidQRMessage || 'Invalid QR Code');
+        //                     });
+        //             }
+        //         };
+        //         reader.readAsDataURL(file);
+        //     }
+        // }
+
+        // // Skip QR scan
+        // function skipQRScan() {
+        //     if (html5QrCode) {
+        //         html5QrCode.stop();
+        //     }
+        //     showScreen(3);
+        // }
+
+        // UPDATED: Handle QR code success for returning visitors
         function handleQRCodeSuccess(decodedText) {
             try {
                 let qrData;
                 
+                // Try to parse as JSON first
                 try {
                     qrData = JSON.parse(decodedText);
                 } catch (e) {
-                    qrData = JSON.parse(atob(decodedText));
+                    // Try base64 decode if JSON parse fails
+                    try {
+                        qrData = JSON.parse(atob(decodedText));
+                    } catch (e2) {
+                        throw new Error('Invalid QR format');
+                    }
                 }
                 
-                if (qrData.email) {
-                    if (html5QrCode) {
-                        html5QrCode.stop();
-                    }
-                    
-                    if (qrData.id) {
-                        const storedPhoto = localStorage.getItem(`visitor_photo_${qrData.id}`);
-                        if (storedPhoto) {
-                            qrData.photo = storedPhoto;
-                        }
-                    }
-                    
-                    visitorData = {
-                        ...visitorData,
-                        ...qrData
-                    };
-                    
-                    Swal.fire({
-                        title: translations[currentLanguage].qrValidatedTitle || 'Welcome Back!',
-                        text: translations[currentLanguage].qrValidatedMessage || 'Your QR code has been validated successfully',
-                        icon: 'success',
-                        confirmButtonColor: '#27ae60'
-                    });
-                    
-                    showScreen(5);
+                // Validate QR data has required fields
+                if (!qrData.email || !qrData.firstName || !qrData.lastName) {
+                    throw new Error('Missing required fields in QR code');
                 }
+                
+                // Stop QR scanner
+                if (html5QrCode) {
+                    try {
+                        const state = html5QrCode.getState();
+                        // Only stop if scanner is running (state 2) or paused (state 3)
+                        if (state === 2 || state === 3) {
+                            html5QrCode.stop().catch(() => {});
+                        }
+                    } catch (e) {
+                        // Scanner not initialized or already stopped, ignore
+                    }
+                }
+                
+                // Retrieve stored photo from localStorage
+                const storedPhoto = localStorage.getItem(`visitor_photo_${qrData.email}`);
+                
+                // Populate visitor data from QR code
+                visitorData = {
+                    ...visitorData,
+                    firstName: qrData.firstName,
+                    lastName: qrData.lastName,
+                    email: qrData.email,
+                    phone: qrData.phone || '',
+                    company: qrData.company || '',
+                    photo: storedPhoto || null,
+                    type: 'returning'
+                };
+                
+                // Show success message
+                Swal.fire({
+                    title: translations[currentLanguage].qrScanSuccess || 'QR Code Scanned!',
+                    html: `<p>${translations[currentLanguage].welcomeBackQR || 'Welcome back!'}</p>
+                        <p><strong>${qrData.firstName} ${qrData.lastName}</strong></p>
+                        <p>${qrData.company || ''}</p>`,
+                    icon: 'success',
+                    confirmButtonColor: '#27ae60',
+                    timer: 3000,
+                    timerProgressBar: true
+                }).then(() => {
+                    // Update flow to skip to host screen
+                    currentFlow = [1, 2, 5, 6, 7, 8]; // Returning visitor flow
+                    currentFlowIndex = 2; // Set to index of host screen (5)
+                    showScreen(5); // Go directly to host selection
+                });
+                
             } catch (e) {
                 console.error('QR decode error:', e);
-                showNotification(translations[currentLanguage].invalidQRMessage || 'Invalid QR Code');
+                
+                Swal.fire({
+                    title: translations[currentLanguage].invalidQRMessage || 'Invalid QR Code',
+                    text: translations[currentLanguage].qrScanFailed || 'Could not read QR code. Please try again or continue manually.',
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3498db',
+                    cancelButtonColor: '#95a5a6',
+                    confirmButtonText: translations[currentLanguage].tryAgain || 'Try Again',
+                    cancelButtonText: translations[currentLanguage].continueManually || 'Continue Manually'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Restart QR scanner
+                        initQRScanner();
+                    } else {
+                        // Redirect to basic info screen like first-time visitor
+                        if (html5QrCode) {
+                            try {
+                                const state = html5QrCode.getState();
+                                // Only stop if scanner is running (state 2) or paused (state 3)
+                                if (state === 2 || state === 3) {
+                                    html5QrCode.stop().catch(() => {});
+                                }
+                            } catch (e) {
+                                // Scanner not initialized or already stopped, ignore
+                            }
+                        }
+                        visitorData.type = 'returning'; // Keep as returning but needs manual entry
+                        currentFlow = screenFlow['new']; // Use new visitor flow
+                        currentFlowIndex = 1;
+                        showScreen(3); // Go to basic info screen
+                    }
+                });
             }
         }
 
-        // Handle QR upload
+        // UPDATED: Handle QR upload for returning visitors
         function handleQRUpload(input) {
             const file = input.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    if (html5QrCode) {
-                        html5QrCode.scanFile(file, true)
-                            .then(decodedText => {
-                                handleQRCodeSuccess(decodedText);
-                            })
-                            .catch(err => {
-                                showNotification(translations[currentLanguage].invalidQRMessage || 'Invalid QR Code');
+                // Show loading
+                showLoading();
+                
+                if (html5QrCode) {
+                    html5QrCode.scanFile(file, true)
+                        .then(decodedText => {
+                            hideLoading();
+                            handleQRCodeSuccess(decodedText);
+                        })
+                        .catch(err => {
+                            hideLoading();
+                            console.error('QR file scan error:', err);
+                            Swal.fire({
+                                title: translations[currentLanguage].invalidQRMessage || 'Invalid QR Code',
+                                text: translations[currentLanguage].qrScanFailed || 'Could not read QR code from image.',
+                                icon: 'error',
+                                confirmButtonColor: '#e74c3c'
                             });
-                    }
-                };
-                reader.readAsDataURL(file);
+                        });
+                } else {
+                    hideLoading();
+                    showNotification('QR Scanner not initialized');
+                }
+                
+                // Reset file input
+                input.value = '';
             }
         }
 
-        // Skip QR scan
+        // UPDATED: Skip QR scan - redirect to basic info like first-time visitor
         function skipQRScan() {
             if (html5QrCode) {
-                html5QrCode.stop();
+                try {
+                    const state = html5QrCode.getState();
+                    // Only stop if scanner is running (state 2) or paused (state 3)
+                    if (state === 2 || state === 3) {
+                        html5QrCode.stop().catch(() => {});
+                    }
+                } catch (e) {
+                    // Scanner not initialized or already stopped, ignore
+                }
             }
-            showScreen(3);
+            
+            // Treat as new visitor since no QR code
+            visitorData.type = 'returning';
+            currentFlow = screenFlow['new']; // Use new visitor flow for manual entry
+            currentFlowIndex = 1;
+            showScreen(3); // Go to basic info screen
         }
 
         // // Screen navigation
@@ -1893,7 +2179,15 @@
             clearInterval(countdownTimer);
             stopCamera();
             if (html5QrCode) {
-                html5QrCode.stop().catch(() => {});
+                try {
+                    const state = html5QrCode.getState();
+                    // Only stop if scanner is running (state 2) or paused (state 3)
+                    if (state === 2 || state === 3) {
+                        html5QrCode.stop().catch(() => {});
+                    }
+                } catch (e) {
+                    // Scanner not initialized or already stopped, ignore
+                }
             }
             
             visitorData = {};
@@ -2195,7 +2489,41 @@
             });
         }
 
-        // Update success screen with actual database data
+        // // Update success screen with actual database data
+        // function updateSuccessScreen(data) {
+        //     // Update badge number
+        //     document.getElementById('badgeNumber').textContent = data.badge_number;
+            
+        //     // Update visitor information
+        //     document.getElementById('visitorName').textContent = data.visitor_name;
+        //     document.getElementById('visitorCompany').textContent = data.company;
+            
+        //     // Update host information
+        //     document.getElementById('badgeHost').textContent = data.host_name;
+            
+        //     // Update valid until time
+        //     const validUntilDate = new Date(data.valid_until);
+        //     document.getElementById('validUntil').textContent = 
+        //         validUntilDate.toLocaleTimeString('en-US', { 
+        //             hour: '2-digit', 
+        //             minute: '2-digit', 
+        //             hour12: true 
+        //         });
+            
+        //     // Update badge photo if available
+        //     const badgePhotoDiv = document.getElementById('badgePhotoDisplay');
+        //     if (visitorData.photo) {
+        //         badgePhotoDiv.innerHTML = `<img src="${visitorData.photo}" alt="Visitor Photo">`;
+        //     } else {
+        //         badgePhotoDiv.innerHTML = '<i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>';
+        //     }
+            
+        //     // Store visit ID for potential future reference
+        //     visitorData.visit_id = data.visit_id;
+        //     visitorData.badge_number = data.badge_number;
+        // }
+
+        // UPDATED: Update success screen to include QR code generation
         function updateSuccessScreen(data) {
             // Update badge number
             document.getElementById('badgeNumber').textContent = data.badge_number;
@@ -2219,7 +2547,7 @@
             // Update badge photo if available
             const badgePhotoDiv = document.getElementById('badgePhotoDisplay');
             if (visitorData.photo) {
-                badgePhotoDiv.innerHTML = `<img src="${visitorData.photo}" alt="Visitor Photo">`;
+                badgePhotoDiv.innerHTML = `<img src="${visitorData.photo}" alt="Visitor Photo" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">`;
             } else {
                 badgePhotoDiv.innerHTML = '<i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>';
             }
@@ -2227,6 +2555,9 @@
             // Store visit ID for potential future reference
             visitorData.visit_id = data.visit_id;
             visitorData.badge_number = data.badge_number;
+            
+            // Generate QR code for the visitor
+            generateVisitorQRCode();
         }
 
         // Updated department loading function to fetch from database
@@ -2590,4 +2921,240 @@
                 select.appendChild(option);
             });
         }
+
+
+        
+
+        // Add this constant at the top of the script section (after the departmentData declaration)
+        const COMPANY_VISITED = 'Pan Asia';
+
+        // // Update the completeCheckIn function - find this function and replace it:
+        // function completeCheckIn() {
+        //     showLoading();
+            
+        //     // Prepare data for database insertion
+        //     const checkInData = {
+        //         firstName: visitorData.firstName,
+        //         lastName: visitorData.lastName,
+        //         email: visitorData.email,
+        //         phone: visitorData.phone,
+        //         company: visitorData.company,
+        //         photo: visitorData.photo || null,
+        //         type: visitorData.type,
+        //         host: {
+        //             id: selectedHost.id || selectedHost.employeeId,
+        //             name: selectedHost.name,
+        //             email: selectedHost.email,
+        //             department: selectedHost.department,
+        //             departmentCode: selectedHost.departmentCode
+        //         },
+        //         purpose: selectedPurpose,
+        //         notes: visitorData.notes || null,
+        //         booking_code: visitorData.booking_code || null,
+        //         company_visited: COMPANY_VISITED  // ADD THIS LINE
+        //     };
+            
+        //     // Send data to server for database insertion
+        //     fetch('<?= base_url("kiosk/complete_checkin") ?>', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'X-Requested-With': 'XMLHttpRequest'
+        //         },
+        //         body: JSON.stringify(checkInData)
+        //     })
+        //     .then(response => response.json())
+        //     .then(result => {
+        //         hideLoading();
+                
+        //         if (result.status === 'success') {
+        //             // Update success screen with actual data from database
+        //             updateSuccessScreen(result.data);
+                    
+        //             // Update step indicator to show final step
+        //             updateStepIndicator(8);
+                    
+        //             // Show success screen
+        //             showScreen(8);
+                    
+        //             // Start countdown timer
+        //             startCountdown();
+                    
+        //             console.log('Check-in successful:', result.data);
+                    
+        //             // Store photo locally if available (for QR code reference)
+        //             if (visitorData.photo && result.data.visit_id) {
+        //                 try {
+        //                     localStorage.setItem(`visitor_photo_${result.data.visit_id}`, visitorData.photo);
+        //                 } catch (e) {
+        //                     console.error('Could not store photo:', e);
+        //                 }
+        //             }
+        //         } else {
+        //             // Show error message
+        //             Swal.fire({
+        //                 title: 'Check-in Failed',
+        //                 text: result.message || 'An error occurred during check-in. Please try again.',
+        //                 icon: 'error',
+        //                 confirmButtonColor: '#e74c3c'
+        //             });
+        //         }
+        //     })
+        //     .catch(error => {
+        //         hideLoading();
+        //         console.error('Check-in error:', error);
+                
+        //         Swal.fire({
+        //             title: 'Connection Error',
+        //             text: 'Unable to connect to the server. Please check your connection and try again.',
+        //             icon: 'error',
+        //             confirmButtonColor: '#e74c3c'
+        //         });
+        //     });
+        // }
+
+        // UPDATED: Complete check-in function with QR generation
+        function completeCheckIn() {
+            showLoading();
+            
+            // Prepare data for database insertion
+            const checkInData = {
+                firstName: visitorData.firstName,
+                lastName: visitorData.lastName,
+                email: visitorData.email,
+                phone: visitorData.phone,
+                company: visitorData.company,
+                photo: visitorData.photo || null,
+                type: visitorData.type,
+                host: {
+                    id: selectedHost.id || selectedHost.employeeId,
+                    name: selectedHost.name,
+                    email: selectedHost.email,
+                    department: selectedHost.department,
+                    departmentCode: selectedHost.departmentCode
+                },
+                purpose: selectedPurpose,
+                notes: visitorData.notes || null,
+                booking_code: visitorData.booking_code || null,
+                company_visited: COMPANY_VISITED
+            };
+            
+            // Send data to server for database insertion
+            fetch('<?= base_url("kiosk/complete_checkin") ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(checkInData)
+            })
+            .then(response => response.json())
+            .then(result => {
+                hideLoading();
+                
+                if (result.status === 'success') {
+                    // Update success screen with actual data from database
+                    updateSuccessScreen(result.data);
+                    
+                    // Update step indicator to show final step
+                    updateStepIndicator(8);
+                    
+                    // Show success screen
+                    showScreen(8);
+                    
+                    // Start countdown timer
+                    startCountdown();
+                    
+                    console.log('Check-in successful:', result.data);
+                    
+                } else {
+                    // Show error message
+                    Swal.fire({
+                        title: 'Check-in Failed',
+                        text: result.message || 'An error occurred during check-in. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#e74c3c'
+                    });
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Check-in error:', error);
+                
+                Swal.fire({
+                    title: 'Connection Error',
+                    text: 'Unable to connect to the server. Please check your connection and try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#e74c3c'
+                });
+            });
+        }
+
+        // UPDATED: Reset kiosk - also clear QR code
+        function resetKiosk() {
+            clearInterval(countdownTimer);
+            stopCamera();
+            if (html5QrCode) {
+                try {
+                    const state = html5QrCode.getState();
+                    // Only stop if scanner is running (state 2) or paused (state 3)
+                    if (state === 2 || state === 3) {
+                        html5QrCode.stop().catch(() => {});
+                    }
+                } catch (e) {
+                    // Scanner not initialized or already stopped, ignore
+                }
+            }
+            
+            // Clear QR code instance
+            if (qrCodeInstance) {
+                const qrContainer = document.getElementById('qrCodeContainer');
+                if (qrContainer) {
+                    qrContainer.innerHTML = '';
+                }
+                qrCodeInstance = null;
+            }
+            
+            visitorData = {};
+            selectedHost = null;
+            selectedPurpose = null;
+            selectedDepartment = null;
+            capturedPhotoData = null;
+            photoTaken = false;
+            currentFlow = [];
+            currentFlowIndex = 0;
+            
+            document.querySelectorAll('input').forEach(input => {
+                if (input.type !== 'checkbox') {
+                    input.value = '';
+                    input.classList.remove('is-invalid');
+                } else {
+                    input.checked = false;
+                }
+            });
+            
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.value = '';
+            });
+            
+            document.querySelectorAll('.purpose-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            document.getElementById('departmentSelect').value = '';
+            document.getElementById('employeeSection').style.display = 'none';
+            document.getElementById('selectedHost').innerHTML = `<span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>`;
+            document.getElementById('captureBtn').style.display = 'block';
+            document.getElementById('retakeBtn').style.display = 'none';
+            document.getElementById('capturedImage').style.display = 'none';
+            document.getElementById('photoSkipBtn').style.display = 'block';
+            document.getElementById('photoNextBtn').style.display = 'none';
+            document.getElementById('hostNextBtn').disabled = true;
+            document.getElementById('purposeNextBtn').disabled = true;
+            document.getElementById('agreeNextBtn').disabled = true;
+            
+            showScreen(1);
+        }
+
+
     </script>
