@@ -1,5 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+
+// Check for logout success via URL parameter
+$logout_success = $this->input->get('logout') === 'success';
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -269,6 +272,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         </div>
         
         <div class="login-body">
+            <?php if($logout_success): ?>
+                <div class="alert alert-success" role="alert">
+                    <i class="bi bi-check-circle"></i> You have been logged out successfully
+                </div>
+            <?php endif; ?>
+            
             <?php if($this->session->flashdata('error')): ?>
                 <div class="alert alert-danger" role="alert">
                     <i class="bi bi-exclamation-circle"></i> <?= $this->session->flashdata('error') ?>
@@ -331,13 +340,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <a href="<?= base_url('main/tw') ?>" class="quick-btn">
                     <div class="logo-head">
                         <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" alt="Toms World">
-                    </div>
+                    </div>            
                     <h5>TW PORTAL</h5>
                 </a>
                 <a href="<?= base_url('main/pa') ?>" class="quick-btn">
                     <div class="logo-head">
                         <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" alt="Pan-Asia">
-                    </div>
+                    </div>             
                     <h5>PA PORTAL</h5>
                 </a>
             </div>
@@ -411,6 +420,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 setTimeout(() => alert.remove(), 500);
             });
         }, 5000);
+        
+        // Clean URL after showing logout message
+        <?php if($logout_success): ?>
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, '<?= base_url("auth") ?>');
+        }
+        <?php endif; ?>
     </script>
 </body>
 </html>

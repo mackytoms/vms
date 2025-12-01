@@ -1154,6 +1154,47 @@
         let photoTaken = false;
         // Global variable for QR Code instance
         let qrCodeInstance = null;
+        // Add this flag near the top with other state variables
+        let isProcessingQR = false;
+
+        let isScannerStopping = false;
+
+        // FIXED: Safe stop function that checks scanner state first
+        async function stopQRScanner() {
+            if (!html5QrCode || isScannerStopping) {
+                return Promise.resolve();
+            }
+            
+            isScannerStopping = true;
+            
+            return new Promise((resolve) => {
+                try {
+                    // Check if scanner is actually running before stopping
+                    const state = html5QrCode.getState();
+                    // State 2 = SCANNING, State 3 = PAUSED (may vary by version)
+                    // Some versions use 1 for scanning
+                    if (state === 2 || state === 1) {
+                        html5QrCode.stop().then(() => {
+                            isScannerStopping = false;
+                            resolve();
+                        }).catch((err) => {
+                            console.log('Scanner stop error (ignored):', err);
+                            isScannerStopping = false;
+                            resolve();
+                        });
+                    } else {
+                        // Scanner not running, just resolve
+                        isScannerStopping = false;
+                        resolve();
+                    }
+                } catch (e) {
+                    // If getState() fails or any other error, just resolve
+                    console.log('Scanner state check error (ignored):', e);
+                    isScannerStopping = false;
+                    resolve();
+                }
+            });
+        }
 
         // Screen flow mapping
         const screenFlow = {
@@ -1522,9 +1563,16 @@
         //     }
         //     showScreen(3);
         // }
+        
 
-        // UPDATED: Handle QR code success for returning visitors
+        // FIXED: Handle QR code success for returning visitors
         function handleQRCodeSuccess(decodedText) {
+            // Prevent multiple calls
+            if (isProcessingQR) {
+                return;
+            }
+            isProcessingQR = true;
+            
             try {
                 let qrData;
                 
@@ -1532,36 +1580,27 @@
                 try {
                     qrData = JSON.parse(decodedText);
                 } catch (e) {
-                    // Try base64 decode if JSON parse fails
                     try {
                         qrData = JSON.parse(atob(decodedText));
                     } catch (e2) {
+                        isProcessingQR = false;
                         throw new Error('Invalid QR format');
                     }
                 }
                 
                 // Validate QR data has required fields
                 if (!qrData.email || !qrData.firstName || !qrData.lastName) {
+                    isProcessingQR = false;
                     throw new Error('Missing required fields in QR code');
                 }
                 
-                // Stop QR scanner
-                if (html5QrCode) {
-                    try {
-                        const state = html5QrCode.getState();
-                        // Only stop if scanner is running (state 2) or paused (state 3)
-                        if (state === 2 || state === 3) {
-                            html5QrCode.stop().catch(() => {});
-                        }
-                    } catch (e) {
-                        // Scanner not initialized or already stopped, ignore
-                    }
-                }
+                // Stop QR scanner safely (don't await, let it happen in background)
+                stopQRScanner();
                 
-                // Retrieve stored photo from localStorage
+                // Retrieve stored photo from localStorage using email as key
                 const storedPhoto = localStorage.getItem(`visitor_photo_${qrData.email}`);
                 
-                // Populate visitor data from QR code
+                // Populate visitor data from QR code - this skips basicInfoScreen & photoScreen
                 visitorData = {
                     ...visitorData,
                     firstName: qrData.firstName,
@@ -1573,7 +1612,12 @@
                     type: 'returning'
                 };
                 
-                // Show success message
+                // Update flow for returning visitor - skips screens 3 (basicInfo) and 4 (photo)
+                // Flow: Welcome(1) -> QR(2) -> Host(5) -> Purpose(6) -> Agreement(7) -> Success(8)
+                currentFlow = [1, 2, 5, 6, 7, 8];
+                currentFlowIndex = 2; // Position 2 in array = screen 5 (hostScreen)
+                
+                // Show success message and then navigate to hostScreen
                 Swal.fire({
                     title: translations[currentLanguage].qrScanSuccess || 'QR Code Scanned!',
                     html: `<p>${translations[currentLanguage].welcomeBackQR || 'Welcome back!'}</p>
@@ -1582,104 +1626,107 @@
                     icon: 'success',
                     confirmButtonColor: '#27ae60',
                     timer: 3000,
-                    timerProgressBar: true
+                    timerProgressBar: true,
+                    showConfirmButton: true,
+                    confirmButtonText: 'OK'
                 }).then(() => {
-                    // Update flow to skip to host screen
-                    currentFlow = [1, 2, 5, 6, 7, 8]; // Returning visitor flow
-                    currentFlowIndex = 2; // Set to index of host screen (5)
-                    showScreen(5); // Go directly to host selection
+                    // Reset the processing flag
+                    isProcessingQR = false;
+                    // Navigate to hostScreen (screen 5) - skipping basicInfo and photo screens
+                    showScreen(5);
                 });
                 
             } catch (e) {
                 console.error('QR decode error:', e);
+                isProcessingQR = false;
                 
                 Swal.fire({
                     title: translations[currentLanguage].invalidQRMessage || 'Invalid QR Code',
-                    text: translations[currentLanguage].qrScanFailed || 'Could not read QR code. Please try again or continue manually.',
+                    text: translations[currentLanguage].qrScanFailed || 'Could not read QR code.',
                     icon: 'error',
                     showCancelButton: true,
                     confirmButtonColor: '#3498db',
                     cancelButtonColor: '#95a5a6',
-                    confirmButtonText: translations[currentLanguage].tryAgain || 'Try Again',
-                    cancelButtonText: translations[currentLanguage].continueManually || 'Continue Manually'
+                    confirmButtonText: 'Try Again',
+                    cancelButtonText: 'Continue Manually'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Restart QR scanner
                         initQRScanner();
                     } else {
-                        // Redirect to basic info screen like first-time visitor
-                        if (html5QrCode) {
-                            try {
-                                const state = html5QrCode.getState();
-                                // Only stop if scanner is running (state 2) or paused (state 3)
-                                if (state === 2 || state === 3) {
-                                    html5QrCode.stop().catch(() => {});
-                                }
-                            } catch (e) {
-                                // Scanner not initialized or already stopped, ignore
-                            }
-                        }
-                        visitorData.type = 'returning'; // Keep as returning but needs manual entry
-                        currentFlow = screenFlow['new']; // Use new visitor flow
-                        currentFlowIndex = 1;
-                        showScreen(3); // Go to basic info screen
+                        skipQRScan();
                     }
                 });
             }
         }
-
-        // UPDATED: Handle QR upload for returning visitors
+        
+        // FIXED: Handle QR upload for returning visitors
         function handleQRUpload(input) {
             const file = input.files[0];
             if (file) {
                 // Show loading
                 showLoading();
                 
-                if (html5QrCode) {
-                    html5QrCode.scanFile(file, true)
-                        .then(decodedText => {
-                            hideLoading();
-                            handleQRCodeSuccess(decodedText);
-                        })
-                        .catch(err => {
-                            hideLoading();
-                            console.error('QR file scan error:', err);
-                            Swal.fire({
-                                title: translations[currentLanguage].invalidQRMessage || 'Invalid QR Code',
-                                text: translations[currentLanguage].qrScanFailed || 'Could not read QR code from image.',
-                                icon: 'error',
-                                confirmButtonColor: '#e74c3c'
-                            });
-                        });
-                } else {
-                    hideLoading();
-                    showNotification('QR Scanner not initialized');
+                // Initialize scanner if not already
+                if (!html5QrCode) {
+                    html5QrCode = new Html5Qrcode("qr-reader");
                 }
+                
+                html5QrCode.scanFile(file, true)
+                    .then(decodedText => {
+                        hideLoading();
+                        handleQRCodeSuccess(decodedText);
+                    })
+                    .catch(err => {
+                        hideLoading();
+                        console.error('QR file scan error:', err);
+                        Swal.fire({
+                            title: translations[currentLanguage].invalidQRMessage || 'Invalid QR Code',
+                            text: translations[currentLanguage].qrScanFailed || 'Could not read QR code from image.',
+                            icon: 'error',
+                            confirmButtonColor: '#e74c3c'
+                        });
+                    });
                 
                 // Reset file input
                 input.value = '';
             }
         }
 
+
         // UPDATED: Skip QR scan - redirect to basic info like first-time visitor
-        function skipQRScan() {
-            if (html5QrCode) {
-                try {
-                    const state = html5QrCode.getState();
-                    // Only stop if scanner is running (state 2) or paused (state 3)
-                    if (state === 2 || state === 3) {
-                        html5QrCode.stop().catch(() => {});
-                    }
-                } catch (e) {
-                    // Scanner not initialized or already stopped, ignore
-                }
-            }
+        // function skipQRScan() {
+        //     if (html5QrCode) {
+        //         try {
+        //             const state = html5QrCode.getState();
+        //             // Only stop if scanner is running (state 2) or paused (state 3)
+        //             if (state === 2 || state === 3) {
+        //                 html5QrCode.stop().catch(() => {});
+        //             }
+        //         } catch (e) {
+        //             // Scanner not initialized or already stopped, ignore
+        //         }
+        //     }
             
-            // Treat as new visitor since no QR code
-            visitorData.type = 'returning';
-            currentFlow = screenFlow['new']; // Use new visitor flow for manual entry
-            currentFlowIndex = 1;
-            showScreen(3); // Go to basic info screen
+        //     // Treat as new visitor since no QR code
+        //     visitorData.type = 'returning';
+        //     currentFlow = screenFlow['new']; // Use new visitor flow for manual entry
+        //     currentFlowIndex = 1;
+        //     showScreen(3); // Go to basic info screen
+        // }
+
+
+        // FIXED: Skip QR scan - redirect to basic info like first-time visitor
+        function skipQRScan() {
+            isProcessingQR = false;
+            isScannerStopping = false;
+            
+            stopQRScanner().then(() => {
+                // Treat as new visitor since no QR code - use new visitor flow for manual entry
+                visitorData.type = 'returning';
+                currentFlow = screenFlow['new']; // [1, 3, 4, 5, 6, 7, 8]
+                currentFlowIndex = 1;
+                showScreen(3); // Go to basic info screen
+            });
         }
 
         // // Screen navigation
@@ -1713,11 +1760,13 @@
         //     currentScreen = screenNumber;
         // }
 
-        // Modified showScreen function to handle auto-selection
+        // FIXED: showScreen function - update the part that handles screen 2
         function showScreen(screenNumber) {
-            if (currentScreen === 2 && html5QrCode) {
-                html5QrCode.stop();
+            // Stop QR scanner when leaving screen 2 (but don't throw error)
+            if (currentScreen === 2 && screenNumber !== 2) {
+                stopQRScanner(); // This now safely handles already-stopped scanner
             }
+            
             if (currentScreen === 4 && screenNumber !== 4) {
                 stopCamera();
             }
@@ -1743,27 +1792,19 @@
             // AUTO-SELECT DELIVERY PURPOSE IF VISITOR TYPE IS DELIVERY
             if (screenNumber === 6) { // Purpose screen
                 if (visitorData.type === 'delivery') {
-                    // Find and auto-select the delivery purpose card
                     setTimeout(() => {
                         const deliveryCard = Array.from(document.querySelectorAll('.purpose-card'))
                             .find(card => card.getAttribute('onclick').includes("'delivery'"));
                         
                         if (deliveryCard) {
-                            // Clear any existing selections
                             document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
-                            
-                            // Select the delivery card
                             deliveryCard.classList.add('selected');
                             selectedPurpose = 'delivery';
                             visitorData.purpose = 'delivery';
-                            
-                            // Enable the next button
                             document.getElementById('purposeNextBtn').disabled = false;
-                            
-                            // Optional: Show a notification to the user
                             showNotification('Delivery purpose auto-selected based on your visit type');
                         }
-                    }, 100); // Small delay to ensure DOM is ready
+                    }, 100);
                 }
             }
             
@@ -2174,62 +2215,90 @@
             }, 1000);
         }
 
-        // Reset kiosk
-        function resetKiosk() {
-            clearInterval(countdownTimer);
-            stopCamera();
-            if (html5QrCode) {
-                try {
-                    const state = html5QrCode.getState();
-                    // Only stop if scanner is running (state 2) or paused (state 3)
-                    if (state === 2 || state === 3) {
-                        html5QrCode.stop().catch(() => {});
-                    }
-                } catch (e) {
-                    // Scanner not initialized or already stopped, ignore
-                }
-            }
+        // // Reset kiosk
+        // function resetKiosk() {
+        //     clearInterval(countdownTimer);
+        //     stopCamera();
             
-            visitorData = {};
-            selectedHost = null;
-            selectedPurpose = null;
-            selectedDepartment = null;
-            capturedPhotoData = null;
-            photoTaken = false;
-            currentFlow = [];
-            currentFlowIndex = 0;
+        //     // Reset flags
+        //     isProcessingQR = false;
+        //     isScannerStopping = false;
             
-            document.querySelectorAll('input').forEach(input => {
-                if (input.type !== 'checkbox') {
-                    input.value = '';
-                    input.classList.remove('is-invalid');
-                } else {
-                    input.checked = false;
-                }
-            });
+        //     // Stop scanner safely
+        //     stopQRScanner();
             
-            document.querySelectorAll('textarea').forEach(textarea => {
-                textarea.value = '';
-            });
+        //     // Clear QR code instance
+        //     if (qrCodeInstance) {
+        //         const qrContainer = document.getElementById('qrCodeContainer');
+        //         if (qrContainer) {
+        //             qrContainer.innerHTML = '';
+        //         }
+        //         qrCodeInstance = null;
+        //     }
             
-            document.querySelectorAll('.purpose-card').forEach(card => {
-                card.classList.remove('selected');
-            });
+        //     visitorData = {};
+        //     selectedHost = null;
+        //     selectedPurpose = null;
+        //     selectedDepartment = null;
+        //     capturedPhotoData = null;
+        //     photoTaken = false;
+        //     currentFlow = [];
+        //     currentFlowIndex = 0;
             
-            document.getElementById('departmentSelect').value = '';
-            document.getElementById('employeeSection').style.display = 'none';
-            document.getElementById('selectedHost').innerHTML = `<span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>`;
-            document.getElementById('captureBtn').style.display = 'block';
-            document.getElementById('retakeBtn').style.display = 'none';
-            document.getElementById('capturedImage').style.display = 'none';
-            document.getElementById('photoSkipBtn').style.display = 'block';
-            document.getElementById('photoNextBtn').style.display = 'none';
-            document.getElementById('hostNextBtn').disabled = true;
-            document.getElementById('purposeNextBtn').disabled = true;
-            document.getElementById('agreeNextBtn').disabled = true;
+        //     document.querySelectorAll('input').forEach(input => {
+        //         if (input.type !== 'checkbox') {
+        //             input.value = '';
+        //             input.classList.remove('is-invalid');
+        //         } else {
+        //             input.checked = false;
+        //         }
+        //     });
             
-            showScreen(1);
-        }
+        //     document.querySelectorAll('textarea').forEach(textarea => {
+        //         textarea.value = '';
+        //     });
+            
+        //     document.querySelectorAll('.purpose-card').forEach(card => {
+        //         card.classList.remove('selected');
+        //     });
+            
+        //     document.getElementById('departmentSelect').value = '';
+        //     document.getElementById('employeeSection').style.display = 'none';
+        //     document.getElementById('selectedHost').innerHTML = `<span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>`;
+        //     document.getElementById('captureBtn').style.display = 'block';
+        //     document.getElementById('retakeBtn').style.display = 'none';
+        //     document.getElementById('capturedImage').style.display = 'none';
+        //     document.getElementById('photoSkipBtn').style.display = 'block';
+        //     document.getElementById('photoNextBtn').style.display = 'none';
+        //     document.getElementById('hostNextBtn').disabled = true;
+        //     document.getElementById('purposeNextBtn').disabled = true;
+        //     document.getElementById('agreeNextBtn').disabled = true;
+            
+        //     showScreen(1);
+        // }
+
+        // async function stopQRScanner() {
+        //     if (!html5QrCode || isScannerStopping) {
+        //         return Promise.resolve();
+        //     }
+            
+        //     isScannerStopping = true;
+            
+        //     return new Promise((resolve) => {
+        //         try {
+        //             html5QrCode.stop().then(() => {
+        //                 isScannerStopping = false;
+        //                 resolve();
+        //             }).catch(() => {
+        //                 isScannerStopping = false;
+        //                 resolve();
+        //             });
+        //         } catch (e) {
+        //             isScannerStopping = false;
+        //             resolve();
+        //         }
+        //     });
+        // }
 
         // Pre-scheduled visit functions
         function showPreScheduled() {
@@ -2645,81 +2714,81 @@
             });
         }
 
-        // Handle QR code for returning visitors
-        function handleQRCodeSuccess(decodedText) {
-            try {
-                let qrData;
+        // // Handle QR code for returning visitors
+        // function handleQRCodeSuccess(decodedText) {
+        //     try {
+        //         let qrData;
                 
-                try {
-                    qrData = JSON.parse(decodedText);
-                } catch (e) {
-                    qrData = JSON.parse(atob(decodedText));
-                }
+        //         try {
+        //             qrData = JSON.parse(decodedText);
+        //         } catch (e) {
+        //             qrData = JSON.parse(atob(decodedText));
+        //         }
                 
-                if (qrData.email) {
-                    if (html5QrCode) {
-                        html5QrCode.stop();
-                    }
+        //         if (qrData.email) {
+        //             if (html5QrCode) {
+        //                 html5QrCode.stop();
+        //             }
                     
-                    // Search for visitor in database
-                    fetch('<?= base_url("kiosk/search_visitor") ?>', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: JSON.stringify({ email: qrData.email })
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.status === 'success' && result.visitor) {
-                            // Populate form with visitor data
-                            visitorData = {
-                                ...visitorData,
-                                firstName: result.visitor.first_name,
-                                lastName: result.visitor.last_name,
-                                email: result.visitor.email,
-                                phone: result.visitor.phone,
-                                company: result.visitor.company,
-                                photo: result.visitor.photo,
-                                visitor_id: result.visitor.visitor_id,
-                                total_visits: result.visitor.total_visits
-                            };
+        //             // Search for visitor in database
+        //             fetch('<?= base_url("kiosk/search_visitor") ?>', {
+        //                 method: 'POST',
+        //                 headers: {
+        //                     'Content-Type': 'application/json',
+        //                     'X-Requested-With': 'XMLHttpRequest'
+        //                 },
+        //                 body: JSON.stringify({ email: qrData.email })
+        //             })
+        //             .then(response => response.json())
+        //             .then(result => {
+        //                 if (result.status === 'success' && result.visitor) {
+        //                     // Populate form with visitor data
+        //                     visitorData = {
+        //                         ...visitorData,
+        //                         firstName: result.visitor.first_name,
+        //                         lastName: result.visitor.last_name,
+        //                         email: result.visitor.email,
+        //                         phone: result.visitor.phone,
+        //                         company: result.visitor.company,
+        //                         photo: result.visitor.photo,
+        //                         visitor_id: result.visitor.visitor_id,
+        //                         total_visits: result.visitor.total_visits
+        //                     };
                             
-                            // Pre-fill the form if moving to basic info screen
-                            if (document.getElementById('firstName')) {
-                                document.getElementById('firstName').value = result.visitor.first_name;
-                                document.getElementById('lastName').value = result.visitor.last_name;
-                                document.getElementById('email').value = result.visitor.email;
-                                document.getElementById('phone').value = result.visitor.phone;
-                                document.getElementById('company').value = result.visitor.company;
-                            }
+        //                     // Pre-fill the form if moving to basic info screen
+        //                     if (document.getElementById('firstName')) {
+        //                         document.getElementById('firstName').value = result.visitor.first_name;
+        //                         document.getElementById('lastName').value = result.visitor.last_name;
+        //                         document.getElementById('email').value = result.visitor.email;
+        //                         document.getElementById('phone').value = result.visitor.phone;
+        //                         document.getElementById('company').value = result.visitor.company;
+        //                     }
                             
-                            Swal.fire({
-                                title: `Welcome Back!`,
-                                text: `Welcome back, ${result.visitor.first_name}! You've visited us ${result.visitor.total_visits} time(s) before.`,
-                                icon: 'success',
-                                confirmButtonColor: '#27ae60'
-                            });
+        //                     Swal.fire({
+        //                         title: `Welcome Back!`,
+        //                         text: `Welcome back, ${result.visitor.first_name}! You've visited us ${result.visitor.total_visits} time(s) before.`,
+        //                         icon: 'success',
+        //                         confirmButtonColor: '#27ae60'
+        //                     });
                             
-                            // Skip to host selection for returning visitors
-                            showScreen(5);
-                        } else {
-                            showNotification('Visitor not found. Please complete full registration.');
-                            showScreen(3);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error searching visitor:', error);
-                        showNotification('Error processing QR code. Please continue with manual entry.');
-                        showScreen(3);
-                    });
-                }
-            } catch (e) {
-                console.error('QR decode error:', e);
-                showNotification('Invalid QR Code');
-            }
-        }
+        //                     // Skip to host selection for returning visitors
+        //                     showScreen(5);
+        //                 } else {
+        //                     showNotification('Visitor not found. Please complete full registration.');
+        //                     showScreen(3);
+        //                 }
+        //             })
+        //             .catch(error => {
+        //                 console.error('Error searching visitor:', error);
+        //                 showNotification('Error processing QR code. Please continue with manual entry.');
+        //                 showScreen(3);
+        //             });
+        //         }
+        //     } catch (e) {
+        //         console.error('QR decode error:', e);
+        //         showNotification('Invalid QR Code');
+        //     }
+        // }
 
         // Load pre-scheduled visits from database
         function loadPreScheduledVisits() {
@@ -3090,21 +3159,17 @@
             });
         }
 
-        // UPDATED: Reset kiosk - also clear QR code
+        // FIXED: resetKiosk function
         function resetKiosk() {
             clearInterval(countdownTimer);
             stopCamera();
-            if (html5QrCode) {
-                try {
-                    const state = html5QrCode.getState();
-                    // Only stop if scanner is running (state 2) or paused (state 3)
-                    if (state === 2 || state === 3) {
-                        html5QrCode.stop().catch(() => {});
-                    }
-                } catch (e) {
-                    // Scanner not initialized or already stopped, ignore
-                }
-            }
+            
+            // Reset flags
+            isProcessingQR = false;
+            isScannerStopping = false;
+            
+            // Stop scanner safely (won't throw error if already stopped)
+            stopQRScanner();
             
             // Clear QR code instance
             if (qrCodeInstance) {

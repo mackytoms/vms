@@ -1,29 +1,27 @@
-<!DOCTYPE html>
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Visitor Management System</title>
+    <title>LOGIN - KIOSK V-PASS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-       body {
+        body {
             background-image: url('<?= base_url("assets/images/bg/index_bg.jpg") ?>');
-            background-size: cover; /* makes sure the image covers the entire screen */
-            background-position: center; /* centers the image */
-            background-repeat: no-repeat; /* prevents tiling */
-
-            /* Optional gradient overlay on top of the image */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             background-blend-mode: overlay;
-            background-color: rgb(99 99 89 / 70%); /* semi-transparent gradient tone */
-
+            background-color: rgb(99 99 89 / 70%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         }
-
 
         .login-container {
             border: 1px solid black;
@@ -37,14 +35,8 @@
         }
 
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .login-header {
@@ -58,8 +50,8 @@
             margin: 0;
             font-size: 2em;
             font-weight: 600;
-            color: white; /* main text color */
-            -webkit-text-stroke: 1px black; /* border thickness & color */
+            color: white;
+            -webkit-text-stroke: 1px black;
         }
 
         .login-header p {
@@ -94,20 +86,28 @@
             border-radius: 50%;
         }
 
-        .login-body {
-            padding: 40px 30px;
+		.logo-head {
+            height: 60px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .form-group {
-            margin-bottom: 25px;
+        .logo-head img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 50%;
         }
 
-        .form-label {
-            color: #495057;
-            font-weight: 500;
-            margin-bottom: 8px;
-            font-size: 0.95em;
+		.logo-head.h5 {
+			font-weight: 200;
         }
+
+        .login-body { padding: 40px 30px; }
+        .form-group { margin-bottom: 25px; }
+        .form-label { color: #495057; font-weight: 500; margin-bottom: 8px; font-size: 0.95em; }
 
         .form-control {
             border: 2px solid #e1e5eb;
@@ -122,9 +122,7 @@
             box-shadow: 0 0 0 0.2rem rgba(243, 156, 18, 0.1);
         }
 
-        .input-group {
-            position: relative;
-        }
+        .input-group { position: relative; }
 
         .input-icon {
             position: absolute;
@@ -136,9 +134,7 @@
             z-index: 10;
         }
 
-        .form-control.with-icon {
-            padding-right: 45px;
-        }
+        .form-control.with-icon { padding-right: 45px; }
 
         .btn-login {
             background: linear-gradient(135deg, #f39c12, #e67e22);
@@ -157,6 +153,7 @@
         .btn-login:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(243, 156, 18, 0.4);
+            color: white;
         }
 
         .remember-forgot {
@@ -166,23 +163,9 @@
             margin-bottom: 20px;
         }
 
-        .form-check {
-            display: flex;
-            align-items: center;
-        }
-
-        .form-check-input {
-            width: 18px;
-            height: 18px;
-            margin-right: 8px;
-            cursor: pointer;
-        }
-
-        .form-check-label {
-            color: #6c757d;
-            cursor: pointer;
-            user-select: none;
-        }
+        .form-check { display: flex; align-items: center; }
+        .form-check-input { width: 18px; height: 18px; margin-right: 8px; cursor: pointer; }
+        .form-check-label { color: #6c757d; cursor: pointer; user-select: none; }
 
         .forgot-link {
             color: #f39c12;
@@ -191,10 +174,7 @@
             transition: color 0.3s ease;
         }
 
-        .forgot-link:hover {
-            color: #e67e22;
-            text-decoration: underline;
-        }
+        .forgot-link:hover { color: #e67e22; text-decoration: underline; }
 
         .alert {
             border-radius: 10px;
@@ -205,25 +185,12 @@
         }
 
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        .alert-danger {
-            background-color: #fee;
-            color: #c33;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-        }
+        .alert-danger { background-color: #fee; color: #c33; }
+        .alert-success { background-color: #d4edda; color: #155724; }
 
         .divider {
             text-align: center;
@@ -248,11 +215,7 @@
             position: relative;
         }
 
-        .quick-access {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
+        .quick-access { display: flex; gap: 10px; margin-top: 20px; }
 
         .quick-btn {
             flex: 1;
@@ -280,50 +243,29 @@
             font-size: 0.85em;
         }
 
-        .spinner-border {
-            display: none;
-            width: 20px;
-            height: 20px;
-            margin-left: 10px;
-        }
+        .spinner-border { display: none; width: 20px; height: 20px; margin-left: 10px; }
+        .loading .spinner-border { display: inline-block; }
+        .loading .btn-text { margin-right: 5px; }
 
-        .loading .spinner-border {
-            display: inline-block;
-        }
-
-        .loading .btn-text {
-            margin-right: 5px;
-        }
-
-        /* Mobile responsiveness */
         @media (max-width: 480px) {
-            .login-container {
-                margin: 20px;
-            }
-            
-            .login-header {
-                padding: 30px 20px;
-            }
-            
-            .login-body {
-                padding: 30px 20px;
-            }
+            .login-container { margin: 20px; }
+            .login-header { padding: 30px 20px; }
+            .login-body { padding: 30px 20px; }
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="login-header">
-            <h1>Visitor Management System</h1>
-            <p>Secure Access Portal</p>
-            <div class="company-logos">
+            <h1>KIOSK V-PASS</h1>
+            <!-- <div class="company-logos">
                 <div class="logo-circle">
                     <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" alt="Toms World">
                 </div>
                 <div class="logo-circle">
                     <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" alt="Pan-Asia">
                 </div>
-            </div>
+            </div> -->
         </div>
         
         <div class="login-body">
@@ -367,28 +309,18 @@
                     </div>
                 </div>
                 
-                <div class="remember-forgot">
+                <!-- <div class="remember-forgot">
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                        <label class="form-check-label" for="remember">
-                            Remember me
-                        </label>
+                        <label class="form-check-label" for="remember">Remember me</label>
                     </div>
                     <a href="#" class="forgot-link" onclick="showForgotPassword()">Forgot Password?</a>
-                </div>
+                </div> -->
                 
-                <button class="btn btn-login">
-                    <a href="<?= base_url('main/admin') ?>">
-                    
-                            Sign In (Temporary)
-                    </a>
-                </button>
-                
-                
-                <!-- <button type="submit" class="btn btn-login" id="loginBtn">
+                <button type="submit" class="btn btn-login" id="loginBtn">
                     <span class="btn-text">Sign In</span>
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                </button> -->
+                </button>
             </form>
             
             <div class="divider">
@@ -397,16 +329,23 @@
             
             <div class="quick-access">
                 <a href="<?= base_url('main/tw') ?>" class="quick-btn">
-                    <i class="bi bi-building"></i> TW Portal
+                    <div class="logo-head">
+                        <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" alt="Toms World">
+                    </div>              
+                    <h5>TW PORTAL</h5>
                 </a>
                 <a href="<?= base_url('main/pa') ?>" class="quick-btn">
-                    <i class="bi bi-globe"></i> PA Portal
+                    <div class="logo-head">
+                        <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" alt="Pan-Asia">
+                    </div>
+                    <h5>PA PORTAL</h5>
                 </a>
             </div>
         </div>
         
         <div class="login-footer">
-            &copy; <?= date('Y') ?> TOMS WORLD. All rights reserved.
+            VPASS Copyright &copy; <?= date('Y') ?> All rights reserved.<br>
+			Information Technology & Services Department.
         </div>
     </div>
 
@@ -420,7 +359,6 @@
         togglePassword.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-            
             this.classList.toggle('bi-eye');
             this.classList.toggle('bi-eye-slash');
         });
@@ -431,15 +369,9 @@
         
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            // Add loading state
             loginBtn.classList.add('loading');
             loginBtn.disabled = true;
-            
-            // Simulate login process (remove this and use actual form submission)
-            setTimeout(() => {
-                this.submit();
-            }, 500);
+            setTimeout(() => { this.submit(); }, 500);
         });
         
         // Forgot password
@@ -455,9 +387,7 @@
                 confirmButtonColor: '#f39c12',
                 preConfirm: () => {
                     const email = document.getElementById('reset-email').value;
-                    if (!email) {
-                        Swal.showValidationMessage('Please enter your email address');
-                    }
+                    if (!email) { Swal.showValidationMessage('Please enter your email address'); }
                     return email;
                 }
             }).then((result) => {

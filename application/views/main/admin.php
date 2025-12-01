@@ -289,6 +289,7 @@ $activeVisits = getActiveVisits($conn);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
     <style>
         :root {
             --primary-color: #f39c12;
@@ -313,6 +314,8 @@ $activeVisits = getActiveVisits($conn);
         .sidebar-item:hover { background: var(--sidebar-hover); padding-left: 25px; }
         .sidebar-item.active { background: var(--sidebar-hover); border-left: 4px solid var(--primary-color); }
         .sidebar-item i { font-size: 1.3em; width: 30px; text-align: center; }
+        .sidebar-item.logout {color: #2c3e50 !important;}
+        .sidebar-item.logout:hover {color: #e0e0e0 !important; background-color: #dc3545 !important;}
         .sidebar.collapsed .sidebar-item span { display: none; }
         .sidebar-badge { background: var(--danger-color); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: auto; }
         .main-content { margin-left: 250px; transition: all 0.3s ease; min-height: 100vh; }
@@ -379,8 +382,8 @@ $activeVisits = getActiveVisits($conn);
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="assets/images/icons/stufftoy.png" alt="TOMS WORLD" onerror="this.style.display='none'">
-                <img src="assets/images/icons/pan-asia.jpg" alt="PAN-ASIA" onerror="this.style.display='none'">
+                <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" alt="TOMS WORLD" onerror="this.style.display='none'">
+                <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" alt="PAN-ASIA" onerror="this.style.display='none'">
             </div>
             <h3>KIOSK V-PASS</h3>
         </div>
@@ -411,21 +414,24 @@ $activeVisits = getActiveVisits($conn);
         <div class="topbar">
             <div class="topbar-left">
                 <i class="bi bi-list menu-toggle" onclick="toggleSidebar()"></i>
-                <div class="search-box">
+                <!-- <div class="search-box">
                     <input type="text" placeholder="Search visitors, employees..." id="globalSearch">
                     <i class="bi bi-search"></i>
-                </div>
+                </div> -->
             </div>
             <div class="topbar-right">
-                <div class="notification-icon">
+                <!-- <div class="notification-icon">
                     <i class="bi bi-bell"></i>
                     <span class="notification-badge"><?php echo $dashboardStats['currently_in']; ?></span>
-                </div>
-                <div class="user-profile">
+                </div> -->
+                <!-- <div class="user-profile">
                     <div class="user-avatar">AD</div>
                     <span>Admin</span>
                     <i class="bi bi-chevron-down"></i>
-                </div>
+                </div> -->
+            <a href="<?= base_url('auth/logout') ?>" class="sidebar-item logout" onclick="return confirmLogout(event)">
+                <i class="bi bi-box-arrow-left"></i><span>Logout</span>
+            </a>
             </div>
         </div>
 
@@ -1097,6 +1103,26 @@ $activeVisits = getActiveVisits($conn);
                         `;
                     });
                 });
+        }
+
+        // Confirm logout
+        function confirmLogout(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Logout?',
+                text: 'Are you sure you want to logout?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#e74c3c',
+                cancelButtonColor: '#95a5a6',
+                confirmButtonText: 'Yes, Logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '<?= base_url("auth/logout") ?>';
+                }
+            });
+            return false;
         }
 
         // Add Employee Form
