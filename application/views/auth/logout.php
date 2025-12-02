@@ -1,8 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
-// Check for logout success via URL parameter
-$logout_success = $this->input->get('logout') === 'success';
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,32 +61,7 @@ $logout_success = $this->input->get('logout') === 'success';
             -webkit-text-stroke: 0.5px black;
         }
 
-        .company-logos {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .logo-circle {
-            width: 60px;
-            height: 60px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .logo-circle img {
-            width: 40px;
-            height: 40px;
-            object-fit: contain;
-            border-radius: 50%;
-        }
-
-		.logo-head {
+        .logo-head {
             height: 60px;
             background: white;
             display: flex;
@@ -102,10 +74,6 @@ $logout_success = $this->input->get('logout') === 'success';
             height: 40px;
             object-fit: contain;
             border-radius: 50%;
-        }
-
-		.logo-head.h5 {
-			font-weight: 200;
         }
 
         .login-body { padding: 40px 30px; }
@@ -159,25 +127,53 @@ $logout_success = $this->input->get('logout') === 'success';
             color: white;
         }
 
-        .remember-forgot {
+        /* Toggle Button for Admin Login */
+        .btn-toggle-login {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 1em;
+            font-weight: 500;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            justify-content: center;
+            gap: 10px;
         }
 
-        .form-check { display: flex; align-items: center; }
-        .form-check-input { width: 18px; height: 18px; margin-right: 8px; cursor: pointer; }
-        .form-check-label { color: #6c757d; cursor: pointer; user-select: none; }
-
-        .forgot-link {
-            color: #f39c12;
-            text-decoration: none;
-            font-size: 0.95em;
-            transition: color 0.3s ease;
+        .btn-toggle-login:hover {
+            background: linear-gradient(135deg, #5a6268, #3d4246);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+            color: white;
         }
 
-        .forgot-link:hover { color: #e67e22; text-decoration: underline; }
+        .btn-toggle-login i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-toggle-login.active i {
+            transform: rotate(180deg);
+        }
+
+        /* Collapsible Form Container */
+        .login-form-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+        .login-form-container.show {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 25px;
+        }
 
         .alert {
             border-radius: 10px;
@@ -259,108 +255,120 @@ $logout_success = $this->input->get('logout') === 'success';
 </head>
 <body>
     <div class="login-container">
-        <div class="login-header">
+        <!-- <div class="login-header">
             <h1>KIOSK V-PASS</h1>
-            <!-- <div class="company-logos">
-                <div class="logo-circle">
-                    <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" alt="Toms World">
-                </div>
-                <div class="logo-circle">
-                    <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" alt="Pan-Asia">
-                </div>
-            </div> -->
-        </div>
+        </div> -->
         
         <div class="login-body">
-            <?php if($logout_success): ?>
-                <div class="alert alert-success" role="alert">
-                    <i class="bi bi-check-circle"></i> You have been logged out successfully
-                </div>
-            <?php endif; ?>
-            
-            <?php if($this->session->flashdata('error')): ?>
-                <div class="alert alert-danger" role="alert">
-                    <i class="bi bi-exclamation-circle"></i> <?= $this->session->flashdata('error') ?>
-                </div>
-            <?php endif; ?>
-            
-            <?php if($this->session->flashdata('success')): ?>
-                <div class="alert alert-success" role="alert">
-                    <i class="bi bi-check-circle"></i> <?= $this->session->flashdata('success') ?>
-                </div>
-            <?php endif; ?>
-            
-            <form id="loginForm" method="POST" action="<?= base_url('auth/login') ?>">
-                <div class="form-group">
-                    <label for="username" class="form-label">Username or Email</label>
-                    <div class="input-group">
-                        <input type="text" 
-                               class="form-control with-icon" 
-                               id="username" 
-                               name="username" 
-                               placeholder="Enter your username"
-                               required 
-                               autofocus>
-                        <i class="bi bi-person input-icon"></i>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
-                    <div class="input-group">
-                        <input type="password" 
-                               class="form-control with-icon" 
-                               id="password" 
-                               name="password" 
-                               placeholder="Enter your password"
-                               required>
-                        <i class="bi bi-eye-slash input-icon" id="togglePassword"></i>
-                    </div>
-                </div>
-                
-                <!-- <div class="remember-forgot">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                        <label class="form-check-label" for="remember">Remember me</label>
-                    </div>
-                    <a href="#" class="forgot-link" onclick="showForgotPassword()">Forgot Password?</a>
-                </div> -->
-                
-                <button type="submit" class="btn btn-login" id="loginBtn">
-                    <span class="btn-text">Sign In</span>
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                </button>
-            </form>
-            
-            <div class="divider">
-                <span>Quick Access</span>
+            <div class="divider" style="margin-top: 0;">
+                <span>Visitor Access</span>
             </div>
             
             <div class="quick-access">
                 <a href="<?= base_url('main/tw') ?>" class="quick-btn">
                     <div class="logo-head">
                         <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" alt="Toms World">
-                    </div>            
+                    </div>
                     <h5>TW PORTAL</h5>
                 </a>
                 <a href="<?= base_url('main/pa') ?>" class="quick-btn">
                     <div class="logo-head">
                         <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" alt="Pan-Asia">
-                    </div>             
+                    </div>
                     <h5>PA PORTAL</h5>
                 </a>
+            </div>
+
+            <div class="divider">
+                <span>Admin Access</span>
+            </div>
+
+            <!-- Toggle Button -->
+            <button type="button" class="btn-toggle-login" id="toggleLoginBtn">
+                <i class="bi bi-lock"></i>
+                <span>Admin Sign In</span>
+                <i class="bi bi-chevron-down"></i>
+            </button>
+
+            <!-- Collapsible Login Form -->
+            <div class="login-form-container" id="loginFormContainer">
+                <?php if($this->session->flashdata('error')): ?>
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-circle"></i> <?= $this->session->flashdata('error') ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if($this->session->flashdata('success')): ?>
+                    <div class="alert alert-success" role="alert">
+                        <i class="bi bi-check-circle"></i> <?= $this->session->flashdata('success') ?>
+                    </div>
+                <?php endif; ?>
+                
+                <form id="loginForm" method="POST" action="<?= base_url('auth/login') ?>">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username or Email</label>
+                        <div class="input-group">
+                            <input type="text" 
+                                   class="form-control with-icon" 
+                                   id="username" 
+                                   name="username" 
+                                   placeholder="Enter your username"
+                                   required>
+                            <i class="bi bi-person input-icon"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group">
+                            <input type="password" 
+                                   class="form-control with-icon" 
+                                   id="password" 
+                                   name="password" 
+                                   placeholder="Enter your password"
+                                   required>
+                            <i class="bi bi-eye-slash input-icon" id="togglePassword"></i>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-login" id="loginBtn">
+                        <span class="btn-text">Sign In</span>
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    </button>
+                </form>
             </div>
         </div>
         
         <div class="login-footer">
             KIOSK V-PASS Copyright &copy; <?= date('Y') ?> All rights reserved.<br>
-			Information Technology & Services Department.
+            Information Technology & Services Department.
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // Toggle Login Form Visibility
+        const toggleLoginBtn = document.getElementById('toggleLoginBtn');
+        const loginFormContainer = document.getElementById('loginFormContainer');
+        const usernameInput = document.getElementById('username');
+
+        toggleLoginBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            loginFormContainer.classList.toggle('show');
+            
+            // Focus on username input when form is shown
+            if (loginFormContainer.classList.contains('show')) {
+                setTimeout(() => usernameInput.focus(), 400);
+            }
+        });
+
+        // Auto-show form if there's an error or success message
+        <?php if($this->session->flashdata('error') || $this->session->flashdata('success')): ?>
+        toggleLoginBtn.classList.add('active');
+        loginFormContainer.classList.add('show');
+        <?php endif; ?>
+
         // Toggle password visibility
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
@@ -383,34 +391,6 @@ $logout_success = $this->input->get('logout') === 'success';
             setTimeout(() => { this.submit(); }, 500);
         });
         
-        // Forgot password
-        function showForgotPassword() {
-            Swal.fire({
-                title: 'Reset Password',
-                html: `
-                    <p class="text-muted">Enter your email address and we'll send you instructions to reset your password.</p>
-                    <input type="email" id="reset-email" class="swal2-input" placeholder="Enter your email">
-                `,
-                showCancelButton: true,
-                confirmButtonText: 'Send Reset Link',
-                confirmButtonColor: '#f39c12',
-                preConfirm: () => {
-                    const email = document.getElementById('reset-email').value;
-                    if (!email) { Swal.showValidationMessage('Please enter your email address'); }
-                    return email;
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Email Sent!',
-                        text: 'Password reset instructions have been sent to ' + result.value,
-                        confirmButtonColor: '#f39c12'
-                    });
-                }
-            });
-        }
-        
         // Auto-hide alerts after 5 seconds
         setTimeout(() => {
             const alerts = document.querySelectorAll('.alert');
@@ -420,13 +400,6 @@ $logout_success = $this->input->get('logout') === 'success';
                 setTimeout(() => alert.remove(), 500);
             });
         }, 5000);
-        
-        // Clean URL after showing logout message
-        <?php if($logout_success): ?>
-        if (window.history.replaceState) {
-            window.history.replaceState(null, null, '<?= base_url("auth") ?>');
-        }
-        <?php endif; ?>
     </script>
 </body>
 </html>
