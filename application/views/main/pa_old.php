@@ -5,11 +5,11 @@
         <!-- Header -->
         <div class="kiosk-header">
             <div class="company-logo">
-                <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" 
-                    alt="Toms World" 
+                <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" 
+                    alt="Pan-asia" 
                 style="width: 40px; height: 40px; object-fit: contain; border-radius: 50%;">
             </div>
-            <h1 data-translate="companyName">Welcome to TOMS WORLD</h1>
+            <h1 data-translate="companyName">Welcome to PAN-ASIA</h1>
             <div class="datetime-display" id="datetime"></div>
         </div>
 
@@ -151,8 +151,6 @@
                                 </div>
                             </div>
                         </div>
-
-
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label" data-translate="company">Company *</label>
@@ -194,8 +192,9 @@
                             <button class="btn-large btn-next" onclick="retakePhoto()" id="retakeBtn" style="display: none;">
                                 <i class="bi bi-arrow-clockwise"></i> <span data-translate="retakePhoto">Retake Photo</span>
                             </button>
-                        </div> 
+                        </div>                            
                         <p class="text-muted mt-2" data-translate="photoGuide">Position your face within the oval guide</p>
+
                     </div>
 
                     <div class="nav-buttons">
@@ -357,7 +356,7 @@
                         Your host has been notified of your arrival
                     </p>
 
-                    <!-- <div class="badge-preview" id="badgePreview">
+                    <div class="badge-preview" id="badgePreview">
                         <h4 style="color: #f39c12; margin-bottom: 15px;" data-translate="visitorBadge">Your Visitor Badge</h4>
                         <div class="badge-photo-display" id="badgePhotoDisplay">
                             <i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>
@@ -373,7 +372,7 @@
                             <strong data-translate="validUntil">Valid Until:</strong> <span id="validUntil"></span>
                         </div>
                         
-                        <!- QR CODE SECTION - NEW ->
+                        <!-- QR CODE SECTION - NEW -->
                         <div style="margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; border: 2px dashed #f39c12;">
                             <h5 style="color: #495057; margin-bottom: 10px;">
                                 <i class="bi bi-qr-code"></i> <span data-translate="saveQRCode">Save Your QR Code</span>
@@ -382,69 +381,11 @@
                                 Scan this QR code on your next visit for faster check-in
                             </p>
                             <div id="qrCodeContainer" style="display: flex; justify-content: center; margin-bottom: 10px;"></div>
-                            <!- <button class="btn btn-outline-primary btn-sm" onclick="downloadQRCode()" style="margin-top: 10px;">
+                            <button class="btn btn-outline-primary btn-sm" onclick="downloadQRCode()" style="margin-top: 10px;">
                                 <i class="bi bi-download"></i> <span data-translate="downloadQR">Download QR Code</span>
-                            </button> ->
+                            </button>
                         </div>
-                    </div> -->
-
-                    <div class="row g-4 align-items-start">
-    
-                        <!-- LEFT: Badge Details -->
-                        <div class="col-md-6">
-                            <div class="badge-preview" id="badgePreview" 
-                                style="border: 1px solid #f39c12; border-radius: 12px; padding: 20px;">
-                                
-                                <h4 style="color: #f39c12; margin-bottom: 15px;" data-translate="visitorBadge">
-                                    Your Visitor Badge
-                                </h4>
-
-                                <div class="badge-photo-display" id="badgePhotoDisplay" style="text-align:center;">
-                                    <i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>
-                                </div>
-
-                                <div id="badgeNumber" style="font-size: 1.6em; font-weight: bold; color: #f39c12a8; margin-bottom: 10px; text-align:center;">
-                                    V-2024-1201
-                                </div>
-
-                                <div id="visitorName" style="font-size: 1.3em; margin-bottom: 8px; text-align:center;"></div>
-                                <div id="visitorCompany" style="color: #7f8c8d; margin-bottom: 12px; text-align:center;"></div>
-                                <hr>
-
-                                <div style="margin-top: 12px; text-align: left;">
-                                    <strong data-translate="host">Host:</strong> <span id="badgeHost"></span><br>
-                                    <strong data-translate="validUntil">Valid Until:</strong> <span id="validUntil"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- RIGHT: QR Code Section -->
-                        <div class="col-md-6">
-                            <div style="padding: 20px; background: #fff; border-radius: 12px; border: 2px dashed #f39c12;">
-                                <h5 style="color: #495057; margin-bottom: 10px;">
-                                    <i class="bi bi-qr-code"></i> 
-                                    <span data-translate="saveQRCode">Save Your QR Code</span>
-                                </h5>
-
-                                <p style="font-size: 0.9em; color: #6c757d; margin-bottom: 15px;" data-translate="qrCodeDesc">
-                                    Scan this QR code on your next visit for faster check-in
-                                </p>
-
-                                <div id="qrCodeContainer" 
-                                    style="display:flex; justify-content:center; margin-bottom:10px;">
-                                </div>
-
-                                <!-- Optional download button -->
-                                <!-- 
-                                <button class="btn btn-outline-primary btn-sm" onclick="downloadQRCode()">
-                                    <i class="bi bi-download"></i> <span data-translate="downloadQR">Download QR Code</span>
-                                </button> 
-                                -->
-                            </div>
-                        </div>
-
                     </div>
-
 
                     <div style="background: #e8f4fd; border-left: 4px solid #f39c12; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left;">
                         <h5 style="color: #f39c12a8; margin-bottom: 8px;">
@@ -512,159 +453,151 @@
             <div class="loading-text" data-translate="processing">Processing...</div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
-        // // Department and Employee Data Structure
-        // const departmentData = {
-        //     'ADM': {
-        //         name: 'Admin',
-        //         employees: [
-        //             { id: 'ADM001', name: 'John Smith', email: 'j.smith@company.com' },
-        //             { id: 'ADM002', name: 'Sarah Johnson', email: 's.johnson@company.com' },
-        //             { id: 'ADM003', name: 'Michael Chen', email: 'm.chen@company.com' }
-        //         ]
-        //     },
-        //     'BDD': {
-        //         name: 'Design & Construction',
-        //         employees: [
-        //             { id: 'BDD001', name: 'Emily Davis', email: 'e.davis@company.com' },
-        //             { id: 'BDD002', name: 'Robert Wilson', email: 'r.wilson@company.com' }
-        //         ]
-        //     },
-        //     'CRT': {
-        //         name: 'Creatives',
-        //         employees: [
-        //             { id: 'CRT001', name: 'Lisa Anderson', email: 'l.anderson@company.com' },
-        //             { id: 'CRT002', name: 'David Martinez', email: 'd.martinez@company.com' },
-        //             { id: 'CRT003', name: 'Jessica Taylor', email: 'j.taylor@company.com' }
-        //         ]
-        //     },
-        //     'ED': {
-        //         name: 'Ent. Risk Management',
-        //         employees: [
-        //             { id: 'ED001', name: 'Thomas Brown', email: 't.brown@company.com' },
-        //             { id: 'ED002', name: 'Jennifer White', email: 'j.white@company.com' }
-        //         ]
-        //     },
-        //     'EXE': {
-        //         name: 'Executive',
-        //         employees: [
-        //             { id: 'EXE001', name: 'William Garcia', email: 'w.garcia@company.com' },
-        //             { id: 'EXE002', name: 'Patricia Miller', email: 'p.miller@company.com' }
-        //         ]
-        //     },
-        //     'FIN': {
-        //         name: 'Finance',
-        //         employees: [
-        //             { id: 'FIN001', name: 'Christopher Lee', email: 'c.lee@company.com' },
-        //             { id: 'FIN002', name: 'Amanda Jones', email: 'a.jones@company.com' },
-        //             { id: 'FIN003', name: 'Daniel Rodriguez', email: 'd.rodriguez@company.com' }
-        //         ]
-        //     },
-        //     'HR': {
-        //         name: 'Human Resource',
-        //         employees: [
-        //             { id: 'HR001', name: 'Michelle Thompson', email: 'm.thompson@company.com' },
-        //             { id: 'HR002', name: 'Kevin Harris', email: 'k.harris@company.com' },
-        //             { id: 'HR003', name: 'Rachel Clark', email: 'r.clark@company.com' }
-        //         ]
-        //     },
-        //     'IMP': {
-        //         name: 'Importation',
-        //         employees: [
-        //             { id: 'IMP001', name: 'Brian Lewis', email: 'b.lewis@company.com' },
-        //             { id: 'IMP002', name: 'Sophia Walker', email: 's.walker@company.com' }
-        //         ]
-        //     },
-        //     'ITSD': {
-        //         name: 'Information Technology & Services',
-        //         employees: [
-        //             { id: 'ITSD001', name: 'James Hall', email: 'j.hall@company.com' },
-        //             { id: 'ITSD002', name: 'Olivia Allen', email: 'o.allen@company.com' },
-        //             { id: 'ITSD003', name: 'Matthew Young', email: 'm.young@company.com' },
-        //             { id: 'ITSD004', name: 'Emma King', email: 'e.king@company.com' }
-        //         ]
-        //     },
-        //     'MRK': {
-        //         name: 'Marketing',
-        //         employees: [
-        //             { id: 'MRK001', name: 'Andrew Wright', email: 'a.wright@company.com' },
-        //             { id: 'MRK002', name: 'Isabella Lopez', email: 'i.lopez@company.com' },
-        //             { id: 'MRK003', name: 'Joshua Hill', email: 'j.hill@company.com' }
-        //         ]
-        //     },
-        //     'MER': {
-        //         name: 'Audit & Merchandising',
-        //         employees: [
-        //             { id: 'MER001', name: 'Megan Scott', email: 'm.scott@company.com' },
-        //             { id: 'MER002', name: 'Ryan Green', email: 'r.green@company.com' }
-        //         ]
-        //     },
-        //     'OP': {
-        //         name: 'Operations',
-        //         employees: [
-        //             { id: 'OP001', name: 'Nicholas Adams', email: 'n.adams@company.com' },
-        //             { id: 'OP002', name: 'Victoria Baker', email: 'v.baker@company.com' },
-        //             { id: 'OP003', name: 'Alexander Nelson', email: 'a.nelson@company.com' }
-        //         ]
-        //     },
-        //     'ODSM': {
-        //         name: 'Org. Development & Strat. Mngt.',
-        //         employees: [
-        //             { id: 'ODSM001', name: 'Samantha Carter', email: 's.carter@company.com' },
-        //             { id: 'ODSM002', name: 'Joseph Mitchell', email: 'j.mitchell@company.com' }
-        //         ]
-        //     },
-        //     'SPD': {
-        //         name: 'Special Projects',
-        //         employees: [
-        //             { id: 'SPD001', name: 'Lauren Perez', email: 'l.perez@company.com' },
-        //             { id: 'SPD002', name: 'Charles Roberts', email: 'c.roberts@company.com' }
-        //         ]
-        //     },
-        //     'SD': {
-        //         name: 'Stocks Department',
-        //         employees: [
-        //             { id: 'SD001', name: 'Ashley Turner', email: 'a.turner@company.com' },
-        //             { id: 'SD002', name: 'Benjamin Phillips', email: 'b.phillips@company.com' }
-        //         ]
-        //     },
-        //     'TD': {
-        //         name: 'Technical',
-        //         employees: [
-        //             { id: 'TD001', name: 'Nathan Campbell', email: 'n.campbell@company.com' },
-        //             { id: 'TD002', name: 'Madison Parker', email: 'm.parker@company.com' }
-        //         ]
-        //     },
-        //     'WLD': {
-        //         name: 'Warehouse & Logistics',
-        //         employees: [
-        //             { id: 'WLD001', name: 'Eric Evans', email: 'e.evans@company.com' },
-        //             { id: 'WLD002', name: 'Hannah Edwards', email: 'h.edwards@company.com' },
-        //             { id: 'WLD003', name: 'Tyler Collins', email: 't.collins@company.com' }
-        //         ]
-        //     },
-        //     'PA': {
-        //         name: 'Pan Asia HR',
-        //         employees: [
-        //             { id: 'PA001', name: 'Grace Stewart', email: 'g.stewart@company.com' },
-        //             { id: 'PA002', name: 'Dylan Sanchez', email: 'd.sanchez@company.com' }
-        //         ]
-        //     },
-        //     'GT': {
-        //         name: 'Game Test',
-        //         employees: [
-        //             { id: 'GT001', name: 'Angelo Ragon', email: 'ar@gmail.com' }
-        //         ]
-        //     }
-        // };
+        // Department and Employee Data Structure
+        const departmentData = {
+            'ADM': {
+                name: 'Admin',
+                employees: [
+                    { id: 'ADM001', name: 'John Smith', email: 'j.smith@company.com' },
+                    { id: 'ADM002', name: 'Sarah Johnson', email: 's.johnson@company.com' },
+                    { id: 'ADM003', name: 'Michael Chen', email: 'm.chen@company.com' }
+                ]
+            },
+            'BDD': {
+                name: 'Design & Construction',
+                employees: [
+                    { id: 'BDD001', name: 'Emily Davis', email: 'e.davis@company.com' },
+                    { id: 'BDD002', name: 'Robert Wilson', email: 'r.wilson@company.com' }
+                ]
+            },
+            'CRT': {
+                name: 'Creatives',
+                employees: [
+                    { id: 'CRT001', name: 'Lisa Anderson', email: 'l.anderson@company.com' },
+                    { id: 'CRT002', name: 'David Martinez', email: 'd.martinez@company.com' },
+                    { id: 'CRT003', name: 'Jessica Taylor', email: 'j.taylor@company.com' }
+                ]
+            },
+            'ED': {
+                name: 'Ent. Risk Management',
+                employees: [
+                    { id: 'ED001', name: 'Thomas Brown', email: 't.brown@company.com' },
+                    { id: 'ED002', name: 'Jennifer White', email: 'j.white@company.com' }
+                ]
+            },
+            'EXE': {
+                name: 'Executive',
+                employees: [
+                    { id: 'EXE001', name: 'William Garcia', email: 'w.garcia@company.com' },
+                    { id: 'EXE002', name: 'Patricia Miller', email: 'p.miller@company.com' }
+                ]
+            },
+            'FIN': {
+                name: 'Finance',
+                employees: [
+                    { id: 'FIN001', name: 'Christopher Lee', email: 'c.lee@company.com' },
+                    { id: 'FIN002', name: 'Amanda Jones', email: 'a.jones@company.com' },
+                    { id: 'FIN003', name: 'Daniel Rodriguez', email: 'd.rodriguez@company.com' }
+                ]
+            },
+            'HR': {
+                name: 'Human Resource',
+                employees: [
+                    { id: 'HR001', name: 'Michelle Thompson', email: 'm.thompson@company.com' },
+                    { id: 'HR002', name: 'Kevin Harris', email: 'k.harris@company.com' },
+                    { id: 'HR003', name: 'Rachel Clark', email: 'r.clark@company.com' }
+                ]
+            },
+            'IMP': {
+                name: 'Importation',
+                employees: [
+                    { id: 'IMP001', name: 'Brian Lewis', email: 'b.lewis@company.com' },
+                    { id: 'IMP002', name: 'Sophia Walker', email: 's.walker@company.com' }
+                ]
+            },
+            'ITSD': {
+                name: 'Information Technology & Services',
+                employees: [
+                    { id: 'ITSD001', name: 'James Hall', email: 'j.hall@company.com' },
+                    { id: 'ITSD002', name: 'Olivia Allen', email: 'o.allen@company.com' },
+                    { id: 'ITSD003', name: 'Matthew Young', email: 'm.young@company.com' },
+                    { id: 'ITSD004', name: 'Emma King', email: 'e.king@company.com' }
+                ]
+            },
+            'MRK': {
+                name: 'Marketing',
+                employees: [
+                    { id: 'MRK001', name: 'Andrew Wright', email: 'a.wright@company.com' },
+                    { id: 'MRK002', name: 'Isabella Lopez', email: 'i.lopez@company.com' },
+                    { id: 'MRK003', name: 'Joshua Hill', email: 'j.hill@company.com' }
+                ]
+            },
+            'MER': {
+                name: 'Audit & Merchandising',
+                employees: [
+                    { id: 'MER001', name: 'Megan Scott', email: 'm.scott@company.com' },
+                    { id: 'MER002', name: 'Ryan Green', email: 'r.green@company.com' }
+                ]
+            },
+            'OP': {
+                name: 'Operations',
+                employees: [
+                    { id: 'OP001', name: 'Nicholas Adams', email: 'n.adams@company.com' },
+                    { id: 'OP002', name: 'Victoria Baker', email: 'v.baker@company.com' },
+                    { id: 'OP003', name: 'Alexander Nelson', email: 'a.nelson@company.com' }
+                ]
+            },
+            'ODSM': {
+                name: 'Org. Development & Strat. Mngt.',
+                employees: [
+                    { id: 'ODSM001', name: 'Samantha Carter', email: 's.carter@company.com' },
+                    { id: 'ODSM002', name: 'Joseph Mitchell', email: 'j.mitchell@company.com' }
+                ]
+            },
+            'SPD': {
+                name: 'Special Projects',
+                employees: [
+                    { id: 'SPD001', name: 'Lauren Perez', email: 'l.perez@company.com' },
+                    { id: 'SPD002', name: 'Charles Roberts', email: 'c.roberts@company.com' }
+                ]
+            },
+            'SD': {
+                name: 'Stocks Department',
+                employees: [
+                    { id: 'SD001', name: 'Ashley Turner', email: 'a.turner@company.com' },
+                    { id: 'SD002', name: 'Benjamin Phillips', email: 'b.phillips@company.com' }
+                ]
+            },
+            'TD': {
+                name: 'Technical',
+                employees: [
+                    { id: 'TD001', name: 'Nathan Campbell', email: 'n.campbell@company.com' },
+                    { id: 'TD002', name: 'Madison Parker', email: 'm.parker@company.com' }
+                ]
+            },
+            'WLD': {
+                name: 'Warehouse & Logistics',
+                employees: [
+                    { id: 'WLD001', name: 'Eric Evans', email: 'e.evans@company.com' },
+                    { id: 'WLD002', name: 'Hannah Edwards', email: 'h.edwards@company.com' },
+                    { id: 'WLD003', name: 'Tyler Collins', email: 't.collins@company.com' }
+                ]
+            },
+            'PA': {
+                name: 'Pan Asia HR',
+                employees: [
+                    { id: 'PA001', name: 'Grace Stewart', email: 'g.stewart@company.com' },
+                    { id: 'PA002', name: 'Dylan Sanchez', email: 'd.sanchez@company.com' }
+                ]
+            }
+        };
 
         // Language Translations (Extended with new keys)
         const translations = {
             'en': {
-                companyName: "Welcome to TOMS WORLD",
+                companyName: "Welcome to PAN-ASIA",
                 welcome: "Welcome!",
                 selectLanguage: "Please select your preferred language",
                 firstTimeVisitor: "First Time Visitor",
@@ -749,6 +682,15 @@
                 welcomeBackQR: "Welcome back! Your information has been loaded.",
 
                 agreementContent: `
+                    <h5>Visitor Guidelines</h5>
+                    <p>By entering our premises, you agree to:</p>
+                    <ul>
+                        <li>Wear your visitor badge visibly at all times</li>
+                        <li>Remain in authorized areas only</li>
+                        <li>Be escorted in restricted areas</li>
+                        <li>Follow all safety and security protocols</li>
+                        <li>Return your badge when leaving</li>
+                    </ul>
                     <h5 class="mt-3">Health & Safety</h5>
                     <p>I confirm that:</p>
                     <ul>
@@ -766,7 +708,7 @@
                 ]
             },
             'zh-TW': {
-                companyName: "歡迎來到 TOMS WORLD",
+                companyName: "歡迎來到 PAN-ASIA",
                 welcome: "歡迎！",
                 selectLanguage: "請選擇您的語言偏好",
                 firstTimeVisitor: "首次訪客",
@@ -842,7 +784,7 @@
                 emergencyMessage: "救援正在路上。請留在原地。",
                 checkOutTitle: "簽出",
                 checkOutMessage: "簽出功能即將推出",
-
+                
                 saveQRCode: "保存您的二維碼",
                 qrCodeDesc: "下次訪問時掃描此二維碼以快速登記",
                 downloadQR: "下載二維碼",
@@ -851,6 +793,15 @@
                 welcomeBackQR: "歡迎回來！您的信息已加載。",
                 
                 agreementContent: `
+                    <h5>訪客指引</h5>
+                    <p>進入我們的場所，您同意：</p>
+                    <ul>
+                        <li>隨時明顯佩戴您的訪客證</li>
+                        <li>僅停留在授權區域</li>
+                        <li>在限制區域需要陪同</li>
+                        <li>遵守所有安全和保安協議</li>
+                        <li>離開時歸還您的訪客證</li>
+                    </ul>
                     <h5 class="mt-3">健康與安全</h5>
                     <p>我確認：</p>
                     <ul>
@@ -868,7 +819,7 @@
                 ]
             },
             'zh-CN': {
-                companyName: "欢迎来到 TOMS WORLD",
+                companyName: "欢迎来到 PAN-ASIA",
                 welcome: "欢迎！",
                 selectLanguage: "请选择您的语言偏好",
                 firstTimeVisitor: "首次访客",
@@ -953,6 +904,15 @@
                 welcomeBackQR: "欢迎回来！您的信息已加载。",
 
                 agreementContent: `
+                    <h5>访客指引</h5>
+                    <p>进入我们的场所，您同意：</p>
+                    <ul>
+                        <li>随时明显佩戴您的访客证</li>
+                        <li>仅停留在授权区域</li>
+                        <li>在限制区域需要陪同</li>
+                        <li>遵守所有安全和保安协议</li>
+                        <li>离开时归还您的访客证</li>
+                    </ul>
                     <h5 class="mt-3">健康与安全</h5>
                     <p>我确认：</p>
                     <ul>
@@ -970,7 +930,7 @@
                 ]
             },
             'fil': {
-                companyName: "Maligayang pagdating sa TOMS WORLD",
+                companyName: "Maligayang pagdating sa PAN-ASIA",
                 welcome: "Maligayang pagdating!",
                 selectLanguage: "Mangyaring piliin ang iyong gustong wika",
                 firstTimeVisitor: "Unang Bisita",
@@ -1053,8 +1013,17 @@
                 qrScanSuccess: "Matagumpay na na-scan ang QR Code!",
                 qrScanFailed: "Hindi mabasa ang QR code. Subukan muli o magpatuloy nang manu-mano.",
                 welcomeBackQR: "Maligayang pagbabalik! Na-load na ang iyong impormasyon.",
-                
+    
                 agreementContent: `
+                    <h5>Mga Gabay para sa Bisita</h5>
+                    <p>Sa pagpasok sa aming lugar, sumasang-ayon ka na:</p>
+                    <ul>
+                        <li>Laging isuot ang visitor badge na nakikita</li>
+                        <li>Manatili lamang sa mga awtorisadong lugar</li>
+                        <li>Kailangan ng kasamang tauhan sa mga restricted na lugar</li>
+                        <li>Sundin ang lahat ng protokol sa kaligtasan at seguridad</li>
+                        <li>Ibalik ang badge kapag aalis</li>
+                    </ul>
                     <h5 class="mt-3">Kalusugan at Kaligtasan</h5>
                     <p>Kumpirma ko na:</p>
                     <ul>
@@ -1072,7 +1041,7 @@
                 ]
             },
             'ja': {
-                companyName: "TOMS WORLDへようこそ",
+                companyName: "PAN-ASIAへようこそ",
                 welcome: "ようこそ！",
                 selectLanguage: "ご希望の言語を選択してください",
                 firstTimeVisitor: "初回訪問者",
@@ -1147,16 +1116,25 @@
                 emergencyNotified: "セキュリティに通知されました！",
                 emergencyMessage: "助けが向かっています。その場でお待ちください。",
                 checkOutTitle: "チェックアウト",
-                checkOutMessage: "チェックアウト機能は近日公開予定",      
-
+                checkOutMessage: "チェックアウト機能は近日公開予定",
+                            
                 saveQRCode: "QRコードを保存",
                 qrCodeDesc: "次回の訪問時にこのQRコードをスキャンして、より速くチェックインできます",
                 downloadQR: "QRコードをダウンロード",
                 qrScanSuccess: "QRコードのスキャンに成功しました！",
                 qrScanFailed: "QRコードを読み取れませんでした。もう一度お試しいただくか、手動で続行してください。",
                 welcomeBackQR: "おかえりなさい！情報が読み込まれました。",
-    
+                
                 agreementContent: `
+                    <h5>訪問者ガイドライン</h5>
+                    <p>施設に入場することで、以下に同意します：</p>
+                    <ul>
+                        <li>訪問者バッジを常に目に見える場所に着用する</li>
+                        <li>許可されたエリアのみに滞在する</li>
+                        <li>制限エリアでは同行が必要</li>
+                        <li>すべての安全およびセキュリティプロトコルに従う</li>
+                        <li>退出時にバッジを返却する</li>
+                    </ul>
                     <h5 class="mt-3">健康と安全</h5>
                     <p>以下を確認します：</p>
                     <ul>
@@ -1193,30 +1171,6 @@
         // Add this flag near the top with other state variables
         let isProcessingQR = false;
 
-
-        // Screen flow mapping
-        const screenFlow = {
-            'new': [1, 3, 4, 5, 6, 7, 8],
-            'returning': [1, 2, 5, 6, 7, 8],
-            'delivery': [1, 3, 4, 5, 6, 7, 8]
-        };
-        
-        let currentFlow = [];
-        let currentFlowIndex = 0;
-
-        // Sample pre-scheduled visits
-        const preScheduledVisits = [
-            { 
-                code: 'MEET-2024-001', 
-                name: 'Alice Johnson', 
-                company: 'Tech Solutions Inc.', 
-                host: 'John Smith', 
-                time: '10:00 AM',
-                purpose: 'Sales Meeting'
-            }
-        ];
-
-        // State variables - make sure these are declared near the top with other state variables
         let isScannerStopping = false;
 
         // FIXED: Safe stop function that checks scanner state first
@@ -1256,7 +1210,28 @@
             });
         }
 
+        // Screen flow mapping
+        const screenFlow = {
+            'new': [1, 3, 4, 5, 6, 7, 8],
+            'returning': [1, 2, 5, 6, 7, 8],
+            'delivery': [1, 3, 4, 5, 6, 7, 8]
+        };
         
+        let currentFlow = [];
+        let currentFlowIndex = 0;
+
+        // Sample pre-scheduled visits
+        const preScheduledVisits = [
+            { 
+                code: 'MEET-2024-001', 
+                name: 'Alice Johnson', 
+                company: 'Tech Solutions Inc.', 
+                host: 'John Smith', 
+                time: '10:00 AM',
+                purpose: 'Sales Meeting'
+            }
+        ];
+
         // Function to generate QR code data
         function generateQRCodeData() {
             const qrData = {
@@ -1306,29 +1281,29 @@
             }
         }
 
-        // // Function to download QR code as image
-        // function downloadQRCode() {
-        //     const qrContainer = document.getElementById('qrCodeContainer');
-        //     const canvas = qrContainer.querySelector('canvas');
+        // Function to download QR code as image
+        function downloadQRCode() {
+            const qrContainer = document.getElementById('qrCodeContainer');
+            const canvas = qrContainer.querySelector('canvas');
             
-        //     if (canvas) {
-        //         const link = document.createElement('a');
-        //         link.download = `visitor-qr-${visitorData.firstName}-${visitorData.lastName}.png`;
-        //         link.href = canvas.toDataURL('image/png');
-        //         link.click();
-        //         showNotification(translations[currentLanguage].downloadQR || 'QR Code downloaded!');
-        //     } else {
-        //         // Try to get image element if canvas not available
-        //         const img = qrContainer.querySelector('img');
-        //         if (img) {
-        //             const link = document.createElement('a');
-        //             link.download = `visitor-qr-${visitorData.firstName}-${visitorData.lastName}.png`;
-        //             link.href = img.src;
-        //             link.click();
-        //             showNotification(translations[currentLanguage].downloadQR || 'QR Code downloaded!');
-        //         }
-        //     }
-        // }
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = `visitor-qr-${visitorData.firstName}-${visitorData.lastName}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showNotification(translations[currentLanguage].downloadQR || 'QR Code downloaded!');
+            } else {
+                // Try to get image element if canvas not available
+                const img = qrContainer.querySelector('img');
+                if (img) {
+                    const link = document.createElement('a');
+                    link.download = `visitor-qr-${visitorData.firstName}-${visitorData.lastName}.png`;
+                    link.href = img.src;
+                    link.click();
+                    showNotification(translations[currentLanguage].downloadQR || 'QR Code downloaded!');
+                }
+            }
+        }
 
         // Local storage for visitor data
         const STORAGE_KEY = 'kioskVisitorData';
@@ -1657,6 +1632,15 @@
         //     }
         // }
 
+        // // Skip QR scan
+        // function skipQRScan() {
+        //     if (html5QrCode) {
+        //         html5QrCode.stop();
+        //     }
+        //     showScreen(3);
+        // }
+        
+
         // FIXED: Handle QR code success for returning visitors
         function handleQRCodeSuccess(decodedText) {
             // Prevent multiple calls
@@ -1750,7 +1734,7 @@
                 });
             }
         }
-
+        
         // FIXED: Handle QR upload for returning visitors
         function handleQRUpload(input) {
             const file = input.files[0];
@@ -1784,6 +1768,7 @@
             }
         }
 
+
         // UPDATED: Skip QR scan - redirect to basic info like first-time visitor
         // function skipQRScan() {
         //     if (html5QrCode) {
@@ -1805,13 +1790,6 @@
         //     showScreen(3); // Go to basic info screen
         // }
 
-        // // Skip QR scan
-        // function skipQRScan() {
-        //     if (html5QrCode) {
-        //         html5QrCode.stop();
-        //     }
-        //     showScreen(3);
-        // }
 
         // FIXED: Skip QR scan - redirect to basic info like first-time visitor
         function skipQRScan() {
@@ -2313,67 +2291,90 @@
             }, 1000);
         }
 
-        // Reset kiosk
-        function resetKiosk() {
-            clearInterval(countdownTimer);
-            stopCamera();
+        // // Reset kiosk
+        // function resetKiosk() {
+        //     clearInterval(countdownTimer);
+        //     stopCamera();
             
-            // Reset flags
-            isProcessingQR = false;
-            isScannerStopping = false;
+        //     // Reset flags
+        //     isProcessingQR = false;
+        //     isScannerStopping = false;
             
-            // Stop scanner safely
-            stopQRScanner();
+        //     // Stop scanner safely
+        //     stopQRScanner();
             
-            // Clear QR code instance
-            if (qrCodeInstance) {
-                const qrContainer = document.getElementById('qrCodeContainer');
-                if (qrContainer) {
-                    qrContainer.innerHTML = '';
-                }
-                qrCodeInstance = null;
-            }
+        //     // Clear QR code instance
+        //     if (qrCodeInstance) {
+        //         const qrContainer = document.getElementById('qrCodeContainer');
+        //         if (qrContainer) {
+        //             qrContainer.innerHTML = '';
+        //         }
+        //         qrCodeInstance = null;
+        //     }
             
-            visitorData = {};
-            selectedHost = null;
-            selectedPurpose = null;
-            selectedDepartment = null;
-            capturedPhotoData = null;
-            photoTaken = false;
-            currentFlow = [];
-            currentFlowIndex = 0;
+        //     visitorData = {};
+        //     selectedHost = null;
+        //     selectedPurpose = null;
+        //     selectedDepartment = null;
+        //     capturedPhotoData = null;
+        //     photoTaken = false;
+        //     currentFlow = [];
+        //     currentFlowIndex = 0;
             
-            document.querySelectorAll('input').forEach(input => {
-                if (input.type !== 'checkbox') {
-                    input.value = '';
-                    input.classList.remove('is-invalid');
-                } else {
-                    input.checked = false;
-                }
-            });
+        //     document.querySelectorAll('input').forEach(input => {
+        //         if (input.type !== 'checkbox') {
+        //             input.value = '';
+        //             input.classList.remove('is-invalid');
+        //         } else {
+        //             input.checked = false;
+        //         }
+        //     });
             
-            document.querySelectorAll('textarea').forEach(textarea => {
-                textarea.value = '';
-            });
+        //     document.querySelectorAll('textarea').forEach(textarea => {
+        //         textarea.value = '';
+        //     });
             
-            document.querySelectorAll('.purpose-card').forEach(card => {
-                card.classList.remove('selected');
-            });
+        //     document.querySelectorAll('.purpose-card').forEach(card => {
+        //         card.classList.remove('selected');
+        //     });
             
-            document.getElementById('departmentSelect').value = '';
-            document.getElementById('employeeSection').style.display = 'none';
-            document.getElementById('selectedHost').innerHTML = `<span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>`;
-            document.getElementById('captureBtn').style.display = 'block';
-            document.getElementById('retakeBtn').style.display = 'none';
-            document.getElementById('capturedImage').style.display = 'none';
-            document.getElementById('photoSkipBtn').style.display = 'block';
-            document.getElementById('photoNextBtn').style.display = 'none';
-            document.getElementById('hostNextBtn').disabled = true;
-            document.getElementById('purposeNextBtn').disabled = true;
-            document.getElementById('agreeNextBtn').disabled = true;
+        //     document.getElementById('departmentSelect').value = '';
+        //     document.getElementById('employeeSection').style.display = 'none';
+        //     document.getElementById('selectedHost').innerHTML = `<span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>`;
+        //     document.getElementById('captureBtn').style.display = 'block';
+        //     document.getElementById('retakeBtn').style.display = 'none';
+        //     document.getElementById('capturedImage').style.display = 'none';
+        //     document.getElementById('photoSkipBtn').style.display = 'block';
+        //     document.getElementById('photoNextBtn').style.display = 'none';
+        //     document.getElementById('hostNextBtn').disabled = true;
+        //     document.getElementById('purposeNextBtn').disabled = true;
+        //     document.getElementById('agreeNextBtn').disabled = true;
             
-            showScreen(1);
-        }
+        //     showScreen(1);
+        // }
+
+        // async function stopQRScanner() {
+        //     if (!html5QrCode || isScannerStopping) {
+        //         return Promise.resolve();
+        //     }
+            
+        //     isScannerStopping = true;
+            
+        //     return new Promise((resolve) => {
+        //         try {
+        //             html5QrCode.stop().then(() => {
+        //                 isScannerStopping = false;
+        //                 resolve();
+        //             }).catch(() => {
+        //                 isScannerStopping = false;
+        //                 resolve();
+        //             });
+        //         } catch (e) {
+        //             isScannerStopping = false;
+        //             resolve();
+        //         }
+        //     });
+        // }
 
         // Pre-scheduled visit functions
         function showPreScheduled() {
@@ -2733,7 +2734,7 @@
             });
         }
 
-        // Updated employee loading function to fetch from database
+        // // Updated employee loading function to fetch from database
         // function onDepartmentChange() {
         //     const deptCode = document.getElementById('departmentSelect').value;
         //     const employeeSection = document.getElementById('employeeSection');
@@ -3068,8 +3069,9 @@
 
 
         
+
         // Add this constant at the top of the script section (after the departmentData declaration)
-        const COMPANY_VISITED = 'Toms World';
+        const COMPANY_VISITED = 'Pan Asia';
 
         // // Update the completeCheckIn function - find this function and replace it:
         // function completeCheckIn() {
@@ -3294,5 +3296,6 @@
             
             showScreen(1);
         }
+
 
     </script>

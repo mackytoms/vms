@@ -357,7 +357,7 @@
                         Your host has been notified of your arrival
                     </p>
 
-                    <!-- <div class="badge-preview" id="badgePreview">
+                    <div class="badge-preview" id="badgePreview">
                         <h4 style="color: #f39c12; margin-bottom: 15px;" data-translate="visitorBadge">Your Visitor Badge</h4>
                         <div class="badge-photo-display" id="badgePhotoDisplay">
                             <i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>
@@ -373,7 +373,7 @@
                             <strong data-translate="validUntil">Valid Until:</strong> <span id="validUntil"></span>
                         </div>
                         
-                        <!- QR CODE SECTION - NEW ->
+                        <!-- QR CODE SECTION - NEW -->
                         <div style="margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; border: 2px dashed #f39c12;">
                             <h5 style="color: #495057; margin-bottom: 10px;">
                                 <i class="bi bi-qr-code"></i> <span data-translate="saveQRCode">Save Your QR Code</span>
@@ -382,69 +382,11 @@
                                 Scan this QR code on your next visit for faster check-in
                             </p>
                             <div id="qrCodeContainer" style="display: flex; justify-content: center; margin-bottom: 10px;"></div>
-                            <!- <button class="btn btn-outline-primary btn-sm" onclick="downloadQRCode()" style="margin-top: 10px;">
+                            <!-- <button class="btn btn-outline-primary btn-sm" onclick="downloadQRCode()" style="margin-top: 10px;">
                                 <i class="bi bi-download"></i> <span data-translate="downloadQR">Download QR Code</span>
-                            </button> ->
+                            </button> -->
                         </div>
-                    </div> -->
-
-                    <div class="row g-4 align-items-start">
-    
-                        <!-- LEFT: Badge Details -->
-                        <div class="col-md-6">
-                            <div class="badge-preview" id="badgePreview" 
-                                style="border: 1px solid #f39c12; border-radius: 12px; padding: 20px;">
-                                
-                                <h4 style="color: #f39c12; margin-bottom: 15px;" data-translate="visitorBadge">
-                                    Your Visitor Badge
-                                </h4>
-
-                                <div class="badge-photo-display" id="badgePhotoDisplay" style="text-align:center;">
-                                    <i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>
-                                </div>
-
-                                <div id="badgeNumber" style="font-size: 1.6em; font-weight: bold; color: #f39c12a8; margin-bottom: 10px; text-align:center;">
-                                    V-2024-1201
-                                </div>
-
-                                <div id="visitorName" style="font-size: 1.3em; margin-bottom: 8px; text-align:center;"></div>
-                                <div id="visitorCompany" style="color: #7f8c8d; margin-bottom: 12px; text-align:center;"></div>
-                                <hr>
-
-                                <div style="margin-top: 12px; text-align: left;">
-                                    <strong data-translate="host">Host:</strong> <span id="badgeHost"></span><br>
-                                    <strong data-translate="validUntil">Valid Until:</strong> <span id="validUntil"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- RIGHT: QR Code Section -->
-                        <div class="col-md-6">
-                            <div style="padding: 20px; background: #fff; border-radius: 12px; border: 2px dashed #f39c12;">
-                                <h5 style="color: #495057; margin-bottom: 10px;">
-                                    <i class="bi bi-qr-code"></i> 
-                                    <span data-translate="saveQRCode">Save Your QR Code</span>
-                                </h5>
-
-                                <p style="font-size: 0.9em; color: #6c757d; margin-bottom: 15px;" data-translate="qrCodeDesc">
-                                    Scan this QR code on your next visit for faster check-in
-                                </p>
-
-                                <div id="qrCodeContainer" 
-                                    style="display:flex; justify-content:center; margin-bottom:10px;">
-                                </div>
-
-                                <!-- Optional download button -->
-                                <!-- 
-                                <button class="btn btn-outline-primary btn-sm" onclick="downloadQRCode()">
-                                    <i class="bi bi-download"></i> <span data-translate="downloadQR">Download QR Code</span>
-                                </button> 
-                                -->
-                            </div>
-                        </div>
-
                     </div>
-
 
                     <div style="background: #e8f4fd; border-left: 4px solid #f39c12; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left;">
                         <h5 style="color: #f39c12a8; margin-bottom: 8px;">
@@ -749,6 +691,15 @@
                 welcomeBackQR: "Welcome back! Your information has been loaded.",
 
                 agreementContent: `
+                    <h5>Visitor Guidelines</h5>
+                    <p>By entering our premises, you agree to:</p>
+                    <ul>
+                        <li>Wear your visitor badge visibly at all times</li>
+                        <li>Remain in authorized areas only</li>
+                        <li>Be escorted in restricted areas</li>
+                        <li>Follow all safety and security protocols</li>
+                        <li>Return your badge when leaving</li>
+                    </ul>
                     <h5 class="mt-3">Health & Safety</h5>
                     <p>I confirm that:</p>
                     <ul>
@@ -851,6 +802,15 @@
                 welcomeBackQR: "歡迎回來！您的信息已加載。",
                 
                 agreementContent: `
+                    <h5>訪客指引</h5>
+                    <p>進入我們的場所，您同意：</p>
+                    <ul>
+                        <li>隨時明顯佩戴您的訪客證</li>
+                        <li>僅停留在授權區域</li>
+                        <li>在限制區域需要陪同</li>
+                        <li>遵守所有安全和保安協議</li>
+                        <li>離開時歸還您的訪客證</li>
+                    </ul>
                     <h5 class="mt-3">健康與安全</h5>
                     <p>我確認：</p>
                     <ul>
@@ -953,6 +913,15 @@
                 welcomeBackQR: "欢迎回来！您的信息已加载。",
 
                 agreementContent: `
+                    <h5>访客指引</h5>
+                    <p>进入我们的场所，您同意：</p>
+                    <ul>
+                        <li>随时明显佩戴您的访客证</li>
+                        <li>仅停留在授权区域</li>
+                        <li>在限制区域需要陪同</li>
+                        <li>遵守所有安全和保安协议</li>
+                        <li>离开时归还您的访客证</li>
+                    </ul>
                     <h5 class="mt-3">健康与安全</h5>
                     <p>我确认：</p>
                     <ul>
@@ -1055,6 +1024,15 @@
                 welcomeBackQR: "Maligayang pagbabalik! Na-load na ang iyong impormasyon.",
                 
                 agreementContent: `
+                    <h5>Mga Gabay para sa Bisita</h5>
+                    <p>Sa pagpasok sa aming lugar, sumasang-ayon ka na:</p>
+                    <ul>
+                        <li>Laging isuot ang visitor badge na nakikita</li>
+                        <li>Manatili lamang sa mga awtorisadong lugar</li>
+                        <li>Kailangan ng kasamang tauhan sa mga restricted na lugar</li>
+                        <li>Sundin ang lahat ng protokol sa kaligtasan at seguridad</li>
+                        <li>Ibalik ang badge kapag aalis</li>
+                    </ul>
                     <h5 class="mt-3">Kalusugan at Kaligtasan</h5>
                     <p>Kumpirma ko na:</p>
                     <ul>
@@ -1157,6 +1135,15 @@
                 welcomeBackQR: "おかえりなさい！情報が読み込まれました。",
     
                 agreementContent: `
+                    <h5>訪問者ガイドライン</h5>
+                    <p>施設に入場することで、以下に同意します：</p>
+                    <ul>
+                        <li>訪問者バッジを常に目に見える場所に着用する</li>
+                        <li>許可されたエリアのみに滞在する</li>
+                        <li>制限エリアでは同行が必要</li>
+                        <li>すべての安全およびセキュリティプロトコルに従う</li>
+                        <li>退出時にバッジを返却する</li>
+                    </ul>
                     <h5 class="mt-3">健康と安全</h5>
                     <p>以下を確認します：</p>
                     <ul>

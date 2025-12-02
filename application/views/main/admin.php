@@ -3,6 +3,9 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
+
+// $username = "itsdT0ms";
+// $password = "(GrYXU4fOY)wVOr4";
 $dbname = "vms";
 
 // Create connection
@@ -363,6 +366,7 @@ if ($companyFilter === 'Toms World') {
         .sidebar-header { background: linear-gradient(135deg, #f39c12, #1e9338); padding: 20px; text-align: center; color: white; }
         .sidebar-header h3 { margin: 0; font-size: 1.5em; font-weight: 600; }
         .sidebar.collapsed .sidebar-header h3 { display: none; }
+        .sidebar.collapsed .user-filter-badge { display: none; }
         .sidebar-logo { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 10px; }
         .sidebar-logo img { width: 40px; height: 40px; background: white; border-radius: 10px; padding: 5px; object-fit: contain; }
         .sidebar-menu { padding: 20px 0; }
