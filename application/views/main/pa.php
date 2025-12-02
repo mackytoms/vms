@@ -2162,17 +2162,25 @@
             }
         }
 
-        // Capture photo - Updated
+        // Capture photo - FIXED for mobile orientation
         function capturePhoto() {
             const video = document.getElementById('videoElement');
             const image = document.getElementById('capturedImage');
             const canvas = document.createElement('canvas');
             
-            canvas.width = 320;
-            canvas.height = 240;
+            // Get video dimensions
+            const videoWidth = video.videoWidth;
+            const videoHeight = video.videoHeight;
+            
+            // Set canvas size to match video's actual dimensions
+            canvas.width = videoWidth;
+            canvas.height = videoHeight;
             
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Draw the video frame directly without any transforms
+            // The video element already handles orientation correctly
+            ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
             
             capturedPhotoData = canvas.toDataURL('image/jpeg', 0.8);
             
