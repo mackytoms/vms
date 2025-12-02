@@ -40,7 +40,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         }
 
         .login-header {
-            background: linear-gradient(135deg, #f39c12, #ecf3129e, #1e9338);
+            background: linear-gradient(135deg, #f39c12, #1e9338);
             color: white;
             padding: 40px 30px;
             text-align: center;
@@ -344,7 +344,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         </div>
         
         <div class="login-footer">
-            VPASS Copyright &copy; <?= date('Y') ?> All rights reserved.<br>
+            KIOSK V-PASS Copyright &copy; <?= date('Y') ?> All rights reserved.<br>
 			Information Technology & Services Department.
         </div>
     </div>

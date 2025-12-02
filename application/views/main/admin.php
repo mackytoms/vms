@@ -3,10 +3,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-// $username = "itsdT0ms";
-// $password = "(GrYXU4fOY)wVOr4";
 $dbname = "vms";
-
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -16,20 +13,40 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch data for dashboard
-function getDashboardStats($conn) {
+// Get logged in user info from session
+$logged_in_user = isset($_SESSION['username']) ? strtolower($_SESSION['username']) : '';
+$user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
+
+// Determine company filter based on logged-in user
+function getCompanyFilter($username) {
+    $username = strtolower($username);
+    if ($username === 'tw_admin') {
+        return 'Toms World';
+    } elseif ($username === 'pa_admin') {
+        return 'Pan Asia';
+    }
+    return null; // No filter for super admin
+}
+
+$companyFilter = getCompanyFilter($logged_in_user);
+$companyFilterSQL = $companyFilter ? " AND company_visited = '" . $conn->real_escape_string($companyFilter) . "'" : "";
+$companyFilterSQLWhere = $companyFilter ? " WHERE company_visited = '" . $conn->real_escape_string($companyFilter) . "'" : "";
+
+// Fetch data for dashboard with company filter
+function getDashboardStats($conn, $companyFilter = null) {
     $stats = array();
+    $filterSQL = $companyFilter ? " AND company_visited = '" . $conn->real_escape_string($companyFilter) . "'" : "";
     
-    $sql = "SELECT COUNT(DISTINCT visitor_id) as today_total FROM visits WHERE DATE(check_in_time) = CURDATE()";
+    $sql = "SELECT COUNT(DISTINCT visitor_id) as today_total FROM visits WHERE DATE(check_in_time) = CURDATE()" . $filterSQL;
     $result = $conn->query($sql);
     $stats['today_total'] = $result->fetch_assoc()['today_total'];
     
-    $sql = "SELECT COUNT(*) as currently_in FROM visits WHERE check_out_time IS NULL";
+    $sql = "SELECT COUNT(*) as currently_in FROM visits WHERE check_out_time IS NULL" . $filterSQL;
     $result = $conn->query($sql);
     $stats['currently_in'] = $result->fetch_assoc()['currently_in'];
     
     $sql = "SELECT AVG(TIMESTAMPDIFF(HOUR, check_in_time, IFNULL(check_out_time, NOW()))) as avg_duration 
-            FROM visits WHERE DATE(check_in_time) = CURDATE()";
+            FROM visits WHERE DATE(check_in_time) = CURDATE()" . $filterSQL;
     $result = $conn->query($sql);
     $avg = $result->fetch_assoc()['avg_duration'];
     $stats['avg_duration'] = $avg ? round($avg, 1) . 'h' : '0h';
@@ -37,11 +54,14 @@ function getDashboardStats($conn) {
     return $stats;
 }
 
-function getRecentActivity($conn) {
+function getRecentActivity($conn, $companyFilter = null) {
+    $filterSQL = $companyFilter ? " AND v.company_visited = '" . $conn->real_escape_string($companyFilter) . "'" : "";
+    
     $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, e.name as host_name, v.company_visited
             FROM visits v 
             JOIN visitors vi ON v.visitor_id = vi.visitor_id 
             JOIN employees e ON v.host_employee_id = e.employee_id 
+            WHERE 1=1" . $filterSQL . "
             ORDER BY v.check_in_time DESC LIMIT 10";
     
     $result = $conn->query($sql);
@@ -55,14 +75,16 @@ function getRecentActivity($conn) {
     return $activities;
 }
 
-function getActiveVisits($conn) {
+function getActiveVisits($conn, $companyFilter = null) {
+    $filterSQL = $companyFilter ? " AND v.company_visited = '" . $conn->real_escape_string($companyFilter) . "'" : "";
+    
     $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, vi.email, vi.phone, vi.photo,
             e.name as host_name, d.name as department_name, v.company_visited
             FROM visits v 
             JOIN visitors vi ON v.visitor_id = vi.visitor_id 
             JOIN employees e ON v.host_employee_id = e.employee_id
             JOIN departments d ON e.department_code = d.department_code
-            WHERE v.check_out_time IS NULL";
+            WHERE v.check_out_time IS NULL" . $filterSQL;
     
     $result = $conn->query($sql);
     $visits = array();
@@ -75,11 +97,19 @@ function getActiveVisits($conn) {
     return $visits;
 }
 
-function getAllVisitors($conn) {
-    $sql = "SELECT vi.*, COUNT(v.visit_id) as total_visits, MAX(v.check_in_time) as last_visit 
-            FROM visitors vi 
-            LEFT JOIN visits v ON vi.visitor_id = v.visitor_id 
-            GROUP BY vi.visitor_id";
+function getAllVisitors($conn, $companyFilter = null) {
+    if ($companyFilter) {
+        $sql = "SELECT vi.*, COUNT(v.visit_id) as total_visits, MAX(v.check_in_time) as last_visit 
+                FROM visitors vi 
+                LEFT JOIN visits v ON vi.visitor_id = v.visitor_id AND v.company_visited = '" . $conn->real_escape_string($companyFilter) . "'
+                GROUP BY vi.visitor_id
+                HAVING total_visits > 0";
+    } else {
+        $sql = "SELECT vi.*, COUNT(v.visit_id) as total_visits, MAX(v.check_in_time) as last_visit 
+                FROM visitors vi 
+                LEFT JOIN visits v ON vi.visitor_id = v.visitor_id 
+                GROUP BY vi.visitor_id";
+    }
     
     $result = $conn->query($sql);
     $visitors = array();
@@ -92,28 +122,32 @@ function getAllVisitors($conn) {
     return $visitors;
 }
 
-function getDashboardStatsByCompany($conn) {
+function getDashboardStatsByCompany($conn, $companyFilter = null) {
     $stats = array();
     
-    $sql = "SELECT COUNT(DISTINCT visitor_id) as count FROM visits 
-            WHERE DATE(check_in_time) = CURDATE() AND company_visited = 'Toms World'";
-    $result = $conn->query($sql);
-    $stats['toms_world_today'] = $result->fetch_assoc()['count'];
+    if ($companyFilter === 'Toms World' || $companyFilter === null) {
+        $sql = "SELECT COUNT(DISTINCT visitor_id) as count FROM visits 
+                WHERE DATE(check_in_time) = CURDATE() AND company_visited = 'Toms World'";
+        $result = $conn->query($sql);
+        $stats['toms_world_today'] = $result->fetch_assoc()['count'];
+        
+        $sql = "SELECT COUNT(*) as count FROM visits 
+                WHERE check_out_time IS NULL AND company_visited = 'Toms World'";
+        $result = $conn->query($sql);
+        $stats['toms_world_active'] = $result->fetch_assoc()['count'];
+    }
     
-    $sql = "SELECT COUNT(*) as count FROM visits 
-            WHERE check_out_time IS NULL AND company_visited = 'Toms World'";
-    $result = $conn->query($sql);
-    $stats['toms_world_active'] = $result->fetch_assoc()['count'];
-    
-    $sql = "SELECT COUNT(DISTINCT visitor_id) as count FROM visits 
-            WHERE DATE(check_in_time) = CURDATE() AND company_visited = 'Pan Asia'";
-    $result = $conn->query($sql);
-    $stats['pan_asia_today'] = $result->fetch_assoc()['count'];
-    
-    $sql = "SELECT COUNT(*) as count FROM visits 
-            WHERE check_out_time IS NULL AND company_visited = 'Pan Asia'";
-    $result = $conn->query($sql);
-    $stats['pan_asia_active'] = $result->fetch_assoc()['count'];
+    if ($companyFilter === 'Pan Asia' || $companyFilter === null) {
+        $sql = "SELECT COUNT(DISTINCT visitor_id) as count FROM visits 
+                WHERE DATE(check_in_time) = CURDATE() AND company_visited = 'Pan Asia'";
+        $result = $conn->query($sql);
+        $stats['pan_asia_today'] = $result->fetch_assoc()['count'];
+        
+        $sql = "SELECT COUNT(*) as count FROM visits 
+                WHERE check_out_time IS NULL AND company_visited = 'Pan Asia'";
+        $result = $conn->query($sql);
+        $stats['pan_asia_active'] = $result->fetch_assoc()['count'];
+    }
     
     return $stats;
 }
@@ -191,18 +225,24 @@ function getVisitById($conn, $visit_id) {
 if(isset($_GET['action'])) {
     header('Content-Type: application/json');
     
+    // Get company filter from request or session
+    $ajaxCompanyFilter = isset($_GET['company_filter']) ? $_GET['company_filter'] : null;
+    if ($ajaxCompanyFilter === 'null' || $ajaxCompanyFilter === '') {
+        $ajaxCompanyFilter = null;
+    }
+    
     switch($_GET['action']) {
         case 'dashboard_stats':
-            echo json_encode(getDashboardStats($conn));
+            echo json_encode(getDashboardStats($conn, $ajaxCompanyFilter));
             break;
         case 'recent_activity':
-            echo json_encode(getRecentActivity($conn));
+            echo json_encode(getRecentActivity($conn, $ajaxCompanyFilter));
             break;
         case 'active_visits':
-            echo json_encode(getActiveVisits($conn));
+            echo json_encode(getActiveVisits($conn, $ajaxCompanyFilter));
             break;
         case 'all_visitors':
-            echo json_encode(getAllVisitors($conn));
+            echo json_encode(getAllVisitors($conn, $ajaxCompanyFilter));
             break;
         case 'get_visitor':
             if(isset($_GET['visitor_id'])) {
@@ -223,7 +263,7 @@ if(isset($_GET['action'])) {
             echo json_encode(getDepartments($conn));
             break;
         case 'dashboard_stats_by_company':
-            echo json_encode(getDashboardStatsByCompany($conn));
+            echo json_encode(getDashboardStatsByCompany($conn, $ajaxCompanyFilter));
             break;
         case 'checkout':
             if(isset($_POST['visit_id'])) {
@@ -245,11 +285,16 @@ if(isset($_GET['action'])) {
                 $department_code = $conn->real_escape_string($_POST['department_code']);
                 $is_active = isset($_POST['is_active']) ? 1 : 0;
                 
-                $sql = "INSERT INTO employees (name, email, department_code, is_active, created_at) 
-                        VALUES ('$name', '$email', '$department_code', $is_active, NOW())";
+                $count_sql = "SELECT COUNT(*) as cnt FROM employees WHERE department_code = '$department_code'";
+                $count_result = $conn->query($count_sql);
+                $count = $count_result->fetch_assoc()['cnt'] + 1;
+                $employee_id = $department_code . str_pad($count, 3, '0', STR_PAD_LEFT);
+                
+                $sql = "INSERT INTO employees (employee_id, name, email, department_code, is_active, created_at) 
+                        VALUES ('$employee_id', '$name', '$email', '$department_code', $is_active, NOW())";
                 
                 if($conn->query($sql)) {
-                    echo json_encode(['success' => true, 'employee_id' => $conn->insert_id]);
+                    echo json_encode(['success' => true, 'employee_id' => $employee_id]);
                 } else {
                     echo json_encode(['success' => false, 'error' => $conn->error]);
                 }
@@ -275,16 +320,27 @@ if(isset($_GET['action'])) {
     exit;
 }
 
-$dashboardStats = getDashboardStats($conn);
-$recentActivity = getRecentActivity($conn);
-$activeVisits = getActiveVisits($conn);
+$dashboardStats = getDashboardStats($conn, $companyFilter);
+$recentActivity = getRecentActivity($conn, $companyFilter);
+$activeVisits = getActiveVisits($conn, $companyFilter);
+
+// Determine display title based on user
+$pageTitle = "Tom's World & Pan-Asia";
+$welcomeMessage = "Welcome back! Here's what's happening today at Tom's World & Pan-Asia.";
+if ($companyFilter === 'Toms World') {
+    $pageTitle = "Tom's World";
+    $welcomeMessage = "Welcome back! Here's what's happening today at Tom's World.";
+} elseif ($companyFilter === 'Pan Asia') {
+    $pageTitle = "Pan-Asia";
+    $welcomeMessage = "Welcome back! Here's what's happening today at Pan-Asia.";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiosk V-Pass Admin - Tom's World & Pan-Asia</title>
+    <title>Kiosk V-Pass Admin - <?php echo $pageTitle; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
@@ -370,6 +426,7 @@ $activeVisits = getActiveVisits($conn);
         .info-grid { background: #f8f9fa; padding: 15px; border-radius: 8px; }
         .info-grid .row { padding: 5px 0; border-bottom: 1px solid #e0e0e0; }
         .info-grid .row:last-child { border-bottom: none; }
+        .user-filter-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.85em; margin-top: 10px; display: inline-block; }
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.active { transform: translateX(0); }
@@ -382,10 +439,23 @@ $activeVisits = getActiveVisits($conn);
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
+                <?php if ($companyFilter !== 'Pan Asia'): ?>
                 <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" alt="TOMS WORLD" onerror="this.style.display='none'">
+                <?php endif; ?>
+                <?php if ($companyFilter !== 'Toms World'): ?>
                 <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" alt="PAN-ASIA" onerror="this.style.display='none'">
+                <?php endif; ?>
             </div>
             <h3>KIOSK V-PASS</h3>
+            <?php if ($companyFilter): ?>
+            <div class="user-filter-badge">
+                <i class="bi bi-building"></i> <?php echo $companyFilter === 'Toms World' ? "Tom's World" : "Pan-Asia"; ?> Admin
+            </div>
+            <?php else: ?>
+            <div class="user-filter-badge">
+                <i class="bi bi-shield-check"></i> Super Admin
+            </div>
+            <?php endif; ?>
         </div>
         <div class="sidebar-menu">
             <div class="sidebar-item active" onclick="showSection('dashboard')">
@@ -414,21 +484,8 @@ $activeVisits = getActiveVisits($conn);
         <div class="topbar">
             <div class="topbar-left">
                 <i class="bi bi-list menu-toggle" onclick="toggleSidebar()"></i>
-                <!-- <div class="search-box">
-                    <input type="text" placeholder="Search visitors, employees..." id="globalSearch">
-                    <i class="bi bi-search"></i>
-                </div> -->
             </div>
             <div class="topbar-right">
-                <!-- <div class="notification-icon">
-                    <i class="bi bi-bell"></i>
-                    <span class="notification-badge"><?php echo $dashboardStats['currently_in']; ?></span>
-                </div> -->
-                <!-- <div class="user-profile">
-                    <div class="user-avatar">AD</div>
-                    <span>Admin</span>
-                    <i class="bi bi-chevron-down"></i>
-                </div> -->
             <a href="<?= base_url('auth/logout') ?>" class="sidebar-item logout" onclick="return confirmLogout(event)">
                 <i class="bi bi-box-arrow-left"></i><span>Logout</span>
             </a>
@@ -438,7 +495,7 @@ $activeVisits = getActiveVisits($conn);
         <!-- Dashboard Section -->
         <div class="dashboard-content" id="dashboardSection">
             <h1 class="page-title">Visitor Management Dashboard</h1>
-            <p class="page-subtitle">Welcome back! Here's what's happening today at Tom's World & Pan-Asia.</p>
+            <p class="page-subtitle"><?php echo $welcomeMessage; ?></p>
             <div class="quick-stats">
                 <div class="quick-stat-item">
                     <div class="quick-stat-value" id="todayTotal"><?php echo $dashboardStats['today_total']; ?></div>
@@ -587,7 +644,7 @@ $activeVisits = getActiveVisits($conn);
                 <form>
                     <div class="mb-3">
                         <label class="form-label">Company Name</label>
-                        <input type="text" class="form-control" value="Tom's World Philippines, Inc.">
+                        <input type="text" class="form-control" value="<?php echo $pageTitle; ?>">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Default Visit Duration (Hours)</label>
@@ -766,6 +823,10 @@ $activeVisits = getActiveVisits($conn);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
+        // Company filter from PHP - passed to JavaScript
+        const companyFilter = <?php echo json_encode($companyFilter); ?>;
+        const filterParam = companyFilter ? `&company_filter=${encodeURIComponent(companyFilter)}` : '&company_filter=null';
+        
         let currentVisitId = null;
         let currentVisitorData = null;
         let dataTableInstances = {};
@@ -827,7 +888,7 @@ $activeVisits = getActiveVisits($conn);
         }
 
         function loadActiveVisits() {
-            fetch('?action=active_visits')
+            fetch('?action=active_visits' + filterParam)
                 .then(r => r.json())
                 .then(data => {
                     initDataTable('activeVisitsTable', data, (v) => `
@@ -851,7 +912,7 @@ $activeVisits = getActiveVisits($conn);
         }
 
         function loadAllVisitors() {
-            fetch('?action=all_visitors')
+            fetch('?action=all_visitors' + filterParam)
                 .then(r => r.json())
                 .then(data => {
                     initDataTable('allVisitorsTable', data, (v) => `
@@ -1073,17 +1134,16 @@ $activeVisits = getActiveVisits($conn);
         }
 
         function refreshDashboard() {
-            fetch('?action=dashboard_stats')
+            fetch('?action=dashboard_stats' + filterParam)
                 .then(r => r.json())
                 .then(stats => {
                     document.getElementById('todayTotal').textContent = stats.today_total;
                     document.getElementById('currentlyIn').textContent = stats.currently_in;
                     document.getElementById('avgDuration').textContent = stats.avg_duration;
                     document.getElementById('activeVisitCount').textContent = stats.currently_in;
-                    document.querySelector('.notification-badge').textContent = stats.currently_in;
                 });
             
-            fetch('?action=recent_activity')
+            fetch('?action=recent_activity' + filterParam)
                 .then(r => r.json())
                 .then(data => {
                     const tbody = document.getElementById('recentActivityTableBody');

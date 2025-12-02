@@ -442,144 +442,150 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Department and Employee Data Structure
-        const departmentData = {
-            'ADM': {
-                name: 'Admin',
-                employees: [
-                    { id: 'ADM001', name: 'John Smith', email: 'j.smith@company.com' },
-                    { id: 'ADM002', name: 'Sarah Johnson', email: 's.johnson@company.com' },
-                    { id: 'ADM003', name: 'Michael Chen', email: 'm.chen@company.com' }
-                ]
-            },
-            'BDD': {
-                name: 'Design & Construction',
-                employees: [
-                    { id: 'BDD001', name: 'Emily Davis', email: 'e.davis@company.com' },
-                    { id: 'BDD002', name: 'Robert Wilson', email: 'r.wilson@company.com' }
-                ]
-            },
-            'CRT': {
-                name: 'Creatives',
-                employees: [
-                    { id: 'CRT001', name: 'Lisa Anderson', email: 'l.anderson@company.com' },
-                    { id: 'CRT002', name: 'David Martinez', email: 'd.martinez@company.com' },
-                    { id: 'CRT003', name: 'Jessica Taylor', email: 'j.taylor@company.com' }
-                ]
-            },
-            'ED': {
-                name: 'Ent. Risk Management',
-                employees: [
-                    { id: 'ED001', name: 'Thomas Brown', email: 't.brown@company.com' },
-                    { id: 'ED002', name: 'Jennifer White', email: 'j.white@company.com' }
-                ]
-            },
-            'EXE': {
-                name: 'Executive',
-                employees: [
-                    { id: 'EXE001', name: 'William Garcia', email: 'w.garcia@company.com' },
-                    { id: 'EXE002', name: 'Patricia Miller', email: 'p.miller@company.com' }
-                ]
-            },
-            'FIN': {
-                name: 'Finance',
-                employees: [
-                    { id: 'FIN001', name: 'Christopher Lee', email: 'c.lee@company.com' },
-                    { id: 'FIN002', name: 'Amanda Jones', email: 'a.jones@company.com' },
-                    { id: 'FIN003', name: 'Daniel Rodriguez', email: 'd.rodriguez@company.com' }
-                ]
-            },
-            'HR': {
-                name: 'Human Resource',
-                employees: [
-                    { id: 'HR001', name: 'Michelle Thompson', email: 'm.thompson@company.com' },
-                    { id: 'HR002', name: 'Kevin Harris', email: 'k.harris@company.com' },
-                    { id: 'HR003', name: 'Rachel Clark', email: 'r.clark@company.com' }
-                ]
-            },
-            'IMP': {
-                name: 'Importation',
-                employees: [
-                    { id: 'IMP001', name: 'Brian Lewis', email: 'b.lewis@company.com' },
-                    { id: 'IMP002', name: 'Sophia Walker', email: 's.walker@company.com' }
-                ]
-            },
-            'ITSD': {
-                name: 'Information Technology & Services',
-                employees: [
-                    { id: 'ITSD001', name: 'James Hall', email: 'j.hall@company.com' },
-                    { id: 'ITSD002', name: 'Olivia Allen', email: 'o.allen@company.com' },
-                    { id: 'ITSD003', name: 'Matthew Young', email: 'm.young@company.com' },
-                    { id: 'ITSD004', name: 'Emma King', email: 'e.king@company.com' }
-                ]
-            },
-            'MRK': {
-                name: 'Marketing',
-                employees: [
-                    { id: 'MRK001', name: 'Andrew Wright', email: 'a.wright@company.com' },
-                    { id: 'MRK002', name: 'Isabella Lopez', email: 'i.lopez@company.com' },
-                    { id: 'MRK003', name: 'Joshua Hill', email: 'j.hill@company.com' }
-                ]
-            },
-            'MER': {
-                name: 'Audit & Merchandising',
-                employees: [
-                    { id: 'MER001', name: 'Megan Scott', email: 'm.scott@company.com' },
-                    { id: 'MER002', name: 'Ryan Green', email: 'r.green@company.com' }
-                ]
-            },
-            'OP': {
-                name: 'Operations',
-                employees: [
-                    { id: 'OP001', name: 'Nicholas Adams', email: 'n.adams@company.com' },
-                    { id: 'OP002', name: 'Victoria Baker', email: 'v.baker@company.com' },
-                    { id: 'OP003', name: 'Alexander Nelson', email: 'a.nelson@company.com' }
-                ]
-            },
-            'ODSM': {
-                name: 'Org. Development & Strat. Mngt.',
-                employees: [
-                    { id: 'ODSM001', name: 'Samantha Carter', email: 's.carter@company.com' },
-                    { id: 'ODSM002', name: 'Joseph Mitchell', email: 'j.mitchell@company.com' }
-                ]
-            },
-            'SPD': {
-                name: 'Special Projects',
-                employees: [
-                    { id: 'SPD001', name: 'Lauren Perez', email: 'l.perez@company.com' },
-                    { id: 'SPD002', name: 'Charles Roberts', email: 'c.roberts@company.com' }
-                ]
-            },
-            'SD': {
-                name: 'Stocks Department',
-                employees: [
-                    { id: 'SD001', name: 'Ashley Turner', email: 'a.turner@company.com' },
-                    { id: 'SD002', name: 'Benjamin Phillips', email: 'b.phillips@company.com' }
-                ]
-            },
-            'TD': {
-                name: 'Technical',
-                employees: [
-                    { id: 'TD001', name: 'Nathan Campbell', email: 'n.campbell@company.com' },
-                    { id: 'TD002', name: 'Madison Parker', email: 'm.parker@company.com' }
-                ]
-            },
-            'WLD': {
-                name: 'Warehouse & Logistics',
-                employees: [
-                    { id: 'WLD001', name: 'Eric Evans', email: 'e.evans@company.com' },
-                    { id: 'WLD002', name: 'Hannah Edwards', email: 'h.edwards@company.com' },
-                    { id: 'WLD003', name: 'Tyler Collins', email: 't.collins@company.com' }
-                ]
-            },
-            'PA': {
-                name: 'Pan Asia HR',
-                employees: [
-                    { id: 'PA001', name: 'Grace Stewart', email: 'g.stewart@company.com' },
-                    { id: 'PA002', name: 'Dylan Sanchez', email: 'd.sanchez@company.com' }
-                ]
-            }
-        };
+        // // Department and Employee Data Structure
+        // const departmentData = {
+        //     'ADM': {
+        //         name: 'Admin',
+        //         employees: [
+        //             { id: 'ADM001', name: 'John Smith', email: 'j.smith@company.com' },
+        //             { id: 'ADM002', name: 'Sarah Johnson', email: 's.johnson@company.com' },
+        //             { id: 'ADM003', name: 'Michael Chen', email: 'm.chen@company.com' }
+        //         ]
+        //     },
+        //     'BDD': {
+        //         name: 'Design & Construction',
+        //         employees: [
+        //             { id: 'BDD001', name: 'Emily Davis', email: 'e.davis@company.com' },
+        //             { id: 'BDD002', name: 'Robert Wilson', email: 'r.wilson@company.com' }
+        //         ]
+        //     },
+        //     'CRT': {
+        //         name: 'Creatives',
+        //         employees: [
+        //             { id: 'CRT001', name: 'Lisa Anderson', email: 'l.anderson@company.com' },
+        //             { id: 'CRT002', name: 'David Martinez', email: 'd.martinez@company.com' },
+        //             { id: 'CRT003', name: 'Jessica Taylor', email: 'j.taylor@company.com' }
+        //         ]
+        //     },
+        //     'ED': {
+        //         name: 'Ent. Risk Management',
+        //         employees: [
+        //             { id: 'ED001', name: 'Thomas Brown', email: 't.brown@company.com' },
+        //             { id: 'ED002', name: 'Jennifer White', email: 'j.white@company.com' }
+        //         ]
+        //     },
+        //     'EXE': {
+        //         name: 'Executive',
+        //         employees: [
+        //             { id: 'EXE001', name: 'William Garcia', email: 'w.garcia@company.com' },
+        //             { id: 'EXE002', name: 'Patricia Miller', email: 'p.miller@company.com' }
+        //         ]
+        //     },
+        //     'FIN': {
+        //         name: 'Finance',
+        //         employees: [
+        //             { id: 'FIN001', name: 'Christopher Lee', email: 'c.lee@company.com' },
+        //             { id: 'FIN002', name: 'Amanda Jones', email: 'a.jones@company.com' },
+        //             { id: 'FIN003', name: 'Daniel Rodriguez', email: 'd.rodriguez@company.com' }
+        //         ]
+        //     },
+        //     'HR': {
+        //         name: 'Human Resource',
+        //         employees: [
+        //             { id: 'HR001', name: 'Michelle Thompson', email: 'm.thompson@company.com' },
+        //             { id: 'HR002', name: 'Kevin Harris', email: 'k.harris@company.com' },
+        //             { id: 'HR003', name: 'Rachel Clark', email: 'r.clark@company.com' }
+        //         ]
+        //     },
+        //     'IMP': {
+        //         name: 'Importation',
+        //         employees: [
+        //             { id: 'IMP001', name: 'Brian Lewis', email: 'b.lewis@company.com' },
+        //             { id: 'IMP002', name: 'Sophia Walker', email: 's.walker@company.com' }
+        //         ]
+        //     },
+        //     'ITSD': {
+        //         name: 'Information Technology & Services',
+        //         employees: [
+        //             { id: 'ITSD001', name: 'James Hall', email: 'j.hall@company.com' },
+        //             { id: 'ITSD002', name: 'Olivia Allen', email: 'o.allen@company.com' },
+        //             { id: 'ITSD003', name: 'Matthew Young', email: 'm.young@company.com' },
+        //             { id: 'ITSD004', name: 'Emma King', email: 'e.king@company.com' }
+        //         ]
+        //     },
+        //     'MRK': {
+        //         name: 'Marketing',
+        //         employees: [
+        //             { id: 'MRK001', name: 'Andrew Wright', email: 'a.wright@company.com' },
+        //             { id: 'MRK002', name: 'Isabella Lopez', email: 'i.lopez@company.com' },
+        //             { id: 'MRK003', name: 'Joshua Hill', email: 'j.hill@company.com' }
+        //         ]
+        //     },
+        //     'MER': {
+        //         name: 'Audit & Merchandising',
+        //         employees: [
+        //             { id: 'MER001', name: 'Megan Scott', email: 'm.scott@company.com' },
+        //             { id: 'MER002', name: 'Ryan Green', email: 'r.green@company.com' }
+        //         ]
+        //     },
+        //     'OP': {
+        //         name: 'Operations',
+        //         employees: [
+        //             { id: 'OP001', name: 'Nicholas Adams', email: 'n.adams@company.com' },
+        //             { id: 'OP002', name: 'Victoria Baker', email: 'v.baker@company.com' },
+        //             { id: 'OP003', name: 'Alexander Nelson', email: 'a.nelson@company.com' }
+        //         ]
+        //     },
+        //     'ODSM': {
+        //         name: 'Org. Development & Strat. Mngt.',
+        //         employees: [
+        //             { id: 'ODSM001', name: 'Samantha Carter', email: 's.carter@company.com' },
+        //             { id: 'ODSM002', name: 'Joseph Mitchell', email: 'j.mitchell@company.com' }
+        //         ]
+        //     },
+        //     'SPD': {
+        //         name: 'Special Projects',
+        //         employees: [
+        //             { id: 'SPD001', name: 'Lauren Perez', email: 'l.perez@company.com' },
+        //             { id: 'SPD002', name: 'Charles Roberts', email: 'c.roberts@company.com' }
+        //         ]
+        //     },
+        //     'SD': {
+        //         name: 'Stocks Department',
+        //         employees: [
+        //             { id: 'SD001', name: 'Ashley Turner', email: 'a.turner@company.com' },
+        //             { id: 'SD002', name: 'Benjamin Phillips', email: 'b.phillips@company.com' }
+        //         ]
+        //     },
+        //     'TD': {
+        //         name: 'Technical',
+        //         employees: [
+        //             { id: 'TD001', name: 'Nathan Campbell', email: 'n.campbell@company.com' },
+        //             { id: 'TD002', name: 'Madison Parker', email: 'm.parker@company.com' }
+        //         ]
+        //     },
+        //     'WLD': {
+        //         name: 'Warehouse & Logistics',
+        //         employees: [
+        //             { id: 'WLD001', name: 'Eric Evans', email: 'e.evans@company.com' },
+        //             { id: 'WLD002', name: 'Hannah Edwards', email: 'h.edwards@company.com' },
+        //             { id: 'WLD003', name: 'Tyler Collins', email: 't.collins@company.com' }
+        //         ]
+        //     },
+        //     'PA': {
+        //         name: 'Pan Asia HR',
+        //         employees: [
+        //             { id: 'PA001', name: 'Grace Stewart', email: 'g.stewart@company.com' },
+        //             { id: 'PA002', name: 'Dylan Sanchez', email: 'd.sanchez@company.com' }
+        //         ]
+        //     },
+        //     'GT': {
+        //         name: 'Game Test',
+        //         employees: [
+        //             { id: 'GT001', name: 'Angelo Ragon', email: 'ar@gmail.com' }
+        //         ]
+        //     }
+        // };
 
         // Language Translations (Extended with new keys)
         const translations = {
@@ -1328,9 +1334,111 @@
             });
         }
 
-        // Handle department selection
+        // // Handle department selection
+        // function onDepartmentChange() {
+        //     const deptCode = document.getElementById('departmentSelect').value;
+        //     const employeeSection = document.getElementById('employeeSection');
+        //     const employeeGrid = document.getElementById('employeeGrid');
+            
+        //     if (!deptCode) {
+        //         employeeSection.style.display = 'none';
+        //         resetHostSelection();
+        //         return;
+        //     }
+            
+        //     selectedDepartment = deptCode;
+        //     const dept = departmentData[deptCode];
+            
+        //     employeeGrid.innerHTML = '';
+            
+        //     dept.employees.forEach(employee => {
+        //         const card = document.createElement('div');
+        //         card.className = 'employee-card';
+        //         card.innerHTML = `
+        //             <i class="bi bi-person-circle"></i>
+        //             <div class="employee-name">${employee.name}</div>
+        //             <div class="employee-email">${employee.email}</div>
+        //         `;
+        //         card.onclick = () => selectEmployeeFromCard(employee, deptCode);
+        //         employeeGrid.appendChild(card);
+        //     });
+            
+        //     employeeSection.style.display = 'block';
+        // }
+
+        // // Updated employee loading function to fetch from database
+        // function onDepartmentChange() {
+        //     const select = document.getElementById('departmentSelect');
+        //     const deptCode = select.value;
+        //     const employeeSection = document.getElementById('employeeSection');
+        //     const employeeGrid = document.getElementById('employeeGrid');
+            
+        //     if (!deptCode) {
+        //         employeeSection.style.display = 'none';
+        //         resetHostSelection();
+        //         return;
+        //     }
+            
+        //     // Get the department name from the selected option
+        //     const deptName = select.options[select.selectedIndex].text;
+        //     selectedDepartment = {
+        //         code: deptCode,
+        //         name: deptName
+        //     };
+            
+        //     // Show loading indicator
+        //     employeeGrid.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+        //     employeeSection.style.display = 'block';
+            
+        //     // Fetch employees from database
+        //     fetch(`<?= base_url("kiosk/get_employees/") ?>${deptCode}`, {
+        //         method: 'GET',
+        //         headers: {
+        //             'X-Requested-With': 'XMLHttpRequest'
+        //         }
+        //     })
+        //     .then(response => response.json())
+        //     .then(result => {
+        //         if (result.status === 'success') {
+        //             employeeGrid.innerHTML = '';
+                    
+        //             result.employees.forEach(employee => {
+        //                 const card = document.createElement('div');
+        //                 card.className = 'employee-card';
+        //                 card.innerHTML = `
+        //                     <i class="bi bi-person-circle"></i>
+        //                     <div class="employee-name">${employee.name}</div>
+        //                     <div class="employee-email">${employee.email}</div>
+        //                 `;
+                        
+        //                 // FIX: Use event parameter to get the clicked element
+        //                 card.addEventListener('click', function(e) {
+        //                     selectEmployeeFromCard({
+        //                         id: employee.employee_id,
+        //                         employeeId: employee.employee_id,
+        //                         name: employee.name,
+        //                         email: employee.email
+        //                     }, deptCode, deptName, e.currentTarget);
+        //                 });
+                        
+        //                 employeeGrid.appendChild(card);
+        //             });
+                    
+        //             if (result.employees.length === 0) {
+        //                 employeeGrid.innerHTML = '<p class="text-muted text-center">No employees found in this department</p>';
+        //             }
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error('Error loading employees:', error);
+        //         employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees. Please try again.</p>';
+        //     });
+        // }
+
+        // Updated employee loading function to fetch from database
         function onDepartmentChange() {
-            const deptCode = document.getElementById('departmentSelect').value;
+            const select = document.getElementById('departmentSelect');
+            const deptCode = select.value;
             const employeeSection = document.getElementById('employeeSection');
             const employeeGrid = document.getElementById('employeeGrid');
             
@@ -1340,39 +1448,155 @@
                 return;
             }
             
-            selectedDepartment = deptCode;
-            const dept = departmentData[deptCode];
+            // Get the department name from the selected option and store it
+            const deptName = select.options[select.selectedIndex].text;
+            selectedDepartment = {
+                code: deptCode,
+                name: deptName
+            };
             
-            employeeGrid.innerHTML = '';
-            
-            dept.employees.forEach(employee => {
-                const card = document.createElement('div');
-                card.className = 'employee-card';
-                card.innerHTML = `
-                    <i class="bi bi-person-circle"></i>
-                    <div class="employee-name">${employee.name}</div>
-                    <div class="employee-email">${employee.email}</div>
-                `;
-                card.onclick = () => selectEmployeeFromCard(employee, deptCode);
-                employeeGrid.appendChild(card);
-            });
-            
+            // Show loading indicator
+            employeeGrid.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
             employeeSection.style.display = 'block';
+            
+            // Fetch employees from database
+            fetch(`<?= base_url("kiosk/get_employees/") ?>${deptCode}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    employeeGrid.innerHTML = '';
+                    
+                    // Store department info for use in click handler
+                    const currentDeptCode = selectedDepartment.code;
+                    const currentDeptName = selectedDepartment.name;
+                    
+                    result.employees.forEach(employee => {
+                        const card = document.createElement('div');
+                        card.className = 'employee-card';
+                        card.innerHTML = `
+                            <i class="bi bi-person-circle"></i>
+                            <div class="employee-name">${employee.name}</div>
+                            <div class="employee-email">${employee.email}</div>
+                        `;
+                        
+                        // Store employee data as data attributes on the card
+                        card.dataset.employeeId = employee.employee_id;
+                        card.dataset.employeeName = employee.name;
+                        card.dataset.employeeEmail = employee.email;
+                        card.dataset.deptCode = currentDeptCode;
+                        card.dataset.deptName = currentDeptName;
+                        
+                        // Simple click handler
+                        card.onclick = function() {
+                            selectEmployeeFromCard(this);
+                        };
+                        
+                        employeeGrid.appendChild(card);
+                    });
+                    
+                    if (result.employees.length === 0) {
+                        employeeGrid.innerHTML = '<p class="text-muted text-center">No employees found in this department</p>';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading employees:', error);
+                employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees. Please try again.</p>';
+            });
         }
 
-        // Select employee from card
-        function selectEmployeeFromCard(employee, deptCode) {
-            // Remove previous selection
+        // // Select employee from card
+        // function selectEmployeeFromCard(employee, deptCode) {
+        //     // Remove previous selection
+        //     document.querySelectorAll('.employee-card').forEach(card => {
+        //         card.classList.remove('selected');
+        //     });
+            
+        //     // Add selection to clicked card
+        //     event.currentTarget.classList.add('selected');
+            
+        //     selectedHost = {
+        //         ...employee,
+        //         department: departmentData[deptCode].name,
+        //         departmentCode: deptCode
+        //     };
+            
+        //     visitorData.host = selectedHost;
+            
+        //     document.getElementById('selectedHost').innerHTML = `
+        //         <div class="d-flex align-items-center gap-3">
+        //             <i class="bi bi-person-circle" style="font-size: 2em;"></i>
+        //             <div>
+        //                 <div style="font-weight: 600;">${employee.name}</div>
+        //                 <div style="font-size: 0.9em; color: #7f8c8d;">${departmentData[deptCode].name}</div>
+        //             </div>
+        //         </div>
+        //     `;
+            
+        //     document.getElementById('hostNextBtn').disabled = false;
+        // }
+
+        // // Select employee from card - FIXED VERSION
+        // function selectEmployeeFromCard(employee, deptCode, deptName, cardElement) {
+        //     // Remove previous selection
+        //     document.querySelectorAll('.employee-card').forEach(card => {
+        //         card.classList.remove('selected');
+        //     });
+            
+        //     // Add selection to clicked card
+        //     if (cardElement) {
+        //         cardElement.classList.add('selected');
+        //     }
+            
+        //     selectedHost = {
+        //         ...employee,
+        //         department: deptName,
+        //         departmentCode: deptCode
+        //     };
+            
+        //     visitorData.host = selectedHost;
+            
+        //     document.getElementById('selectedHost').innerHTML = `
+        //         <div class="d-flex align-items-center gap-3">
+        //             <i class="bi bi-person-circle" style="font-size: 2em;"></i>
+        //             <div>
+        //                 <div style="font-weight: 600;">${employee.name}</div>
+        //                 <div style="font-size: 0.9em; color: #7f8c8d;">${deptName}</div>
+        //             </div>
+        //         </div>
+        //     `;
+            
+        //     document.getElementById('hostNextBtn').disabled = false;
+        // }
+
+        // Select employee from card - FIXED VERSION using data attributes
+        function selectEmployeeFromCard(cardElement) {
+            // Remove previous selection from all cards
             document.querySelectorAll('.employee-card').forEach(card => {
                 card.classList.remove('selected');
             });
             
             // Add selection to clicked card
-            event.currentTarget.classList.add('selected');
+            cardElement.classList.add('selected');
+            
+            // Get data from card's data attributes
+            const employeeId = cardElement.dataset.employeeId;
+            const employeeName = cardElement.dataset.employeeName;
+            const employeeEmail = cardElement.dataset.employeeEmail;
+            const deptCode = cardElement.dataset.deptCode;
+            const deptName = cardElement.dataset.deptName;
             
             selectedHost = {
-                ...employee,
-                department: departmentData[deptCode].name,
+                id: employeeId,
+                employeeId: employeeId,
+                name: employeeName,
+                email: employeeEmail,
+                department: deptName,
                 departmentCode: deptCode
             };
             
@@ -1382,8 +1606,8 @@
                 <div class="d-flex align-items-center gap-3">
                     <i class="bi bi-person-circle" style="font-size: 2em;"></i>
                     <div>
-                        <div style="font-weight: 600;">${employee.name}</div>
-                        <div style="font-size: 0.9em; color: #7f8c8d;">${departmentData[deptCode].name}</div>
+                        <div style="font-weight: 600;">${employeeName}</div>
+                        <div style="font-size: 0.9em; color: #7f8c8d;">${deptName}</div>
                     </div>
                 </div>
             `;
