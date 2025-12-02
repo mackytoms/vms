@@ -85,6 +85,7 @@
             background: #f8f9fa;
             position: relative;
             overflow-y: auto;
+            flex-wrap: wrap;
         }
 
         /* Step Indicator */
@@ -125,6 +126,7 @@
 
         .screen.active {
             display: block;
+            margin-top: 100px;
         }
 
         @keyframes slideIn {
@@ -538,7 +540,7 @@
         .success-screen {
             text-align: center;
             padding: 30px;
-            margin-top: 280px;
+            /* margin-top: 280px; */
         }
 
         .success-icon {
