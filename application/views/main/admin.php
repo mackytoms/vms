@@ -1,11 +1,11 @@
 <?php
 // Database configuration
 $servername = "localhost";
-$username = "root";
-$password = "";
+// $username = "root";
+// $password = "";
 
-// $username = "itsdT0ms";
-// $password = "(GrYXU4fOY)wVOr4";
+$username = "itsdT0ms";
+$password = "(GrYXU4fOY)wVOr4";
 $dbname = "vms";
 
 // Create connection

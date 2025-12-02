@@ -419,7 +419,7 @@
 
                         <!-- RIGHT: QR Code Section -->
                         <div class="col-md-6">
-                            <div style="padding: 20px; background: #fff; border-radius: 12px; border: 2px dashed #f39c12;">
+                            <div style="padding: 20px; background: #fff; border-radius: 12px; border: 2px dashed #f39c12; margin: 25px auto;">
                                 <h5 style="color: #495057; margin-bottom: 10px;">
                                     <i class="bi bi-qr-code"></i> 
                                     <span data-translate="saveQRCode">Save Your QR Code</span>
