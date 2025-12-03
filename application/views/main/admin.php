@@ -430,6 +430,15 @@ if ($companyFilter === 'Toms World') {
     $pageTitle = "Pan-Asia";
     $welcomeMessage = "Welcome back! Here's what's happening today at Pan-Asia.";
 }
+
+// Determine modal header class based on user
+$modalHeaderClass = 'super-admin';
+if ($companyFilter === 'Toms World') {
+    $modalHeaderClass = 'tw-admin';
+} elseif ($companyFilter === 'Pan Asia') {
+    $modalHeaderClass = 'pa-admin';
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -530,6 +539,44 @@ if ($companyFilter === 'Toms World') {
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; }
             .search-box { width: 150px; }
+        }
+        /* Dynamic Modal Header Colors */
+        .modal-header.tw-admin {
+            background: linear-gradient(135deg, #f39c12, #e67e22) !important;
+            color: white;
+        }
+
+        .modal-header.pa-admin {
+            background: linear-gradient(135deg, #1e9338, #0e7a28) !important;
+            color: white;
+        }
+
+        .modal-header.super-admin {
+            background: linear-gradient(135deg, #f39c12, #1e9338) !important;
+            color: white;
+        }
+
+        /* Alternative colored modal headers for different sections */
+        .modal-header.history-modal.tw-admin {
+            background: linear-gradient(135deg, #f39c12, #e67e22) !important;
+        }
+
+        .modal-header.history-modal.pa-admin {
+            background: linear-gradient(135deg, #1e9338, #0e7a28) !important;
+        }
+
+        .modal-header.history-modal.super-admin {
+            background: linear-gradient(135deg, #3498db, #2980b9) !important;
+        }
+
+        .modal-header.employee-modal.tw-admin,
+        .modal-header.employee-modal.pa-admin {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad) !important;
+        }
+
+        .modal-header.department-modal.tw-admin,
+        .modal-header.department-modal.pa-admin {
+            background: linear-gradient(135deg, #e67e22, #d35400) !important;
         }
     </style>
 </head>
@@ -762,7 +809,7 @@ if ($companyFilter === 'Toms World') {
     <div class="modal fade" id="viewVisitorModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #f39c12, #1e9338); color: white;">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
                     <h5 class="modal-title"><i class="bi bi-person-badge"></i> Visitor Details</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -804,7 +851,7 @@ if ($companyFilter === 'Toms World') {
     <div class="modal fade" id="viewAllVisitorModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #f39c12, #1e9338); color: white;">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
                     <h5 class="modal-title"><i class="bi bi-person-vcard"></i> Visitor Information</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -851,7 +898,7 @@ if ($companyFilter === 'Toms World') {
     <div class="modal fade" id="addEmployeeModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
                     <h5 class="modal-title"><i class="bi bi-person-plus"></i> Add New Employee</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -889,7 +936,7 @@ if ($companyFilter === 'Toms World') {
     <div class="modal fade" id="addDepartmentModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
                     <h5 class="modal-title"><i class="bi bi-building-add"></i> Add New Department</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -922,7 +969,7 @@ if ($companyFilter === 'Toms World') {
     <div class="modal fade" id="visitorHistoryModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white;">
+                <div class="modal-header history-modal <?php echo $modalHeaderClass; ?>">
                     <h5 class="modal-title"><i class="bi bi-clock-history"></i> Visitor History</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -960,7 +1007,7 @@ if ($companyFilter === 'Toms World') {
     <div class="modal fade" id="employeeHistoryModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white;">
+                <div class="modal-header employee-modal <?php echo $modalHeaderClass; ?>">
                     <h5 class="modal-title"><i class="bi bi-person-lines-fill"></i> Employee Visit History</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -998,7 +1045,7 @@ if ($companyFilter === 'Toms World') {
     <div class="modal fade" id="departmentEmployeesModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #e67e22, #d35400); color: white;">
+                <div class="modal-header department-modal <?php echo $modalHeaderClass; ?>">
                     <h5 class="modal-title"><i class="bi bi-people-fill"></i> Department Employees</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
