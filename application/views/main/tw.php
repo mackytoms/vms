@@ -760,9 +760,9 @@
                     <p>We collect your information for security and safety purposes. Your data will be handled in accordance with our privacy policy and deleted after 90 days unless required for compliance purposes.</p>
                 `,
                 nextStepsContent: [
-                    "Please collect your printed badge from the printer",
-                    "Wait in the lobby area",
-                    "Your host will come to receive you shortly"
+                    "Please Take a photo of the QR code this shall serve as your Badge",
+                    "then Please Wait in the lobby area for future instructions",
+                    "Your host will come to receive you shortly or Hosts' assistance shall come and guide you"
                 ]
             },
             'zh-TW': {
@@ -862,9 +862,9 @@
                     <p>我們收集您的信息用於安全和保安目的。您的數據將根據我們的隱私政策處理，並在90天後刪除，除非出於合規目的需要保留。</p>
                 `,
                 nextStepsContent: [
-                    "請從打印機收取您打印的訪客證",
-                    "在大堂區等候",
-                    "您的接待人很快就會來接您"
+                    "請拍下 QR Code 的照片，這將作為您的訪客證。",
+                    "接著請在大廳等候後續指示。",
+                    "您的接待人會前來迎接您，或將有協助人員引導您。"
                 ]
             },
             'zh-CN': {
@@ -964,9 +964,9 @@
                     <p>我们收集您的信息用于安全和保安目的。您的数据将根据我们的隐私政策处理，并在90天后删除，除非出于合规目的需要保留。</p>
                 `,
                 nextStepsContent: [
-                    "请从打印机收取您打印的访客证",
-                    "在大堂区等候",
-                    "您的接待人很快就会来接您"
+                    "请拍下二维码照片，这将作为您的访客证。",
+                    "然后请在大厅等待进一步指示。",
+                    "您的接待人会来迎接您，或有工作人员前来引导您。"
                 ]
             },
             'fil': {
@@ -1066,9 +1066,9 @@
                     <p>Kinokolekta namin ang iyong impormasyon para sa layuning pangkaligtasan at seguridad. Ang iyong data ay hahawakan ayon sa aming privacy policy at tatanggalin pagkatapos ng 90 araw maliban kung kinakailangan para sa compliance.</p>
                 `,
                 nextStepsContent: [
-                    "Mangyaring kunin ang iyong na-print na badge mula sa printer",
-                    "Maghintay sa lobby area",
-                    "Darating ang iyong tauhan upang salubungin ka"
+                    "Paki-kuha ng litrato ng QR code, ito ang magsisilbing badge mo.",
+                    "Pagkatapos, maghintay lamang sa lobby para sa susunod na instruksiyon.",
+                    "Darating ang iyong host para salubungin ka, o may staff na tutulong at gagabay sa'yo."
                 ]
             },
             'ja': {
@@ -1168,9 +1168,9 @@
                     <p>セキュリティおよび安全目的で情報を収集します。データはプライバシーポリシーに従って処理され、コンプライアンス目的で必要な場合を除き、90日後に削除されます。</p>
                 `,
                 nextStepsContent: [
-                    "プリンターから印刷されたバッジを受け取ってください",
-                    "ロビーエリアでお待ちください",
-                    "ホストがまもなくお迎えに来ます"
+                    "QRコードの写真を撮ってください。これがあなたの入館バッジになります。",
+                    "その後、ロビーで指示があるまでお待ちください。",
+                    "ホストが迎えに来るか、スタッフがご案内いたします。"
                 ]
             }
             // Add other language translations similarly...

@@ -126,7 +126,7 @@
 
         .screen.active {
             display: block;
-            margin-top: 100px;
+            /* margin-top: 100px; */
         }
 
         @keyframes slideIn {
