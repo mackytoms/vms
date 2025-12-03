@@ -62,7 +62,7 @@ function getDashboardStats($conn, $companyFilter = null) {
 function getRecentActivity($conn, $companyFilter = null) {
     $filterSQL = $companyFilter ? " AND v.company_visited = '" . $conn->real_escape_string($companyFilter) . "'" : "";
     
-    $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, e.name as host_name, v.company_visited
+    $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, e.name as host_name, v.company_visited, v.additional_notes
             FROM visits v 
             JOIN visitors vi ON v.visitor_id = vi.visitor_id 
             JOIN employees e ON v.host_employee_id = e.employee_id 
@@ -84,7 +84,7 @@ function getActiveVisits($conn, $companyFilter = null) {
     $filterSQL = $companyFilter ? " AND v.company_visited = '" . $conn->real_escape_string($companyFilter) . "'" : "";
     
     $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, vi.email, vi.phone, vi.photo,
-            e.name as host_name, d.name as department_name, v.company_visited
+            e.name as host_name, d.name as department_name, v.company_visited, v.additional_notes
             FROM visits v 
             JOIN visitors vi ON v.visitor_id = vi.visitor_id 
             JOIN employees e ON v.host_employee_id = e.employee_id
@@ -520,6 +520,9 @@ if ($companyFilter === 'Toms World') {
         .purpose-badge.delivery { background: rgba(243, 156, 18, 0.1); color: var(--primary-color); }
         .purpose-badge.service { background: rgba(13, 202, 240, 0.1); color: #0dcaf0; }
         .purpose-badge.training { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+        .purpose-badge.tour { background: rgba(108, 117, 125, 0.1); color: #6c757d; }
+        .purpose-badge.event { background: rgba(128, 0, 128, 0.1); color: #800080; }
+        .purpose-badge.other { background: rgba(33, 37, 41, 0.1); color: #212529; }
         .badge-number { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 2px 8px; border-radius: 6px; font-size: 0.85em; font-weight: 600; }
         .action-btn { padding: 5px 10px; border: none; background: none; cursor: pointer; font-size: 1.1em; transition: all 0.3s ease; }
         .action-btn:hover { transform: scale(1.2); }
@@ -533,7 +536,8 @@ if ($companyFilter === 'Toms World') {
         .info-grid .row { padding: 5px 0; border-bottom: 1px solid #e0e0e0; }
         .info-grid .row:last-child { border-bottom: none; }
         .user-filter-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.85em; margin-top: 10px; display: inline-block; }
-        .version-badge { position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 10px 20px; border-radius: 25px; font-size: 0.85em; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 999; }
+        .notes-text { font-size: 0.85em; color: #6c757d; font-style: italic; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .notes-text:hover { overflow: visible; white-space: normal; word-wrap: break-word; }
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.active { transform: translateX(0); }
@@ -578,13 +582,23 @@ if ($companyFilter === 'Toms World') {
         .modal-header.department-modal.pa-admin {
             background: linear-gradient(135deg, #e67e22, #d35400) !important;
         }
+        .notes-text {
+            font-size: 0.85em;
+            color: #6c757d;
+            font-style: italic;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .notes-text:hover {
+            overflow: visible;
+            white-space: normal;
+            word-wrap: break-word;
+        }
     </style>
 </head>
 <body>
-    <!-- <div class="version-badge">
-        <i class="bi bi-lightning-fill"></i> Enhanced v2.0
-    </div> -->
-
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
@@ -669,7 +683,7 @@ if ($companyFilter === 'Toms World') {
                 <table class="table table-hover" id="recentActivityTable">
                     <thead>
                         <tr>
-                            <th>Badge #</th><th>Visitor</th><th>Company</th><th>Host</th><th>Purpose</th><th>Visiting</th><th>Check-In</th><th>Status</th>
+                            <th>Badge #</th><th>Visitor</th><th>Company</th><th>Host</th><th>Purpose</th><th>Notes</th><th>Visiting</th><th>Check-In</th><th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="recentActivityTableBody">
@@ -689,6 +703,7 @@ if ($companyFilter === 'Toms World') {
                             <td><?php echo $activity['company']; ?></td>
                             <td><?php echo $activity['host_name']; ?></td>
                             <td><span class="purpose-badge <?php echo strtolower($activity['purpose']); ?>"><?php echo $activity['purpose']; ?></span></td>
+                            <td><span class="notes-text" title="<?php echo htmlspecialchars($activity['additional_notes'] ?? ''); ?>"><?php echo $activity['additional_notes'] ? htmlspecialchars($activity['additional_notes']) : '-'; ?></span></td>
                             <td><?php echo $companyBadge; ?></td>
                             <td><?php echo date('H:i:s', strtotime($activity['check_in_time'])); ?></td>
                             <td><?php echo $activity['check_out_time'] ? '<span class="status-badge checked-out">Checked Out</span>' : '<span class="status-badge checked-in">Checked In</span>'; ?></td>
@@ -713,7 +728,7 @@ if ($companyFilter === 'Toms World') {
                 <table class="table table-hover" id="activeVisitsTable">
                     <thead>
                         <tr>
-                            <th>Badge #</th><th>Visitor</th><th>Company</th><th>Host</th><th>Department</th><th>Purpose</th><th>Visiting</th><th>Check-In</th><th>Valid Until</th><th>Actions</th>
+                            <th>Badge #</th><th>Visitor</th><th>Company</th><th>Host</th><th>Department</th><th>Purpose</th><th>Notes</th><th>Visiting</th><th>Check-In</th><th>Valid Until</th><th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="activeVisitsTableBody"></tbody>
@@ -1158,6 +1173,7 @@ if ($companyFilter === 'Toms World') {
                         <td>${v.host_name}</td>
                         <td>${v.department_name}</td>
                         <td><span class="purpose-badge ${(v.purpose||'').toLowerCase()}">${v.purpose}</span></td>
+                        <td><span class="notes-text" title="${v.additional_notes || ''}">${v.additional_notes || '-'}</span></td>
                         <td>${getCompanyBadgeHTML(v.company_visited)}</td>
                         <td>${new Date(v.check_in_time).toLocaleString()}</td>
                         <td>${new Date(v.valid_until).toLocaleString()}</td>
@@ -1192,26 +1208,6 @@ if ($companyFilter === 'Toms World') {
                 })
                 .catch(e => console.error('Error loading visitors:', e));
         }
-
-        // function loadEmployees() {
-        //     loadDepartmentsForSelect();
-        //     fetch('?action=employees')
-        //         .then(r => r.json())
-        //         .then(data => {
-        //             initDataTable('employeeTable', data, (e) => `
-        //                 <td>${e.employee_id}</td>
-        //                 <td><strong>${e.name}</strong></td>
-        //                 <td>${e.email}</td>
-        //                 <td>${e.department_name}</td>
-        //                 <td><span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}">${e.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
-        //                 <td>
-        //                     ${e.total_visits || 0}
-        //                     ${e.total_visits > 0 ? `<button class="btn btn-sm btn-link" onclick="viewEmployeeHistory('${e.employee_id}', '${e.name}')" title="View History"><i class="bi bi-clock-history"></i></button>` : ''}
-        //                 </td>
-        //             `);
-        //         })
-        //         .catch(e => console.error('Error loading employees:', e));
-        // }
 
         function loadEmployees() {
             loadDepartmentsForSelect();
@@ -1275,7 +1271,7 @@ if ($companyFilter === 'Toms World') {
                                 showConfirmButton: false,
                                 timer: 2000
                             });
-                            loadEmployees(); // Reload the table
+                            loadEmployees();
                         } else {
                             Swal.fire('Error', data.error || 'Failed to update employee status', 'error');
                         }
@@ -1414,11 +1410,9 @@ if ($companyFilter === 'Toms World') {
                 });
         }
 
-        // NEW: View Visitor History
         function viewVisitorHistory(visitorId, visitorName) {
             document.getElementById('visitorHistoryName').textContent = visitorName;
             
-            // Destroy existing DataTable if it exists
             if ($.fn.DataTable.isDataTable('#visitorHistoryTable')) {
                 $('#visitorHistoryTable').DataTable().clear().destroy();
             }
@@ -1463,7 +1457,6 @@ if ($companyFilter === 'Toms World') {
                             tbody.appendChild(tr);
                         });
                         
-                        // Initialize DataTable
                         dataTableInstances['visitorHistoryTable'] = $('#visitorHistoryTable').DataTable({
                             pageLength: 10,
                             order: [[4, 'desc']],
@@ -1482,11 +1475,9 @@ if ($companyFilter === 'Toms World') {
                 });
         }
 
-        // NEW: View Employee Visit History
         function viewEmployeeHistory(employeeId, employeeName) {
             document.getElementById('employeeHistoryName').textContent = employeeName;
             
-            // Destroy existing DataTable if it exists
             if ($.fn.DataTable.isDataTable('#employeeHistoryTable')) {
                 $('#employeeHistoryTable').DataTable().clear().destroy();
             }
@@ -1531,7 +1522,6 @@ if ($companyFilter === 'Toms World') {
                             tbody.appendChild(tr);
                         });
                         
-                        // Initialize DataTable
                         dataTableInstances['employeeHistoryTable'] = $('#employeeHistoryTable').DataTable({
                             pageLength: 10,
                             order: [[4, 'desc']],
@@ -1550,11 +1540,9 @@ if ($companyFilter === 'Toms World') {
                 });
         }
 
-        // NEW: View Department Employees
         function viewDepartmentEmployees(departmentCode, departmentName) {
             document.getElementById('departmentEmployeesName').textContent = departmentName;
             
-            // Destroy existing DataTable if it exists
             if ($.fn.DataTable.isDataTable('#departmentEmployeesTable')) {
                 $('#departmentEmployeesTable').DataTable().clear().destroy();
             }
@@ -1584,7 +1572,6 @@ if ($companyFilter === 'Toms World') {
                             tbody.appendChild(tr);
                         });
                         
-                        // Initialize DataTable
                         dataTableInstances['departmentEmployeesTable'] = $('#departmentEmployeesTable').DataTable({
                             pageLength: 10,
                             order: [[1, 'asc']],
@@ -1689,6 +1676,7 @@ if ($companyFilter === 'Toms World') {
                                 <td>${a.company}</td>
                                 <td>${a.host_name}</td>
                                 <td><span class="purpose-badge ${(a.purpose||'').toLowerCase()}">${a.purpose}</span></td>
+                                <td><span class="notes-text" title="${a.additional_notes || ''}">${a.additional_notes || '-'}</span></td>
                                 <td>${getCompanyBadgeHTML(a.company_visited)}</td>
                                 <td>${new Date(a.check_in_time).toLocaleTimeString()}</td>
                                 <td>${a.check_out_time ? '<span class="status-badge checked-out">Checked Out</span>' : '<span class="status-badge checked-in">Checked In</span>'}</td>
@@ -1760,7 +1748,6 @@ if ($companyFilter === 'Toms World') {
                 $('#recentActivityTable').DataTable({ pageLength: 10, order: [] });
             }
             
-            // Clean up DataTables when modals are hidden
             $('#visitorHistoryModal').on('hidden.bs.modal', function () {
                 if ($.fn.DataTable.isDataTable('#visitorHistoryTable')) {
                     $('#visitorHistoryTable').DataTable().clear().destroy();

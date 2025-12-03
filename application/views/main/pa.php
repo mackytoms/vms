@@ -32,10 +32,10 @@
                     <p class="welcome-submessage" data-translate="selectLanguage">Please select your preferred language</p>
                     
                     <div class="language-selector">
+                        <button class="language-btn" onclick="selectLanguage('fil')">Filipino</button>
                         <button class="language-btn active" onclick="selectLanguage('en')">English</button>
                         <button class="language-btn" onclick="selectLanguage('zh-TW')">繁體中文</button>
                         <button class="language-btn" onclick="selectLanguage('zh-CN')">简体中文</button>
-                        <button class="language-btn" onclick="selectLanguage('fil')">Filipino</button>
                         <button class="language-btn" onclick="selectLanguage('ja')">日本語</button>
                     </div>
 
@@ -82,13 +82,13 @@
                     
                     <div id="qr-reader"></div>
                     
-                    <div class="qr-upload-section">
+                    <!-- <div class="qr-upload-section">
                         <p class="text-muted mb-3" data-translate="orUploadQR">Or upload QR code image</p>
                         <label class="qr-upload-btn">
                             <i class="bi bi-upload"></i> <span data-translate="uploadQR">Upload QR Code</span>
                             <input type="file" accept="image/*" onchange="handleQRUpload(this)">
                         </label>
-                    </div>
+                    </div> -->
 
                     <div class="nav-buttons">
                         <button class="btn-large btn-back" onclick="previousScreen()">
@@ -143,7 +143,6 @@
                                         required
                                         maxlength="10"
                                         pattern="^[9][0-9]{9}$"
-                                        placeholder="9123456789"
                                     >
                                     <div class="invalid-feedback" data-translate="phoneInvalid">
                                         Please enter a valid Philippine mobile number
@@ -284,10 +283,10 @@
                             <i class="bi bi-calendar-event" style="color: purple;"></i>
                             <h5 data-translate="event">Event</h5>
                         </div>
-                        <!-- <div class="purpose-card" onclick="selectPurpose('other', this)">
+                        <div class="purpose-card" onclick="selectPurpose('other', this)">
                             <i class="bi bi-three-dots text-dark"></i>
                             <h5 data-translate="other">Other</h5>
-                        </div> -->
+                        </div>
                     </div>
 
                     <div class="form-group mt-3">
@@ -1549,22 +1548,72 @@
         //     }
         // }
 
-        // Initialize QR Scanner
+        // // Initialize QR Scanner
+        // function initQRScanner() {
+        //     if (html5QrCode) {
+        //         html5QrCode.stop();
+        //     }
+            
+        //     html5QrCode = new Html5Qrcode("qr-reader");
+            
+        //     const config = { 
+        //         fps: 10, 
+        //         qrbox: { width: 250, height: 250 },
+        //         aspectRatio: 1.0,
+        //         disableFlip: false,
+        //         experimentalFeatures: {
+        //             useBarCodeDetectorIfSupported: true
+        //         }
+        //     };
+            
+        //     html5QrCode.start(
+        //         { facingMode: "environment" },
+        //         config,
+        //         (decodedText) => {
+        //             console.log('QR scanned:', decodedText);
+        //             handleQRCodeSuccess(decodedText);
+        //         },
+        //         (error) => {
+        //             // Ignore continuous scan errors
+        //         }
+        //     ).catch((err) => {
+        //         console.error("Unable to start QR scanner:", err);
+                
+        //         html5QrCode.start(
+        //             { facingMode: "user" },
+        //             config,
+        //             (decodedText) => {
+        //                 handleQRCodeSuccess(decodedText);
+        //             },
+        //             (error) => {}
+        //         ).catch((err2) => {
+        //             showNotification("Camera not available for QR scanning");
+        //         });
+        //     });
+        // }
+
         function initQRScanner() {
             if (html5QrCode) {
-                html5QrCode.stop();
+                html5QrCode.stop().catch(() => {});
             }
             
             html5QrCode = new Html5Qrcode("qr-reader");
             
+            // OPTIMIZED CONFIG - More flexible QR reading
             const config = { 
-                fps: 10, 
-                qrbox: { width: 250, height: 250 },
+                fps: 15, // Increased from 10 for faster detection
+                qrbox: { width: 300, height: 300 }, // Larger scanning area
                 aspectRatio: 1.0,
                 disableFlip: false,
+                // ENHANCED EXPERIMENTAL FEATURES
                 experimentalFeatures: {
                     useBarCodeDetectorIfSupported: true
-                }
+                },
+                // ADD THESE FOR BETTER DETECTION:
+                formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+                // More lenient settings
+                rememberLastUsedCamera: true,
+                supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
             };
             
             html5QrCode.start(
@@ -1580,6 +1629,7 @@
             ).catch((err) => {
                 console.error("Unable to start QR scanner:", err);
                 
+                // Fallback to front camera with same optimized config
                 html5QrCode.start(
                     { facingMode: "user" },
                     config,
@@ -1889,19 +1939,57 @@
                 document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
             }
             
-            // AUTO-SELECT DELIVERY PURPOSE IF VISITOR TYPE IS DELIVERY
+            // // AUTO-SELECT DELIVERY PURPOSE IF VISITOR TYPE IS DELIVERY
+            // if (screenNumber === 6) { // Purpose screen
+            //     if (visitorData.type === 'delivery') {
+            //         setTimeout(() => {
+            //             const deliveryCard = Array.from(document.querySelectorAll('.purpose-card'))
+            //                 .find(card => card.getAttribute('onclick').includes("'delivery'"));
+                        
+            //             if (deliveryCard) {
+            //                 document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
+            //                 deliveryCard.classList.add('selected');
+            //                 selectedPurpose = 'delivery';
+            //                 visitorData.purpose = 'delivery';
+            //                 document.getElementById('purposeNextBtn').disabled = false;
+            //                 showNotification('Delivery purpose auto-selected based on your visit type');
+            //             }
+            //         }, 100);
+            //     }
+            // }
+
+            // Replace the existing screen 6 handling with this enhanced version:
             if (screenNumber === 6) { // Purpose screen
+                // Reset all cards first
+                document.querySelectorAll('.purpose-card').forEach(card => {
+                    card.classList.remove('selected', 'disabled');
+                    card.style.opacity = '1';
+                    card.style.cursor = 'pointer';
+                    card.style.pointerEvents = 'auto';
+                });
+                
                 if (visitorData.type === 'delivery') {
                     setTimeout(() => {
                         const deliveryCard = Array.from(document.querySelectorAll('.purpose-card'))
-                            .find(card => card.getAttribute('onclick').includes("'delivery'"));
+                            .find(card => card.getAttribute('onclick')?.includes("'delivery'"));
                         
                         if (deliveryCard) {
-                            document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
+                            // Auto-select delivery
                             deliveryCard.classList.add('selected');
                             selectedPurpose = 'delivery';
                             visitorData.purpose = 'delivery';
                             document.getElementById('purposeNextBtn').disabled = false;
+                            
+                            // Disable all other purpose cards
+                            document.querySelectorAll('.purpose-card').forEach(card => {
+                                if (card !== deliveryCard) {
+                                    card.classList.add('disabled');
+                                    card.style.opacity = '0.4';
+                                    card.style.cursor = 'not-allowed';
+                                    card.style.pointerEvents = 'none';
+                                }
+                            });
+                            
                             showNotification('Delivery purpose auto-selected based on your visit type');
                         }
                     }, 100);
@@ -1953,10 +2041,41 @@
             }
         }
 
-        // Optional: Modify the selectPurpose function to handle pre-selection better
+        // // Optional: Modify the selectPurpose function to handle pre-selection better
+        // function selectPurpose(purpose, element) {
+        //     // Clear all selections
+        //     document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
+            
+        //     // Add selection to clicked element
+        //     if (element) {
+        //         element.classList.add('selected');
+        //     } else {
+        //         // If no element provided (auto-selection), find and select the card
+        //         const card = Array.from(document.querySelectorAll('.purpose-card'))
+        //             .find(c => c.getAttribute('onclick').includes(`'${purpose}'`));
+        //         if (card) {
+        //             card.classList.add('selected');
+        //         }
+        //     }
+            
+        //     selectedPurpose = purpose;
+        //     visitorData.purpose = purpose;
+        //     document.getElementById('purposeNextBtn').disabled = false;
+        // }
+
+        // Update selectPurpose function to prevent selection when disabled:
         function selectPurpose(purpose, element) {
-            // Clear all selections
-            document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
+            // Check if card is disabled
+            if (element && element.classList.contains('disabled')) {
+                return; // Do nothing if disabled
+            }
+            
+            // Clear all selections (but keep disabled state)
+            document.querySelectorAll('.purpose-card').forEach(card => {
+                if (!card.classList.contains('disabled')) {
+                    card.classList.remove('selected');
+                }
+            });
             
             // Add selection to clicked element
             if (element) {
@@ -1964,8 +2083,8 @@
             } else {
                 // If no element provided (auto-selection), find and select the card
                 const card = Array.from(document.querySelectorAll('.purpose-card'))
-                    .find(c => c.getAttribute('onclick').includes(`'${purpose}'`));
-                if (card) {
+                    .find(c => c.getAttribute('onclick')?.includes(`'${purpose}'`));
+                if (card && !card.classList.contains('disabled')) {
                     card.classList.add('selected');
                 }
             }
@@ -3347,7 +3466,12 @@
             document.getElementById('photoNextBtn').style.display = 'none';
             document.getElementById('hostNextBtn').disabled = true;
             document.getElementById('purposeNextBtn').disabled = true;
-            document.getElementById('agreeNextBtn').disabled = true;
+            document.getElementById('agreeNextBtn').disabled = true;            
+
+            // Hard refresh the page
+            // window.location.href = window.location.href.split('?')[0]; // Removes any query parameters
+            // OR use this for a complete reload:
+            window.location.reload(true); // true forces reload from server, not cache
             
             showScreen(1);
         }

@@ -834,6 +834,30 @@
         #visitNotes {
             text-transform: lowercase !important;
         }
+
+        .purpose-card.disabled {
+            opacity: 0.4 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+            position: relative;
+        }
+
+        .purpose-card.disabled::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(128, 128, 128, 0.3);
+            border-radius: 12px;
+        }
+
+        .purpose-card.selected {
+            border: 3px solid #1e9338 !important;
+            background: #1e93381a;
+            color: #1e9338;
+        }
     </style>
 </head>
 <body>
