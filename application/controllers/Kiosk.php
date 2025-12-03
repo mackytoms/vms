@@ -44,8 +44,10 @@ class Kiosk extends CI_Controller {
         echo json_encode(['status' => 'success', 'employees' => $employees]);
     }
 
-    // In your Kiosk.php controller, update the complete_checkin method:
     public function complete_checkin() {
+        // SET TIMEZONE FIRST - This is the key fix!
+        date_default_timezone_set('Asia/Manila');
+        
         // Get JSON input
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
@@ -74,8 +76,8 @@ class Kiosk extends CI_Controller {
                 'phone' => $data['phone'],
                 'company' => $data['company'],
                 'visitor_type' => $data['type'],
-                'company_visited' => $company_visited,  // Update company visited
-                'updated_at' => date('Y-m-d H:i:s')
+                'company_visited' => $company_visited,
+                'updated_at' => date('Y-m-d H:i:s')  // Now uses Asia/Manila timezone
             ];
             
             // Update photo only if new one is provided
@@ -95,8 +97,8 @@ class Kiosk extends CI_Controller {
                 'company' => $data['company'],
                 'photo' => isset($data['photo']) ? $data['photo'] : null,
                 'visitor_type' => $data['type'],
-                'company_visited' => $company_visited,  // Set company visited
-                'created_at' => date('Y-m-d H:i:s')
+                'company_visited' => $company_visited,
+                'created_at' => date('Y-m-d H:i:s')  // Now uses Asia/Manila timezone
             ];
             
             $this->db->insert('visitors', $visitor_data);
@@ -104,19 +106,24 @@ class Kiosk extends CI_Controller {
         }
         
         // Create visit record
-        $check_in_time = date('Y-m-d H:i:s');
-        $valid_until = date('Y-m-d H:i:s', strtotime('+8 hours'));
+        // Use client-provided time if available, otherwise use server time (now in correct timezone)
+        $check_in_time = isset($data['check_in_time']) && !empty($data['check_in_time']) 
+            ? $data['check_in_time'] 
+            : date('Y-m-d H:i:s');
+        
+        // Calculate valid_until as 8 hours from check_in_time
+        $valid_until = date('Y-m-d H:i:s', strtotime($check_in_time . ' +8 hours'));
         
         $visit_data = [
             'visitor_id' => $visitor_id,
             'host_employee_id' => $data['host']['id'],
             'purpose' => $data['purpose'],
             'additional_notes' => isset($data['notes']) ? $data['notes'] : null,
-            'check_in_time' => $check_in_time,
-            'valid_until' => $valid_until,
+            'check_in_time' => $check_in_time,  // Now uses Asia/Manila timezone
+            'valid_until' => $valid_until,      // Now uses Asia/Manila timezone
             'terms_accepted' => 1,
             'photo_consent' => 1,
-            'company_visited' => $company_visited  // Set company visited for the visit
+            'company_visited' => $company_visited
         ];
         
         $this->db->insert('visits', $visit_data);
@@ -132,6 +139,9 @@ class Kiosk extends CI_Controller {
             return;
         }
         
+        // Log for debugging (optional - remove in production)
+        log_message('info', 'Check-in completed at: ' . $check_in_time . ' (Asia/Manila)');
+        
         // Return success response
         echo json_encode([
             'status' => 'success',
@@ -142,6 +152,7 @@ class Kiosk extends CI_Controller {
                 'visitor_name' => $data['firstName'] . ' ' . $data['lastName'],
                 'company' => $data['company'],
                 'host_name' => $data['host']['name'],
+                'check_in_time' => $check_in_time,  // Send back for verification
                 'valid_until' => $valid_until,
                 'company_visited' => $company_visited
             ]

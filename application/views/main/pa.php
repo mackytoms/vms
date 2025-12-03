@@ -1326,6 +1326,18 @@
             setInterval(updateDateTime, 1000);
             translatePage();
             populateDepartments();
+
+            // ADD THIS SECTION - Auto-convert to lowercase
+            const textInputs = document.querySelectorAll('#firstName, #lastName, #email, #phone, #company, #visitNotes');
+            textInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.toLowerCase();
+                });
+                input.addEventListener('blur', function() {
+                    this.value = this.value.toLowerCase();
+                });
+            });
+            
         });
 
         // Update date and time
@@ -2570,89 +2582,89 @@
 
 
 
-        // Updated completeCheckIn function to connect with database
-        function completeCheckIn() {
-            showLoading();
+        // // Updated completeCheckIn function to connect with database
+        // function completeCheckIn() {
+        //     showLoading();
             
-            // Prepare data for database insertion
-            const checkInData = {
-                firstName: visitorData.firstName,
-                lastName: visitorData.lastName,
-                email: visitorData.email,
-                phone: visitorData.phone,
-                company: visitorData.company,
-                photo: visitorData.photo || null,
-                type: visitorData.type,
-                host: {
-                    id: selectedHost.id || selectedHost.employeeId,
-                    name: selectedHost.name,
-                    email: selectedHost.email,
-                    department: selectedHost.department,
-                    departmentCode: selectedHost.departmentCode
-                },
-                purpose: selectedPurpose,
-                notes: visitorData.notes || null,
-                booking_code: visitorData.booking_code || null
-            };
+        //     // Prepare data for database insertion
+        //     const checkInData = {
+        //         firstName: visitorData.firstName,
+        //         lastName: visitorData.lastName,
+        //         email: visitorData.email,
+        //         phone: visitorData.phone,
+        //         company: visitorData.company,
+        //         photo: visitorData.photo || null,
+        //         type: visitorData.type,
+        //         host: {
+        //             id: selectedHost.id || selectedHost.employeeId,
+        //             name: selectedHost.name,
+        //             email: selectedHost.email,
+        //             department: selectedHost.department,
+        //             departmentCode: selectedHost.departmentCode
+        //         },
+        //         purpose: selectedPurpose,
+        //         notes: visitorData.notes || null,
+        //         booking_code: visitorData.booking_code || null
+        //     };
             
-            // Send data to server for database insertion
-            fetch('<?= base_url("kiosk/complete_checkin") ?>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(checkInData)
-            })
-            .then(response => response.json())
-            .then(result => {
-                hideLoading();
+        //     // Send data to server for database insertion
+        //     fetch('<?= base_url("kiosk/complete_checkin") ?>', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'X-Requested-With': 'XMLHttpRequest'
+        //         },
+        //         body: JSON.stringify(checkInData)
+        //     })
+        //     .then(response => response.json())
+        //     .then(result => {
+        //         hideLoading();
                 
-                if (result.status === 'success') {
-                    // Update success screen with actual data from database
-                    updateSuccessScreen(result.data);
+        //         if (result.status === 'success') {
+        //             // Update success screen with actual data from database
+        //             updateSuccessScreen(result.data);
                     
-                    // Update step indicator to show final step
-                    updateStepIndicator(8);
+        //             // Update step indicator to show final step
+        //             updateStepIndicator(8);
                     
-                    // Show success screen
-                    showScreen(8);
+        //             // Show success screen
+        //             showScreen(8);
                     
-                    // Start countdown timer
-                    startCountdown();
+        //             // Start countdown timer
+        //             startCountdown();
                     
-                    console.log('Check-in successful:', result.data);
+        //             console.log('Check-in successful:', result.data);
                     
-                    // Store photo locally if available (for QR code reference)
-                    if (visitorData.photo && result.data.visit_id) {
-                        try {
-                            localStorage.setItem(`visitor_photo_${result.data.visit_id}`, visitorData.photo);
-                        } catch (e) {
-                            console.error('Could not store photo:', e);
-                        }
-                    }
-                } else {
-                    // Show error message
-                    Swal.fire({
-                        title: 'Check-in Failed',
-                        text: result.message || 'An error occurred during check-in. Please try again.',
-                        icon: 'error',
-                        confirmButtonColor: '#e74c3c'
-                    });
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Check-in error:', error);
+        //             // Store photo locally if available (for QR code reference)
+        //             if (visitorData.photo && result.data.visit_id) {
+        //                 try {
+        //                     localStorage.setItem(`visitor_photo_${result.data.visit_id}`, visitorData.photo);
+        //                 } catch (e) {
+        //                     console.error('Could not store photo:', e);
+        //                 }
+        //             }
+        //         } else {
+        //             // Show error message
+        //             Swal.fire({
+        //                 title: 'Check-in Failed',
+        //                 text: result.message || 'An error occurred during check-in. Please try again.',
+        //                 icon: 'error',
+        //                 confirmButtonColor: '#e74c3c'
+        //             });
+        //         }
+        //     })
+        //     .catch(error => {
+        //         hideLoading();
+        //         console.error('Check-in error:', error);
                 
-                Swal.fire({
-                    title: 'Connection Error',
-                    text: 'Unable to connect to the server. Please check your connection and try again.',
-                    icon: 'error',
-                    confirmButtonColor: '#e74c3c'
-                });
-            });
-        }
+        //         Swal.fire({
+        //             title: 'Connection Error',
+        //             text: 'Unable to connect to the server. Please check your connection and try again.',
+        //             icon: 'error',
+        //             confirmButtonColor: '#e74c3c'
+        //         });
+        //     });
+        // }
 
         // // Update success screen with actual database data
         // function updateSuccessScreen(data) {
@@ -3178,9 +3190,23 @@
         //     });
         // }
 
-        // UPDATED: Complete check-in function with QR generation
         function completeCheckIn() {
             showLoading();
+            
+            // Get current time in Philippines timezone
+            const now = new Date();
+            const phTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+            
+            // Format as MySQL datetime: YYYY-MM-DD HH:MM:SS
+            const formatDateTime = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            };
             
             // Prepare data for database insertion
             const checkInData = {
@@ -3201,8 +3227,17 @@
                 purpose: selectedPurpose,
                 notes: visitorData.notes || null,
                 booking_code: visitorData.booking_code || null,
-                company_visited: COMPANY_VISITED
+                company_visited: COMPANY_VISITED,
+                // ADD THESE LINES FOR TIMEZONE FIX:
+                check_in_time: formatDateTime(phTime),
+                client_timezone: 'Asia/Manila',
+                timezone_offset: now.getTimezoneOffset()
             };
+            
+            // Debug: Log times to console
+            console.log('Browser time:', now.toString());
+            console.log('Philippines time:', phTime.toString());
+            console.log('Sending to DB:', checkInData.check_in_time);
             
             // Send data to server for database insertion
             fetch('<?= base_url("kiosk/complete_checkin") ?>', {

@@ -1,11 +1,13 @@
 <?php
 // Database configuration
 $servername = "localhost";
+
 // $username = "root";
 // $password = "";
 
 $username = "itsdT0ms";
 $password = "(GrYXU4fOY)wVOr4";
+
 $dbname = "vms";
 
 // Create connection
@@ -28,7 +30,7 @@ function getCompanyFilter($username) {
     } elseif ($username === 'pa_admin') {
         return 'Pan Asia';
     }
-    return null; // No filter for super admin
+    return null;
 }
 
 $companyFilter = getCompanyFilter($logged_in_user);
@@ -224,11 +226,71 @@ function getVisitById($conn, $visit_id) {
     return null;
 }
 
+// NEW FUNCTIONS FOR ENHANCED FEATURES
+function getVisitorHistory($conn, $visitor_id) {
+    $visitor_id = $conn->real_escape_string($visitor_id);
+    $sql = "SELECT v.*, e.name as host_name, d.name as department_name
+            FROM visits v 
+            JOIN employees e ON v.host_employee_id = e.employee_id
+            JOIN departments d ON e.department_code = d.department_code
+            WHERE v.visitor_id = $visitor_id
+            ORDER BY v.check_in_time DESC";
+    
+    $result = $conn->query($sql);
+    $visits = array();
+    
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $visits[] = $row;
+        }
+    }
+    return $visits;
+}
+
+function getEmployeeVisitHistory($conn, $employee_id) {
+    $employee_id = $conn->real_escape_string($employee_id);
+    $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, vi.email, vi.phone
+            FROM visits v 
+            JOIN visitors vi ON v.visitor_id = vi.visitor_id
+            WHERE v.host_employee_id = '$employee_id'
+            ORDER BY v.check_in_time DESC";
+    
+    $result = $conn->query($sql);
+    $visits = array();
+    
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $visits[] = $row;
+        }
+    }
+    return $visits;
+}
+
+function getEmployeesByDepartment($conn, $department_code) {
+    $department_code = $conn->real_escape_string($department_code);
+    $sql = "SELECT e.*, d.name as department_name, COUNT(v.visit_id) as total_visits 
+            FROM employees e 
+            JOIN departments d ON e.department_code = d.department_code
+            LEFT JOIN visits v ON e.employee_id = v.host_employee_id
+            WHERE e.department_code = '$department_code'
+            GROUP BY e.employee_id
+            ORDER BY e.name";
+    
+    $result = $conn->query($sql);
+    $employees = array();
+    
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $employees[] = $row;
+        }
+    }
+    return $employees;
+}
+
 // Handle AJAX requests
 if(isset($_GET['action'])) {
     header('Content-Type: application/json');
     
-    // Get company filter from request or session
     $ajaxCompanyFilter = isset($_GET['company_filter']) ? $_GET['company_filter'] : null;
     if ($ajaxCompanyFilter === 'null' || $ajaxCompanyFilter === '') {
         $ajaxCompanyFilter = null;
@@ -268,6 +330,24 @@ if(isset($_GET['action'])) {
         case 'dashboard_stats_by_company':
             echo json_encode(getDashboardStatsByCompany($conn, $ajaxCompanyFilter));
             break;
+        case 'visitor_history':
+            if(isset($_GET['visitor_id'])) {
+                $history = getVisitorHistory($conn, $_GET['visitor_id']);
+                echo json_encode($history);
+            }
+            break;
+        case 'employee_history':
+            if(isset($_GET['employee_id'])) {
+                $history = getEmployeeVisitHistory($conn, $_GET['employee_id']);
+                echo json_encode($history);
+            }
+            break;
+        case 'department_employees':
+            if(isset($_GET['department_code'])) {
+                $employees = getEmployeesByDepartment($conn, $_GET['department_code']);
+                echo json_encode($employees);
+            }
+            break;
         case 'checkout':
             if(isset($_POST['visit_id'])) {
                 $visit_id = $conn->real_escape_string($_POST['visit_id']);
@@ -303,6 +383,20 @@ if(isset($_GET['action'])) {
                 }
             }
             break;
+        case 'toggle_employee_status':
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $employee_id = $conn->real_escape_string($_POST['employee_id']);
+                $new_status = isset($_POST['new_status']) ? intval($_POST['new_status']) : 0;
+                
+                $sql = "UPDATE employees SET is_active = $new_status WHERE employee_id = '$employee_id'";
+                
+                if($conn->query($sql)) {
+                    echo json_encode(['success' => true, 'new_status' => $new_status]);
+                } else {
+                    echo json_encode(['success' => false, 'error' => $conn->error]);
+                }
+            }
+            break;
         case 'add_department':
             if($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $department_code = $conn->real_escape_string($_POST['department_code']);
@@ -327,7 +421,6 @@ $dashboardStats = getDashboardStats($conn, $companyFilter);
 $recentActivity = getRecentActivity($conn, $companyFilter);
 $activeVisits = getActiveVisits($conn, $companyFilter);
 
-// Determine display title based on user
 $pageTitle = "Tom's World & Pan-Asia";
 $welcomeMessage = "Welcome back! Here's what's happening today at Tom's World & Pan-Asia.";
 if ($companyFilter === 'Toms World') {
@@ -431,6 +524,7 @@ if ($companyFilter === 'Toms World') {
         .info-grid .row { padding: 5px 0; border-bottom: 1px solid #e0e0e0; }
         .info-grid .row:last-child { border-bottom: none; }
         .user-filter-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.85em; margin-top: 10px; display: inline-block; }
+        .version-badge { position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 10px 20px; border-radius: 25px; font-size: 0.85em; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 999; }
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.active { transform: translateX(0); }
@@ -440,6 +534,10 @@ if ($companyFilter === 'Toms World') {
     </style>
 </head>
 <body>
+    <!-- <div class="version-badge">
+        <i class="bi bi-lightning-fill"></i> Enhanced v2.0
+    </div> -->
+
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
@@ -820,6 +918,118 @@ if ($companyFilter === 'Toms World') {
         </div>
     </div>
 
+    <!-- NEW: Visitor History Modal -->
+    <div class="modal fade" id="visitorHistoryModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white;">
+                    <h5 class="modal-title"><i class="bi bi-clock-history"></i> Visitor History</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3 p-3 bg-light rounded">
+                        <h5 id="visitorHistoryName" class="text-primary mb-0"></h5>
+                        <small class="text-muted">Complete visit history</small>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="visitorHistoryTable">
+                            <thead>
+                                <tr>
+                                    <th>Badge #</th>
+                                    <th>Host</th>
+                                    <th>Department</th>
+                                    <th>Purpose</th>
+                                    <th>Check-In</th>
+                                    <th>Check-Out</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="visitorHistoryTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Employee Visit History Modal -->
+    <div class="modal fade" id="employeeHistoryModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white;">
+                    <h5 class="modal-title"><i class="bi bi-person-lines-fill"></i> Employee Visit History</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3 p-3 bg-light rounded">
+                        <h5 id="employeeHistoryName" class="text-primary mb-0"></h5>
+                        <small class="text-muted">All visits hosted by this employee</small>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="employeeHistoryTable">
+                            <thead>
+                                <tr>
+                                    <th>Badge #</th>
+                                    <th>Visitor Name</th>
+                                    <th>Company</th>
+                                    <th>Purpose</th>
+                                    <th>Check-In</th>
+                                    <th>Check-Out</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeeHistoryTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Department Employees Modal -->
+    <div class="modal fade" id="departmentEmployeesModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #e67e22, #d35400); color: white;">
+                    <h5 class="modal-title"><i class="bi bi-people-fill"></i> Department Employees</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3 p-3 bg-light rounded">
+                        <h5 id="departmentEmployeesName" class="text-primary mb-0"></h5>
+                        <small class="text-muted">All employees in this department</small>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="departmentEmployeesTable">
+                            <thead>
+                                <tr>
+                                    <th>Employee ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Total Visits Hosted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="departmentEmployeesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -827,7 +1037,6 @@ if ($companyFilter === 'Toms World') {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
-        // Company filter from PHP - passed to JavaScript
         const companyFilter = <?php echo json_encode($companyFilter); ?>;
         const filterParam = companyFilter ? `&company_filter=${encodeURIComponent(companyFilter)}` : '&company_filter=null';
         
@@ -928,11 +1137,34 @@ if ($companyFilter === 'Toms World') {
                         <td><span class="badge bg-info">${v.visitor_type || 'new'}</span></td>
                         <td>${v.total_visits || 0}</td>
                         <td>${v.last_visit ? new Date(v.last_visit).toLocaleDateString() : 'N/A'}</td>
-                        <td><button class="action-btn view" onclick="viewVisitor(${v.visitor_id})" title="View"><i class="bi bi-eye"></i></button></td>
+                        <td>
+                            <button class="action-btn view" onclick="viewVisitor(${v.visitor_id})" title="View Details"><i class="bi bi-eye"></i></button>
+                            <button class="action-btn" style="color: #3498db;" onclick="viewVisitorHistory(${v.visitor_id}, '${v.first_name} ${v.last_name}')" title="View History"><i class="bi bi-clock-history"></i></button>
+                        </td>
                     `);
                 })
                 .catch(e => console.error('Error loading visitors:', e));
         }
+
+        // function loadEmployees() {
+        //     loadDepartmentsForSelect();
+        //     fetch('?action=employees')
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             initDataTable('employeeTable', data, (e) => `
+        //                 <td>${e.employee_id}</td>
+        //                 <td><strong>${e.name}</strong></td>
+        //                 <td>${e.email}</td>
+        //                 <td>${e.department_name}</td>
+        //                 <td><span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}">${e.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
+        //                 <td>
+        //                     ${e.total_visits || 0}
+        //                     ${e.total_visits > 0 ? `<button class="btn btn-sm btn-link" onclick="viewEmployeeHistory('${e.employee_id}', '${e.name}')" title="View History"><i class="bi bi-clock-history"></i></button>` : ''}
+        //                 </td>
+        //             `);
+        //         })
+        //         .catch(e => console.error('Error loading employees:', e));
+        // }
 
         function loadEmployees() {
             loadDepartmentsForSelect();
@@ -944,11 +1176,69 @@ if ($companyFilter === 'Toms World') {
                         <td><strong>${e.name}</strong></td>
                         <td>${e.email}</td>
                         <td>${e.department_name}</td>
-                        <td><span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}">${e.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
-                        <td>${e.total_visits || 0}</td>
+                        <td>
+                            <span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+                                style="cursor: pointer;" 
+                                onclick="toggleEmployeeStatus('${e.employee_id}', ${e.is_active}, '${e.name.replace(/'/g, "\\'")}')" 
+                                title="Click to ${e.is_active == 1 ? 'deactivate' : 'activate'}">
+                                ${e.is_active == 1 ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td>
+                            ${e.total_visits || 0}
+                            ${e.total_visits > 0 ? `<button class="btn btn-sm btn-link" onclick="viewEmployeeHistory('${e.employee_id}', '${e.name}')" title="View History"><i class="bi bi-clock-history"></i></button>` : ''}
+                        </td>
                     `);
                 })
                 .catch(e => console.error('Error loading employees:', e));
+        }
+
+        function toggleEmployeeStatus(employeeId, currentStatus, employeeName) {
+            const newStatus = currentStatus == 1 ? 0 : 1;
+            const actionText = newStatus == 1 ? 'activate' : 'deactivate';
+            const statusText = newStatus == 1 ? 'Active' : 'Inactive';
+            
+            Swal.fire({
+                title: `${actionText.charAt(0).toUpperCase() + actionText.slice(1)} Employee?`,
+                html: `Are you sure you want to ${actionText} <strong>${employeeName}</strong>?<br><small class="text-muted">Status will be changed to: ${statusText}</small>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: newStatus == 1 ? '#27ae60' : '#95a5a6',
+                cancelButtonColor: '#95a5a6',
+                confirmButtonText: `Yes, ${actionText.charAt(0).toUpperCase() + actionText.slice(1)}`,
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('employee_id', employeeId);
+                    formData.append('new_status', newStatus);
+                    
+                    fetch('?action=toggle_employee_status', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: `Employee ${actionText}d successfully`,
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                            loadEmployees(); // Reload the table
+                        } else {
+                            Swal.fire('Error', data.error || 'Failed to update employee status', 'error');
+                        }
+                    })
+                    .catch(e => {
+                        console.error('Error:', e);
+                        Swal.fire('Error', 'Failed to update employee status', 'error');
+                    });
+                }
+            });
         }
 
         function loadDepartments() {
@@ -958,7 +1248,10 @@ if ($companyFilter === 'Toms World') {
                     initDataTable('departmentTable', data, (d) => `
                         <td><span class="badge bg-secondary">${d.department_code}</span></td>
                         <td><strong>${d.name}</strong></td>
-                        <td>${d.employee_count || 0}</td>
+                        <td>
+                            ${d.employee_count || 0}
+                            ${d.employee_count > 0 ? `<button class="btn btn-sm btn-link" onclick="viewDepartmentEmployees('${d.department_code}', '${d.name}')" title="View Employees"><i class="bi bi-people-fill"></i></button>` : ''}
+                        </td>
                         <td>${d.visit_count || 0}</td>
                         <td>${d.created_at || 'N/A'}</td>
                     `);
@@ -1074,6 +1367,195 @@ if ($companyFilter === 'Toms World') {
                 });
         }
 
+        // NEW: View Visitor History
+        function viewVisitorHistory(visitorId, visitorName) {
+            document.getElementById('visitorHistoryName').textContent = visitorName;
+            
+            // Destroy existing DataTable if it exists
+            if ($.fn.DataTable.isDataTable('#visitorHistoryTable')) {
+                $('#visitorHistoryTable').DataTable().clear().destroy();
+            }
+            
+            fetch(`?action=visitor_history&visitor_id=${visitorId}`)
+                .then(r => r.json())
+                .then(visits => {
+                    const tbody = document.getElementById('visitorHistoryTableBody');
+                    tbody.innerHTML = '';
+                    
+                    if (visits.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No visit history found</td></tr>';
+                        new bootstrap.Modal(document.getElementById('visitorHistoryModal')).show();
+                    } else {
+                        visits.forEach(visit => {
+                            const checkIn = new Date(visit.check_in_time);
+                            const checkOut = visit.check_out_time ? new Date(visit.check_out_time) : null;
+                            let duration = 'In Progress';
+                            
+                            if (checkOut) {
+                                const diff = checkOut - checkIn;
+                                const hours = Math.floor(diff / 3600000);
+                                const minutes = Math.floor((diff % 3600000) / 60000);
+                                duration = `${hours}h ${minutes}m`;
+                            }
+                            
+                            const status = checkOut 
+                                ? '<span class="status-badge checked-out">Checked Out</span>' 
+                                : '<span class="status-badge checked-in">Checked In</span>';
+                            
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td><span class="badge-number">${visit.badge_number || 'N/A'}</span></td>
+                                <td>${visit.host_name}</td>
+                                <td>${visit.department_name}</td>
+                                <td><span class="purpose-badge ${(visit.purpose||'').toLowerCase()}">${visit.purpose}</span></td>
+                                <td>${checkIn.toLocaleString()}</td>
+                                <td>${checkOut ? checkOut.toLocaleString() : 'N/A'}</td>
+                                <td>${duration}</td>
+                                <td>${status}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                        
+                        // Initialize DataTable
+                        dataTableInstances['visitorHistoryTable'] = $('#visitorHistoryTable').DataTable({
+                            pageLength: 10,
+                            order: [[4, 'desc']],
+                            language: {
+                                emptyTable: "No visit history found",
+                                zeroRecords: "No matching records found"
+                            }
+                        });
+                        
+                        new bootstrap.Modal(document.getElementById('visitorHistoryModal')).show();
+                    }
+                })
+                .catch(e => {
+                    console.error('Error:', e);
+                    Swal.fire('Error', 'Failed to load visitor history', 'error');
+                });
+        }
+
+        // NEW: View Employee Visit History
+        function viewEmployeeHistory(employeeId, employeeName) {
+            document.getElementById('employeeHistoryName').textContent = employeeName;
+            
+            // Destroy existing DataTable if it exists
+            if ($.fn.DataTable.isDataTable('#employeeHistoryTable')) {
+                $('#employeeHistoryTable').DataTable().clear().destroy();
+            }
+            
+            fetch(`?action=employee_history&employee_id=${employeeId}`)
+                .then(r => r.json())
+                .then(visits => {
+                    const tbody = document.getElementById('employeeHistoryTableBody');
+                    tbody.innerHTML = '';
+                    
+                    if (visits.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No visits hosted yet</td></tr>';
+                        new bootstrap.Modal(document.getElementById('employeeHistoryModal')).show();
+                    } else {
+                        visits.forEach(visit => {
+                            const checkIn = new Date(visit.check_in_time);
+                            const checkOut = visit.check_out_time ? new Date(visit.check_out_time) : null;
+                            let duration = 'In Progress';
+                            
+                            if (checkOut) {
+                                const diff = checkOut - checkIn;
+                                const hours = Math.floor(diff / 3600000);
+                                const minutes = Math.floor((diff % 3600000) / 60000);
+                                duration = `${hours}h ${minutes}m`;
+                            }
+                            
+                            const status = checkOut 
+                                ? '<span class="status-badge checked-out">Checked Out</span>' 
+                                : '<span class="status-badge checked-in">Checked In</span>';
+                            
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td><span class="badge-number">${visit.badge_number || 'N/A'}</span></td>
+                                <td><strong>${visit.first_name} ${visit.last_name}</strong></td>
+                                <td>${visit.company || 'N/A'}</td>
+                                <td><span class="purpose-badge ${(visit.purpose||'').toLowerCase()}">${visit.purpose}</span></td>
+                                <td>${checkIn.toLocaleString()}</td>
+                                <td>${checkOut ? checkOut.toLocaleString() : 'N/A'}</td>
+                                <td>${duration}</td>
+                                <td>${status}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                        
+                        // Initialize DataTable
+                        dataTableInstances['employeeHistoryTable'] = $('#employeeHistoryTable').DataTable({
+                            pageLength: 10,
+                            order: [[4, 'desc']],
+                            language: {
+                                emptyTable: "No visits hosted yet",
+                                zeroRecords: "No matching records found"
+                            }
+                        });
+                        
+                        new bootstrap.Modal(document.getElementById('employeeHistoryModal')).show();
+                    }
+                })
+                .catch(e => {
+                    console.error('Error:', e);
+                    Swal.fire('Error', 'Failed to load employee history', 'error');
+                });
+        }
+
+        // NEW: View Department Employees
+        function viewDepartmentEmployees(departmentCode, departmentName) {
+            document.getElementById('departmentEmployeesName').textContent = departmentName;
+            
+            // Destroy existing DataTable if it exists
+            if ($.fn.DataTable.isDataTable('#departmentEmployeesTable')) {
+                $('#departmentEmployeesTable').DataTable().clear().destroy();
+            }
+            
+            fetch(`?action=department_employees&department_code=${departmentCode}`)
+                .then(r => r.json())
+                .then(employees => {
+                    const tbody = document.getElementById('departmentEmployeesTableBody');
+                    tbody.innerHTML = '';
+                    
+                    if (employees.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No employees in this department</td></tr>';
+                        new bootstrap.Modal(document.getElementById('departmentEmployeesModal')).show();
+                    } else {
+                        employees.forEach(emp => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${emp.employee_id}</td>
+                                <td><strong>${emp.name}</strong></td>
+                                <td><a href="mailto:${emp.email}" class="text-decoration-none">${emp.email}</a></td>
+                                <td><span class="badge ${emp.is_active == 1 ? 'bg-success' : 'bg-secondary'}">${emp.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
+                                <td>${emp.total_visits || 0}</td>
+                                <td>
+                                    ${emp.total_visits > 0 ? `<button class="action-btn" style="color: #9b59b6;" onclick="viewEmployeeHistory('${emp.employee_id}', '${emp.name.replace(/'/g, "\\'")}');" title="View History"><i class="bi bi-clock-history"></i></button>` : '<span class="text-muted">-</span>'}
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                        
+                        // Initialize DataTable
+                        dataTableInstances['departmentEmployeesTable'] = $('#departmentEmployeesTable').DataTable({
+                            pageLength: 10,
+                            order: [[1, 'asc']],
+                            language: {
+                                emptyTable: "No employees in this department",
+                                zeroRecords: "No matching records found"
+                            }
+                        });
+                        
+                        new bootstrap.Modal(document.getElementById('departmentEmployeesModal')).show();
+                    }
+                })
+                .catch(e => {
+                    console.error('Error:', e);
+                    Swal.fire('Error', 'Failed to load department employees', 'error');
+                });
+        }
+
         function checkOutVisitor(visitId) {
             Swal.fire({
                 title: 'Check Out Visitor?',
@@ -1169,7 +1651,6 @@ if ($companyFilter === 'Toms World') {
                 });
         }
 
-        // Confirm logout
         function confirmLogout(event) {
             event.preventDefault();
             Swal.fire({
@@ -1189,7 +1670,6 @@ if ($companyFilter === 'Toms World') {
             return false;
         }
 
-        // Add Employee Form
         document.getElementById('addEmployeeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
@@ -1209,7 +1689,6 @@ if ($companyFilter === 'Toms World') {
                 .catch(e => Swal.fire('Error', 'Failed to add employee', 'error'));
         });
 
-        // Add Department Form
         document.getElementById('addDepartmentForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
@@ -1229,14 +1708,31 @@ if ($companyFilter === 'Toms World') {
                 .catch(e => Swal.fire('Error', 'Failed to add department', 'error'));
         });
 
-        // Initialize recent activity table with pagination
         $(document).ready(function() {
             if (!$.fn.DataTable.isDataTable('#recentActivityTable')) {
                 $('#recentActivityTable').DataTable({ pageLength: 10, order: [] });
             }
+            
+            // Clean up DataTables when modals are hidden
+            $('#visitorHistoryModal').on('hidden.bs.modal', function () {
+                if ($.fn.DataTable.isDataTable('#visitorHistoryTable')) {
+                    $('#visitorHistoryTable').DataTable().clear().destroy();
+                }
+            });
+            
+            $('#employeeHistoryModal').on('hidden.bs.modal', function () {
+                if ($.fn.DataTable.isDataTable('#employeeHistoryTable')) {
+                    $('#employeeHistoryTable').DataTable().clear().destroy();
+                }
+            });
+            
+            $('#departmentEmployeesModal').on('hidden.bs.modal', function () {
+                if ($.fn.DataTable.isDataTable('#departmentEmployeesTable')) {
+                    $('#departmentEmployeesTable').DataTable().clear().destroy();
+                }
+            });
         });
 
-        // Auto-refresh every 30 seconds
         setInterval(() => {
             if (document.getElementById('active-visitsSection').style.display !== 'none') {
                 loadActiveVisits();

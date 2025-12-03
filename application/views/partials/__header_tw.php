@@ -822,6 +822,16 @@
         .qr-download-btn:hover {
             background: #2980b9;
         }
+
+        /* Auto-lowercase for all text inputs */
+        #firstName,
+        #lastName,
+        #email,
+        #phone,
+        #company,
+        #visitNotes {
+            text-transform: lowercase !important;
+        }
     </style>
 </head>
 <body>
