@@ -2324,8 +2324,117 @@
             }
         }
 
-        // Capture photo - FIXED for mobile orientation
+        // // Capture photo - FIXED for mobile orientation
+        // function capturePhoto() {
+        //     const video = document.getElementById('videoElement');
+        //     const image = document.getElementById('capturedImage');
+        //     const canvas = document.createElement('canvas');
+            
+        //     // Get video dimensions
+        //     const videoWidth = video.videoWidth;
+        //     const videoHeight = video.videoHeight;
+            
+        //     // Set canvas size to match video's actual dimensions
+        //     canvas.width = videoWidth;
+        //     canvas.height = videoHeight;
+            
+        //     const ctx = canvas.getContext('2d');
+            
+        //     // Draw the video frame directly without any transforms
+        //     // The video element already handles orientation correctly
+        //     ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
+            
+        //     capturedPhotoData = canvas.toDataURL('image/jpeg', 0.8);
+            
+        //     image.src = capturedPhotoData;
+        //     image.style.display = 'block';
+        //     video.style.display = 'none';
+            
+        //     document.getElementById('captureBtn').style.display = 'none';
+        //     document.getElementById('retakeBtn').style.display = 'block';
+            
+        //     // IMPORTANT: Change Skip button to Continue button when photo is taken
+        //     document.getElementById('photoSkipBtn').style.display = 'none';
+        //     document.getElementById('photoNextBtn').style.display = 'block';
+            
+        //     visitorData.photo = capturedPhotoData;
+        //     photoTaken = true;
+        //     showNotification('Photo captured successfully!');
+        // }
+
+        // Capture photo - WITH 3-SECOND COUNTDOWN
         function capturePhoto() {
+            const video = document.getElementById('videoElement');
+            const captureBtn = document.getElementById('captureBtn');
+            
+            // Disable button during countdown
+            captureBtn.disabled = true;
+            
+            // Create countdown overlay
+            const countdownOverlay = document.createElement('div');
+            countdownOverlay.id = 'countdownOverlay';
+            countdownOverlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                font-size: 120px;
+                font-weight: bold;
+                color: #fff;
+                text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            `;
+            
+            const cameraView = document.querySelector('.camera-view');
+            cameraView.appendChild(countdownOverlay);
+            
+            let countdown = 3;
+            countdownOverlay.textContent = countdown;
+            
+            // Play countdown sound effect (optional - browser beep)
+            const beep = () => {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            };
+            
+            beep(); // First beep
+            
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                
+                if (countdown > 0) {
+                    countdownOverlay.textContent = countdown;
+                    beep();
+                } else {
+                    clearInterval(countdownInterval);
+                    countdownOverlay.remove();
+                    
+                    // Now capture the photo
+                    performPhotoCapture();
+                }
+            }, 1000);
+        }
+        
+        // Actual photo capture logic separated into its own function
+        function performPhotoCapture() {
             const video = document.getElementById('videoElement');
             const image = document.getElementById('capturedImage');
             const canvas = document.createElement('canvas');
@@ -2351,6 +2460,7 @@
             video.style.display = 'none';
             
             document.getElementById('captureBtn').style.display = 'none';
+            document.getElementById('captureBtn').disabled = false; // Re-enable for next time
             document.getElementById('retakeBtn').style.display = 'block';
             
             // IMPORTANT: Change Skip button to Continue button when photo is taken
