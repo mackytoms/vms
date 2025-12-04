@@ -413,6 +413,127 @@ if(isset($_GET['action'])) {
                 }
             }
             break;
+            
+            // Find the AJAX request handler section in admin.php
+            // Add these cases to the switch statement (around line 200-400):
+
+        case 'get_all_purposes':
+            $sql = "SELECT * FROM purposes ORDER BY display_order ASC";
+            $result = $conn->query($sql);
+            $purposes = array();
+            if ($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    $purposes[] = $row;
+                }
+            }
+            echo json_encode(['status' => 'success', 'purposes' => $purposes]);
+            break;
+
+        case 'add_purpose':
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $purpose_code = strtolower(trim($conn->real_escape_string($_POST['purpose_code'])));
+                $purpose_name = trim($conn->real_escape_string($_POST['purpose_name']));
+                $icon_class = trim($conn->real_escape_string($_POST['icon_class'] ?? 'bi-circle'));
+                $color_class = trim($conn->real_escape_string($_POST['color_class'] ?? 'text-primary'));
+                $is_active = isset($_POST['is_active']) ? 1 : 0;
+                
+                // Check if purpose code already exists
+                $check_sql = "SELECT purpose_id FROM purposes WHERE purpose_code = '$purpose_code'";
+                $check_result = $conn->query($check_sql);
+                
+                if ($check_result->num_rows > 0) {
+                    echo json_encode(['status' => 'error', 'message' => 'Purpose code already exists']);
+                } else {
+                    // Get max display order
+                    $max_order_sql = "SELECT MAX(display_order) as max_order FROM purposes";
+                    $max_result = $conn->query($max_order_sql);
+                    $max_row = $max_result->fetch_assoc();
+                    $display_order = ($max_row['max_order'] ?? 0) + 1;
+                    
+                    $sql = "INSERT INTO purposes (purpose_code, purpose_name, icon_class, color_class, display_order, is_active, created_at) 
+                            VALUES ('$purpose_code', '$purpose_name', '$icon_class', '$color_class', $display_order, $is_active, NOW())";
+                    
+                    if($conn->query($sql)) {
+                        echo json_encode(['status' => 'success']);
+                    } else {
+                        echo json_encode(['status' => 'error', 'message' => $conn->error]);
+                    }
+                }
+            }
+            break;
+
+        case 'toggle_purpose_status':
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $purpose_id = intval($conn->real_escape_string($_POST['purpose_id']));
+                $new_status = intval($_POST['new_status']);
+                
+                $sql = "UPDATE purposes SET is_active = $new_status WHERE purpose_id = $purpose_id";
+                
+                if($conn->query($sql)) {
+                    echo json_encode(['status' => 'success', 'new_status' => $new_status]);
+                } else {
+                    echo json_encode(['status' => 'error', 'message' => $conn->error]);
+                }
+            }
+            break;
+
+        case 'update_purpose_order':
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $purpose_id = intval($conn->real_escape_string($_POST['purpose_id']));
+                $direction = $conn->real_escape_string($_POST['direction']);
+                
+                // Get current purpose
+                $current_sql = "SELECT * FROM purposes WHERE purpose_id = $purpose_id";
+                $current_result = $conn->query($current_sql);
+                
+                if ($current_result->num_rows === 0) {
+                    echo json_encode(['status' => 'error', 'message' => 'Purpose not found']);
+                    break;
+                }
+                
+                $current = $current_result->fetch_assoc();
+                
+                // Get adjacent purpose
+                if ($direction === 'up') {
+                    $adjacent_sql = "SELECT * FROM purposes 
+                                WHERE display_order < {$current['display_order']} 
+                                ORDER BY display_order DESC 
+                                LIMIT 1";
+                } else {
+                    $adjacent_sql = "SELECT * FROM purposes 
+                                WHERE display_order > {$current['display_order']} 
+                                ORDER BY display_order ASC 
+                                LIMIT 1";
+                }
+                
+                $adjacent_result = $conn->query($adjacent_sql);
+                
+                if ($adjacent_result->num_rows === 0) {
+                    echo json_encode(['status' => 'error', 'message' => 'Cannot move further']);
+                    break;
+                }
+                
+                $adjacent = $adjacent_result->fetch_assoc();
+                
+                // Swap display orders
+                $conn->begin_transaction();
+                
+                try {
+                    $sql1 = "UPDATE purposes SET display_order = {$adjacent['display_order']} WHERE purpose_id = {$current['purpose_id']}";
+                    $sql2 = "UPDATE purposes SET display_order = {$current['display_order']} WHERE purpose_id = {$adjacent['purpose_id']}";
+                    
+                    $conn->query($sql1);
+                    $conn->query($sql2);
+                    
+                    $conn->commit();
+                    echo json_encode(['status' => 'success']);
+                } catch (Exception $e) {
+                    $conn->rollback();
+                    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+                }
+            }
+            break;
+
     }
     exit;
 }
@@ -596,6 +717,9 @@ if ($companyFilter === 'Toms World') {
             white-space: normal;
             word-wrap: break-word;
         }
+        .text-purple {
+            color: #800080 !important;
+        }
     </style>
 </head>
 <body>
@@ -636,6 +760,9 @@ if ($companyFilter === 'Toms World') {
             </div>
             <div class="sidebar-item" onclick="showSection('departments')">
                 <i class="bi bi-building"></i><span>Departments</span>
+            </div>
+            <div class="sidebar-item" onclick="showSection('purposes')">
+                <i class="bi bi-flag"></i><span>Purposes</span>
             </div>
             <div class="sidebar-item" onclick="showSection('settings')">
                 <i class="bi bi-gear"></i><span>Settings</span>
@@ -795,6 +922,34 @@ if ($companyFilter === 'Toms World') {
                         </tr>
                     </thead>
                     <tbody id="departmentTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Purposes Section -->
+        <div class="dashboard-content" id="purposesSection" style="display: none;">
+            <h1 class="page-title">Purpose Management</h1>
+            <p class="page-subtitle">Manage visit purpose types</p>
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="chart-title">All Visit Purposes</h3>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPurposeModal">
+                        <i class="bi bi-plus-circle"></i> Add Purpose
+                    </button>
+                </div>
+                <table class="table table-hover" id="purposeTable">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Purpose Code</th>
+                            <th>Purpose Name</th>
+                            <th>Icon</th>
+                            <th>Color</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purposeTableBody"></tbody>
                 </table>
             </div>
         </div>
@@ -1092,6 +1247,73 @@ if ($companyFilter === 'Toms World') {
         </div>
     </div>
 
+    <!-- Add Purpose Modal (place with other modals at the bottom) -->
+    <div class="modal fade" id="addPurposeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
+                    <h5 class="modal-title"><i class="bi bi-flag-fill"></i> Add New Purpose</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addPurposeForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Purpose Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="purpose_code" placeholder="e.g., meeting, interview" required maxlength="20">
+                            <small class="text-muted">Unique identifier (lowercase, no spaces)</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Purpose Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="purpose_name" placeholder="e.g., Meeting, Interview" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Icon Class</label>
+                            <input type="text" class="form-control" name="icon_class" placeholder="e.g., bi-people, bi-briefcase" value="bi-circle">
+                            <small class="text-muted">Bootstrap Icons class (e.g., bi-people)</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Color Class</label>
+                            <!-- <select class="form-select" name="color_class">
+                                <option value="text-primary">Primary (Blue)</option>
+                                <option value="text-success">Success (Green)</option>
+                                <option value="text-warning">Warning (Orange)</option>
+                                <option value="text-danger">Danger (Red)</option>
+                                <option value="text-info">Info (Cyan)</option>
+                                <option value="text-secondary">Secondary (Gray)</option>
+                                <option value="text-dark">Dark</option>
+                                <option value="text-purple">Purple</option>
+                            </select> -->
+                            <select class="form-select" name="color_class">
+                                <option value="text-primary">Primary (Blue)</option>
+                                <option value="text-success">Success (Green)</option>
+                                <option value="text-warning">Warning (Orange)</option>
+                                <option value="text-danger">Danger (Red)</option>
+                                <option value="text-info">Info (Cyan)</option>
+                                <option value="text-secondary">Secondary (Gray)</option>
+                                <option value="text-dark">Dark</option>
+                                <option value="text-purple">Purple</option>
+                                <!-- Additional color options -->
+                                <option value="text-light">Light (Light Gray)</option>
+                                <option value="text-muted">Muted (Faded Gray)</option>
+                                <option value="text-black-50">Black 50% Opacity</option>
+                                <option value="text-white">White</option>
+                                <option value="text-transparent">Transparent</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" name="is_active" id="purposeActiveCheck" checked>
+                            <label class="form-check-label" for="purposeActiveCheck">Active Purpose</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save Purpose</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -1111,6 +1333,31 @@ if ($companyFilter === 'Toms World') {
             document.getElementById('mainContent').classList.toggle('expanded');
         }
 
+        // function showSection(section) {
+        //     document.querySelectorAll('.dashboard-content').forEach(c => c.style.display = 'none');
+        //     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            
+        //     const sectionMap = {
+        //         'dashboard': 'dashboardSection',
+        //         'active-visits': 'active-visitsSection',
+        //         'visitors': 'visitorsSection',
+        //         'employees': 'employeesSection',
+        //         'departments': 'departmentsSection',
+        //         'settings': 'settingsSection'
+        //     };
+            
+        //     if (sectionMap[section]) {
+        //         document.getElementById(sectionMap[section]).style.display = 'block';
+        //         event.target.closest('.sidebar-item').classList.add('active');
+                
+        //         switch(section) {
+        //             case 'active-visits': loadActiveVisits(); break;
+        //             case 'visitors': loadAllVisitors(); break;
+        //             case 'employees': loadEmployees(); break;
+        //             case 'departments': loadDepartments(); break;
+        //         }
+        //     }
+        // }
         function showSection(section) {
             document.querySelectorAll('.dashboard-content').forEach(c => c.style.display = 'none');
             document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
@@ -1121,6 +1368,7 @@ if ($companyFilter === 'Toms World') {
                 'visitors': 'visitorsSection',
                 'employees': 'employeesSection',
                 'departments': 'departmentsSection',
+                'purposes': 'purposesSection',  // ADD THIS LINE
                 'settings': 'settingsSection'
             };
             
@@ -1133,6 +1381,7 @@ if ($companyFilter === 'Toms World') {
                     case 'visitors': loadAllVisitors(); break;
                     case 'employees': loadEmployees(); break;
                     case 'departments': loadDepartments(); break;
+                    case 'purposes': loadPurposes(); break;  // ADD THIS LINE
                 }
             }
         }
@@ -1773,6 +2022,196 @@ if ($companyFilter === 'Toms World') {
             }
             refreshDashboard();
         }, 30000);
+
+        // Load purposes function
+        function loadPurposes() {
+            fetch('?action=get_all_purposes')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const tbody = document.getElementById('purposeTableBody');
+                        tbody.innerHTML = '';
+                        
+                        if (data.purposes.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No purposes found</td></tr>';
+                            return;
+                        }
+                        
+                        data.purposes.forEach((p, index) => {
+                            const isFirst = index === 0;
+                            const isLast = index === data.purposes.length - 1;
+                            
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>
+                                    <button class="btn btn-sm btn-outline-secondary" 
+                                            onclick="movePurpose(${p.purpose_id}, 'up')" 
+                                            ${isFirst ? 'disabled' : ''} 
+                                            title="Move Up">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" 
+                                            onclick="movePurpose(${p.purpose_id}, 'down')" 
+                                            ${isLast ? 'disabled' : ''} 
+                                            title="Move Down">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </button>
+                                </td>
+                                <td><span class="badge bg-secondary">${p.purpose_code}</span></td>
+                                <td><strong>${p.purpose_name}</strong></td>
+                                <td><i class="${p.icon_class}" style="font-size: 1.5em;"></i></td>
+                                <td><span class="${p.color_class}">●</span> ${p.color_class}</td>
+                                <td>
+                                    <span class="badge ${p.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+                                        style="cursor: pointer;" 
+                                        onclick="togglePurposeStatus(${p.purpose_id}, ${p.is_active}, '${p.purpose_name.replace(/'/g, "\\'")}')" 
+                                        title="Click to ${p.is_active == 1 ? 'deactivate' : 'activate'}">
+                                        ${p.is_active == 1 ? 'Active' : 'Inactive'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="action-btn view" onclick="viewPurposeDetails(${p.purpose_id})" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                        
+                        // Initialize DataTable
+                        if ($.fn.DataTable.isDataTable('#purposeTable')) {
+                            $('#purposeTable').DataTable().destroy();
+                        }
+                        $('#purposeTable').DataTable({
+                            pageLength: 10,
+                            order: [[0, 'asc']],
+                            columnDefs: [
+                                { orderable: false, targets: [0, 6] }
+                            ]
+                        });
+                    }
+                })
+                .catch(e => {
+                    console.error('Error loading purposes:', e);
+                    Swal.fire('Error', 'Failed to load purposes', 'error');
+                });
+        }
+
+        // Toggle purpose status
+        function togglePurposeStatus(purposeId, currentStatus, purposeName) {
+            const newStatus = currentStatus == 1 ? 0 : 1;
+            const actionText = newStatus == 1 ? 'activate' : 'deactivate';
+            const statusText = newStatus == 1 ? 'Active' : 'Inactive';
+            
+            Swal.fire({
+                title: `${actionText.charAt(0).toUpperCase() + actionText.slice(1)} Purpose?`,
+                html: `Are you sure you want to ${actionText} <strong>${purposeName}</strong>?<br><small class="text-muted">Status will be changed to: ${statusText}</small>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: newStatus == 1 ? '#27ae60' : '#95a5a6',
+                cancelButtonColor: '#95a5a6',
+                confirmButtonText: `Yes, ${actionText.charAt(0).toUpperCase() + actionText.slice(1)}`,
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('purpose_id', purposeId);
+                    formData.append('new_status', newStatus);
+                    
+                    fetch('?action=toggle_purpose_status', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: `Purpose ${actionText}d successfully`,
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                            loadPurposes();
+                        } else {
+                            Swal.fire('Error', data.message || 'Failed to update purpose status', 'error');
+                        }
+                    })
+                    .catch(e => {
+                        console.error('Error:', e);
+                        Swal.fire('Error', 'Failed to update purpose status', 'error');
+                    });
+                }
+            });
+        }
+
+        // Move purpose up/down
+        function movePurpose(purposeId, direction) {
+            const formData = new FormData();
+            formData.append('purpose_id', purposeId);
+            formData.append('direction', direction);
+            
+            fetch('?action=update_purpose_order', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    loadPurposes();
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to update order', 'error');
+                }
+            })
+            .catch(e => {
+                console.error('Error:', e);
+                Swal.fire('Error', 'Failed to update order', 'error');
+            });
+        }
+
+        // View purpose details
+        function viewPurposeDetails(purposeId) {
+            Swal.fire({
+                title: 'Purpose Details',
+                text: 'Purpose details viewing feature coming soon',
+                icon: 'info'
+            });
+        }
+
+        // Add purpose form submission
+        document.getElementById('addPurposeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch('?action=add_purpose', { 
+                method: 'POST', 
+                body: formData 
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    bootstrap.Modal.getInstance(document.getElementById('addPurposeModal')).hide();
+                    this.reset();
+                    Swal.fire({ 
+                        toast: true, 
+                        position: 'top-end', 
+                        icon: 'success', 
+                        title: 'Purpose added successfully', 
+                        showConfirmButton: false, 
+                        timer: 2000 
+                    });
+                    loadPurposes();
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to add purpose', 'error');
+                }
+            })
+            .catch(e => {
+                console.error('Error:', e);
+                Swal.fire('Error', 'Failed to add purpose', 'error');
+            });
+        });
+
     </script>
 </body>
 </html>

@@ -32,10 +32,10 @@
                     <p class="welcome-submessage" data-translate="selectLanguage">Please select your preferred language</p>
                     
                     <div class="language-selector">
+                        <button class="language-btn" onclick="selectLanguage('fil')">Filipino</button>
                         <button class="language-btn active" onclick="selectLanguage('en')">English</button>
                         <button class="language-btn" onclick="selectLanguage('zh-TW')">繁體中文</button>
                         <button class="language-btn" onclick="selectLanguage('zh-CN')">简体中文</button>
-                        <button class="language-btn" onclick="selectLanguage('fil')">Filipino</button>
                         <button class="language-btn" onclick="selectLanguage('ja')">日本語</button>
                     </div>
 
@@ -82,13 +82,13 @@
                     
                     <div id="qr-reader"></div>
                     
-                    <div class="qr-upload-section">
+                    <!-- <div class="qr-upload-section">
                         <p class="text-muted mb-3" data-translate="orUploadQR">Or upload QR code image</p>
                         <label class="qr-upload-btn">
                             <i class="bi bi-upload"></i> <span data-translate="uploadQR">Upload QR Code</span>
                             <input type="file" accept="image/*" onchange="handleQRUpload(this)">
                         </label>
-                    </div>
+                    </div> -->
 
                     <div class="nav-buttons">
                         <button class="btn-large btn-back" onclick="previousScreen()">
@@ -143,7 +143,6 @@
                                         required
                                         maxlength="10"
                                         pattern="^[9][0-9]{9}$"
-                                        placeholder="9123456789"
                                     >
                                     <div class="invalid-feedback" data-translate="phoneInvalid">
                                         Please enter a valid Philippine mobile number
@@ -285,10 +284,10 @@
                             <i class="bi bi-calendar-event" style="color: purple;"></i>
                             <h5 data-translate="event">Event</h5>
                         </div>
-                        <!-- <div class="purpose-card" onclick="selectPurpose('other', this)">
+                        <div class="purpose-card" onclick="selectPurpose('other', this)">
                             <i class="bi bi-three-dots text-dark"></i>
                             <h5 data-translate="other">Other</h5>
-                        </div> -->
+                        </div>
                     </div>
 
                     <div class="form-group mt-3">
@@ -357,7 +356,7 @@
                         Your host has been notified of your arrival
                     </p>
 
-                    <div class="badge-preview" id="badgePreview">
+                    <!-- <div class="badge-preview" id="badgePreview">
                         <h4 style="color: #f39c12; margin-bottom: 15px;" data-translate="visitorBadge">Your Visitor Badge</h4>
                         <div class="badge-photo-display" id="badgePhotoDisplay">
                             <i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>
@@ -373,7 +372,7 @@
                             <strong data-translate="validUntil">Valid Until:</strong> <span id="validUntil"></span>
                         </div>
                         
-                        <!-- QR CODE SECTION - NEW -->
+                        <!- QR CODE SECTION - NEW ->
                         <div style="margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; border: 2px dashed #f39c12;">
                             <h5 style="color: #495057; margin-bottom: 10px;">
                                 <i class="bi bi-qr-code"></i> <span data-translate="saveQRCode">Save Your QR Code</span>
@@ -382,11 +381,69 @@
                                 Scan this QR code on your next visit for faster check-in
                             </p>
                             <div id="qrCodeContainer" style="display: flex; justify-content: center; margin-bottom: 10px;"></div>
-                            <!-- <button class="btn btn-outline-primary btn-sm" onclick="downloadQRCode()" style="margin-top: 10px;">
+                            <!- <button class="btn btn-outline-primary btn-sm" onclick="downloadQRCode()" style="margin-top: 10px;">
                                 <i class="bi bi-download"></i> <span data-translate="downloadQR">Download QR Code</span>
-                            </button> -->
+                            </button> ->
                         </div>
+                    </div> -->
+
+                    <div class="row g-4 align-items-start">
+    
+                        <!-- LEFT: Badge Details -->
+                        <div class="col-md-6">
+                            <div class="badge-preview" id="badgePreview" 
+                                style="border: 1px solid #f39c12; border-radius: 12px; padding: 20px;">
+                                
+                                <h4 style="color: #f39c12; margin-bottom: 15px;" data-translate="visitorBadge">
+                                    Your Visitor Badge
+                                </h4>
+
+                                <div class="badge-photo-display" id="badgePhotoDisplay" style="text-align:center;">
+                                    <i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>
+                                </div>
+
+                                <div id="badgeNumber" style="font-size: 1.6em; font-weight: bold; color: #f39c12a8; margin-bottom: 10px; text-align:center;">
+                                    V-2024-1201
+                                </div>
+
+                                <div id="visitorName" style="font-size: 1.3em; margin-bottom: 8px; text-align:center;"></div>
+                                <div id="visitorCompany" style="color: #7f8c8d; margin-bottom: 12px; text-align:center;"></div>
+                                <hr>
+
+                                <div style="margin-top: 12px; text-align: left;">
+                                    <strong data-translate="host">Host:</strong> <span id="badgeHost"></span><br>
+                                    <strong data-translate="validUntil">Valid Until:</strong> <span id="validUntil"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT: QR Code Section -->
+                        <div class="col-md-6">
+                            <div style="padding: 20px; background: #fff; border-radius: 12px; border: 2px dashed #f39c12; margin: 25px auto;">
+                                <h5 style="color: #495057; margin-bottom: 10px;">
+                                    <i class="bi bi-qr-code"></i> 
+                                    <span data-translate="saveQRCode">Save Your QR Code</span>
+                                </h5>
+
+                                <p style="font-size: 0.9em; color: #6c757d; margin-bottom: 15px;" data-translate="qrCodeDesc">
+                                    Scan this QR code on your next visit for faster check-in
+                                </p>
+
+                                <div id="qrCodeContainer" 
+                                    style="display:flex; justify-content:center; margin-bottom:10px;">
+                                </div>
+
+                                <!-- Optional download button -->
+                                <!-- 
+                                <button class="btn btn-outline-primary btn-sm" onclick="downloadQRCode()">
+                                    <i class="bi bi-download"></i> <span data-translate="downloadQR">Download QR Code</span>
+                                </button> 
+                                -->
+                            </div>
+                        </div>
+
                     </div>
+
 
                     <div style="background: #e8f4fd; border-left: 4px solid #f39c12; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left;">
                         <h5 style="color: #f39c12a8; margin-bottom: 8px;">
@@ -691,15 +748,6 @@
                 welcomeBackQR: "Welcome back! Your information has been loaded.",
 
                 agreementContent: `
-                    <h5>Visitor Guidelines</h5>
-                    <p>By entering our premises, you agree to:</p>
-                    <ul>
-                        <li>Wear your visitor badge visibly at all times</li>
-                        <li>Remain in authorized areas only</li>
-                        <li>Be escorted in restricted areas</li>
-                        <li>Follow all safety and security protocols</li>
-                        <li>Return your badge when leaving</li>
-                    </ul>
                     <h5 class="mt-3">Health & Safety</h5>
                     <p>I confirm that:</p>
                     <ul>
@@ -711,9 +759,9 @@
                     <p>We collect your information for security and safety purposes. Your data will be handled in accordance with our privacy policy and deleted after 90 days unless required for compliance purposes.</p>
                 `,
                 nextStepsContent: [
-                    "Please collect your printed badge from the printer",
-                    "Wait in the lobby area",
-                    "Your host will come to receive you shortly"
+                    "Please Take a photo of the QR code this shall serve as your Badge",
+                    "then Please Wait in the lobby area for future instructions",
+                    "Your host will come to receive you shortly or Hosts' assistance shall come and guide you"
                 ]
             },
             'zh-TW': {
@@ -802,15 +850,6 @@
                 welcomeBackQR: "歡迎回來！您的信息已加載。",
                 
                 agreementContent: `
-                    <h5>訪客指引</h5>
-                    <p>進入我們的場所，您同意：</p>
-                    <ul>
-                        <li>隨時明顯佩戴您的訪客證</li>
-                        <li>僅停留在授權區域</li>
-                        <li>在限制區域需要陪同</li>
-                        <li>遵守所有安全和保安協議</li>
-                        <li>離開時歸還您的訪客證</li>
-                    </ul>
                     <h5 class="mt-3">健康與安全</h5>
                     <p>我確認：</p>
                     <ul>
@@ -822,9 +861,9 @@
                     <p>我們收集您的信息用於安全和保安目的。您的數據將根據我們的隱私政策處理，並在90天後刪除，除非出於合規目的需要保留。</p>
                 `,
                 nextStepsContent: [
-                    "請從打印機收取您打印的訪客證",
-                    "在大堂區等候",
-                    "您的接待人很快就會來接您"
+                    "請拍下 QR Code 的照片，這將作為您的訪客證。",
+                    "接著請在大廳等候後續指示。",
+                    "您的接待人會前來迎接您，或將有協助人員引導您。"
                 ]
             },
             'zh-CN': {
@@ -913,15 +952,6 @@
                 welcomeBackQR: "欢迎回来！您的信息已加载。",
 
                 agreementContent: `
-                    <h5>访客指引</h5>
-                    <p>进入我们的场所，您同意：</p>
-                    <ul>
-                        <li>随时明显佩戴您的访客证</li>
-                        <li>仅停留在授权区域</li>
-                        <li>在限制区域需要陪同</li>
-                        <li>遵守所有安全和保安协议</li>
-                        <li>离开时归还您的访客证</li>
-                    </ul>
                     <h5 class="mt-3">健康与安全</h5>
                     <p>我确认：</p>
                     <ul>
@@ -933,9 +963,9 @@
                     <p>我们收集您的信息用于安全和保安目的。您的数据将根据我们的隐私政策处理，并在90天后删除，除非出于合规目的需要保留。</p>
                 `,
                 nextStepsContent: [
-                    "请从打印机收取您打印的访客证",
-                    "在大堂区等候",
-                    "您的接待人很快就会来接您"
+                    "请拍下二维码照片，这将作为您的访客证。",
+                    "然后请在大厅等待进一步指示。",
+                    "您的接待人会来迎接您，或有工作人员前来引导您。"
                 ]
             },
             'fil': {
@@ -1024,15 +1054,6 @@
                 welcomeBackQR: "Maligayang pagbabalik! Na-load na ang iyong impormasyon.",
                 
                 agreementContent: `
-                    <h5>Mga Gabay para sa Bisita</h5>
-                    <p>Sa pagpasok sa aming lugar, sumasang-ayon ka na:</p>
-                    <ul>
-                        <li>Laging isuot ang visitor badge na nakikita</li>
-                        <li>Manatili lamang sa mga awtorisadong lugar</li>
-                        <li>Kailangan ng kasamang tauhan sa mga restricted na lugar</li>
-                        <li>Sundin ang lahat ng protokol sa kaligtasan at seguridad</li>
-                        <li>Ibalik ang badge kapag aalis</li>
-                    </ul>
                     <h5 class="mt-3">Kalusugan at Kaligtasan</h5>
                     <p>Kumpirma ko na:</p>
                     <ul>
@@ -1044,9 +1065,9 @@
                     <p>Kinokolekta namin ang iyong impormasyon para sa layuning pangkaligtasan at seguridad. Ang iyong data ay hahawakan ayon sa aming privacy policy at tatanggalin pagkatapos ng 90 araw maliban kung kinakailangan para sa compliance.</p>
                 `,
                 nextStepsContent: [
-                    "Mangyaring kunin ang iyong na-print na badge mula sa printer",
-                    "Maghintay sa lobby area",
-                    "Darating ang iyong tauhan upang salubungin ka"
+                    "Paki-kuha ng litrato ng QR code, ito ang magsisilbing badge mo.",
+                    "Pagkatapos, maghintay lamang sa lobby para sa susunod na instruksiyon.",
+                    "Darating ang iyong host para salubungin ka, o may staff na tutulong at gagabay sa'yo."
                 ]
             },
             'ja': {
@@ -1135,15 +1156,6 @@
                 welcomeBackQR: "おかえりなさい！情報が読み込まれました。",
     
                 agreementContent: `
-                    <h5>訪問者ガイドライン</h5>
-                    <p>施設に入場することで、以下に同意します：</p>
-                    <ul>
-                        <li>訪問者バッジを常に目に見える場所に着用する</li>
-                        <li>許可されたエリアのみに滞在する</li>
-                        <li>制限エリアでは同行が必要</li>
-                        <li>すべての安全およびセキュリティプロトコルに従う</li>
-                        <li>退出時にバッジを返却する</li>
-                    </ul>
                     <h5 class="mt-3">健康と安全</h5>
                     <p>以下を確認します：</p>
                     <ul>
@@ -1155,9 +1167,9 @@
                     <p>セキュリティおよび安全目的で情報を収集します。データはプライバシーポリシーに従って処理され、コンプライアンス目的で必要な場合を除き、90日後に削除されます。</p>
                 `,
                 nextStepsContent: [
-                    "プリンターから印刷されたバッジを受け取ってください",
-                    "ロビーエリアでお待ちください",
-                    "ホストがまもなくお迎えに来ます"
+                    "QRコードの写真を撮ってください。これがあなたの入館バッジになります。",
+                    "その後、ロビーで指示があるまでお待ちください。",
+                    "ホストが迎えに来るか、スタッフがご案内いたします。"
                 ]
             }
             // Add other language translations similarly...
@@ -1243,6 +1255,24 @@
             });
         }
 
+        // // Auto-convert all text inputs to lowercase
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     // Select all text inputs and textareas
+        //     const textInputs = document.querySelectorAll('#firstName, #lastName, #email, #phone, #company, #visitNotes');
+            
+        //     textInputs.forEach(input => {
+        //         // Convert to lowercase on input
+        //         input.addEventListener('input', function() {
+        //             this.value = this.value.toLowerCase();
+        //         });
+                
+        //         // Also convert on blur (when user leaves the field)
+        //         input.addEventListener('blur', function() {
+        //             this.value = this.value.toLowerCase();
+        //         });
+        //     });
+        // });
+
         
         // Function to generate QR code data
         function generateQRCodeData() {
@@ -1326,6 +1356,18 @@
             setInterval(updateDateTime, 1000);
             translatePage();
             populateDepartments();
+
+            // ADD THIS SECTION - Auto-convert to lowercase
+            const textInputs = document.querySelectorAll('#firstName, #lastName, #email, #phone, #company, #visitNotes');
+            textInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.toLowerCase();
+                });
+                input.addEventListener('blur', function() {
+                    this.value = this.value.toLowerCase();
+                });
+            });
+
         });
 
         // Update date and time
@@ -1537,22 +1579,86 @@
         //     }
         // }
 
-        // Initialize QR Scanner
+        // // Start check-in process
+        // function startCheckIn(type) {
+        //     visitorData.type = type;
+        //     currentFlow = screenFlow[type];
+        //     currentFlowIndex = 1;
+            
+        //     if (type === 'returning') {
+        //         showScreen(2);
+        //         initQRScanner();
+        //     } else {
+        //         showScreen(3);
+        //     }
+        // }
+
+        // // Initialize QR Scanner
+        // function initQRScanner() {
+        //     if (html5QrCode) {
+        //         html5QrCode.stop();
+        //     }
+            
+        //     html5QrCode = new Html5Qrcode("qr-reader");
+            
+        //     const config = { 
+        //         fps: 10, 
+        //         qrbox: { width: 250, height: 250 },
+        //         aspectRatio: 1.0,
+        //         disableFlip: false,
+        //         experimentalFeatures: {
+        //             useBarCodeDetectorIfSupported: true
+        //         }
+        //     };
+            
+        //     html5QrCode.start(
+        //         { facingMode: "environment" },
+        //         config,
+        //         (decodedText) => {
+        //             console.log('QR scanned:', decodedText);
+        //             handleQRCodeSuccess(decodedText);
+        //         },
+        //         (error) => {
+        //             // Ignore continuous scan errors
+        //         }
+        //     ).catch((err) => {
+        //         console.error("Unable to start QR scanner:", err);
+                
+        //         html5QrCode.start(
+        //             { facingMode: "user" },
+        //             config,
+        //             (decodedText) => {
+        //                 handleQRCodeSuccess(decodedText);
+        //             },
+        //             (error) => {}
+        //         ).catch((err2) => {
+        //             showNotification("Camera not available for QR scanning");
+        //         });
+        //     });
+        // }
+        
         function initQRScanner() {
             if (html5QrCode) {
-                html5QrCode.stop();
+                html5QrCode.stop().catch(() => {});
             }
             
             html5QrCode = new Html5Qrcode("qr-reader");
             
+            // OPTIMIZED CONFIG - More flexible QR reading
             const config = { 
-                fps: 10, 
-                qrbox: { width: 250, height: 250 },
+                fps: 15, // Increased from 10 for faster detection
+                qrbox: { width: 300, height: 300 }, // Larger scanning area
                 aspectRatio: 1.0,
                 disableFlip: false,
+                // ENHANCED EXPERIMENTAL FEATURES
                 experimentalFeatures: {
                     useBarCodeDetectorIfSupported: true
-                }
+                },
+                // ADD THESE FOR BETTER DETECTION:
+                formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+                // More lenient settings
+                rememberLastUsedCamera: true,
+                supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
             };
             
             html5QrCode.start(
@@ -1568,6 +1674,7 @@
             ).catch((err) => {
                 console.error("Unable to start QR scanner:", err);
                 
+                // Fallback to front camera with same optimized config
                 html5QrCode.start(
                     { facingMode: "user" },
                     config,
@@ -1874,19 +1981,57 @@
                 document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
             }
             
-            // AUTO-SELECT DELIVERY PURPOSE IF VISITOR TYPE IS DELIVERY
+            // // AUTO-SELECT DELIVERY PURPOSE IF VISITOR TYPE IS DELIVERY
+            // if (screenNumber === 6) { // Purpose screen
+            //     if (visitorData.type === 'delivery') {
+            //         setTimeout(() => {
+            //             const deliveryCard = Array.from(document.querySelectorAll('.purpose-card'))
+            //                 .find(card => card.getAttribute('onclick').includes("'delivery'"));
+                        
+            //             if (deliveryCard) {
+            //                 document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
+            //                 deliveryCard.classList.add('selected');
+            //                 selectedPurpose = 'delivery';
+            //                 visitorData.purpose = 'delivery';
+            //                 document.getElementById('purposeNextBtn').disabled = false;
+            //                 showNotification('Delivery purpose auto-selected based on your visit type');
+            //             }
+            //         }, 100);
+            //     }
+            // }
+
+            // Replace the existing screen 6 handling with this enhanced version:
             if (screenNumber === 6) { // Purpose screen
+                // Reset all cards first
+                document.querySelectorAll('.purpose-card').forEach(card => {
+                    card.classList.remove('selected', 'disabled');
+                    card.style.opacity = '1';
+                    card.style.cursor = 'pointer';
+                    card.style.pointerEvents = 'auto';
+                });
+                
                 if (visitorData.type === 'delivery') {
                     setTimeout(() => {
                         const deliveryCard = Array.from(document.querySelectorAll('.purpose-card'))
-                            .find(card => card.getAttribute('onclick').includes("'delivery'"));
+                            .find(card => card.getAttribute('onclick')?.includes("'delivery'"));
                         
                         if (deliveryCard) {
-                            document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
+                            // Auto-select delivery
                             deliveryCard.classList.add('selected');
                             selectedPurpose = 'delivery';
                             visitorData.purpose = 'delivery';
                             document.getElementById('purposeNextBtn').disabled = false;
+                            
+                            // Disable all other purpose cards
+                            document.querySelectorAll('.purpose-card').forEach(card => {
+                                if (card !== deliveryCard) {
+                                    card.classList.add('disabled');
+                                    card.style.opacity = '0.4';
+                                    card.style.cursor = 'not-allowed';
+                                    card.style.pointerEvents = 'none';
+                                }
+                            });
+                            
                             showNotification('Delivery purpose auto-selected based on your visit type');
                         }
                     }, 100);
@@ -1938,10 +2083,41 @@
             }
         }
 
-        // Optional: Modify the selectPurpose function to handle pre-selection better
+        // // Optional: Modify the selectPurpose function to handle pre-selection better
+        // function selectPurpose(purpose, element) {
+        //     // Clear all selections
+        //     document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
+            
+        //     // Add selection to clicked element
+        //     if (element) {
+        //         element.classList.add('selected');
+        //     } else {
+        //         // If no element provided (auto-selection), find and select the card
+        //         const card = Array.from(document.querySelectorAll('.purpose-card'))
+        //             .find(c => c.getAttribute('onclick').includes(`'${purpose}'`));
+        //         if (card) {
+        //             card.classList.add('selected');
+        //         }
+        //     }
+            
+        //     selectedPurpose = purpose;
+        //     visitorData.purpose = purpose;
+        //     document.getElementById('purposeNextBtn').disabled = false;
+        // }
+        
+        // Update selectPurpose function to prevent selection when disabled:
         function selectPurpose(purpose, element) {
-            // Clear all selections
-            document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
+            // Check if card is disabled
+            if (element && element.classList.contains('disabled')) {
+                return; // Do nothing if disabled
+            }
+            
+            // Clear all selections (but keep disabled state)
+            document.querySelectorAll('.purpose-card').forEach(card => {
+                if (!card.classList.contains('disabled')) {
+                    card.classList.remove('selected');
+                }
+            });
             
             // Add selection to clicked element
             if (element) {
@@ -1949,8 +2125,8 @@
             } else {
                 // If no element provided (auto-selection), find and select the card
                 const card = Array.from(document.querySelectorAll('.purpose-card'))
-                    .find(c => c.getAttribute('onclick').includes(`'${purpose}'`));
-                if (card) {
+                    .find(c => c.getAttribute('onclick')?.includes(`'${purpose}'`));
+                if (card && !card.classList.contains('disabled')) {
                     card.classList.add('selected');
                 }
             }
@@ -2159,17 +2335,25 @@
             }
         }
 
-        // Capture photo - Updated
+        // Capture photo - FIXED for mobile orientation
         function capturePhoto() {
             const video = document.getElementById('videoElement');
             const image = document.getElementById('capturedImage');
             const canvas = document.createElement('canvas');
             
-            canvas.width = 320;
-            canvas.height = 240;
+            // Get video dimensions
+            const videoWidth = video.videoWidth;
+            const videoHeight = video.videoHeight;
+            
+            // Set canvas size to match video's actual dimensions
+            canvas.width = videoWidth;
+            canvas.height = videoHeight;
             
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Draw the video frame directly without any transforms
+            // The video element already handles orientation correctly
+            ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
             
             capturedPhotoData = canvas.toDataURL('image/jpeg', 0.8);
             
@@ -2300,67 +2484,72 @@
             }, 1000);
         }
 
-        // Reset kiosk
-        function resetKiosk() {
-            clearInterval(countdownTimer);
-            stopCamera();
+        // // Reset kiosk
+        // function resetKiosk() {
+        //     clearInterval(countdownTimer);
+        //     stopCamera();
             
-            // Reset flags
-            isProcessingQR = false;
-            isScannerStopping = false;
+        //     // Reset flags
+        //     isProcessingQR = false;
+        //     isScannerStopping = false;
             
-            // Stop scanner safely
-            stopQRScanner();
+        //     // Stop scanner safely
+        //     stopQRScanner();
             
-            // Clear QR code instance
-            if (qrCodeInstance) {
-                const qrContainer = document.getElementById('qrCodeContainer');
-                if (qrContainer) {
-                    qrContainer.innerHTML = '';
-                }
-                qrCodeInstance = null;
-            }
+        //     // Clear QR code instance
+        //     if (qrCodeInstance) {
+        //         const qrContainer = document.getElementById('qrCodeContainer');
+        //         if (qrContainer) {
+        //             qrContainer.innerHTML = '';
+        //         }
+        //         qrCodeInstance = null;
+        //     }
             
-            visitorData = {};
-            selectedHost = null;
-            selectedPurpose = null;
-            selectedDepartment = null;
-            capturedPhotoData = null;
-            photoTaken = false;
-            currentFlow = [];
-            currentFlowIndex = 0;
+        //     visitorData = {};
+        //     selectedHost = null;
+        //     selectedPurpose = null;
+        //     selectedDepartment = null;
+        //     capturedPhotoData = null;
+        //     photoTaken = false;
+        //     currentFlow = [];
+        //     currentFlowIndex = 0;
             
-            document.querySelectorAll('input').forEach(input => {
-                if (input.type !== 'checkbox') {
-                    input.value = '';
-                    input.classList.remove('is-invalid');
-                } else {
-                    input.checked = false;
-                }
-            });
+        //     document.querySelectorAll('input').forEach(input => {
+        //         if (input.type !== 'checkbox') {
+        //             input.value = '';
+        //             input.classList.remove('is-invalid');
+        //         } else {
+        //             input.checked = false;
+        //         }
+        //     });
             
-            document.querySelectorAll('textarea').forEach(textarea => {
-                textarea.value = '';
-            });
+        //     document.querySelectorAll('textarea').forEach(textarea => {
+        //         textarea.value = '';
+        //     });
             
-            document.querySelectorAll('.purpose-card').forEach(card => {
-                card.classList.remove('selected');
-            });
+        //     document.querySelectorAll('.purpose-card').forEach(card => {
+        //         card.classList.remove('selected');
+        //     });
             
-            document.getElementById('departmentSelect').value = '';
-            document.getElementById('employeeSection').style.display = 'none';
-            document.getElementById('selectedHost').innerHTML = `<span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>`;
-            document.getElementById('captureBtn').style.display = 'block';
-            document.getElementById('retakeBtn').style.display = 'none';
-            document.getElementById('capturedImage').style.display = 'none';
-            document.getElementById('photoSkipBtn').style.display = 'block';
-            document.getElementById('photoNextBtn').style.display = 'none';
-            document.getElementById('hostNextBtn').disabled = true;
-            document.getElementById('purposeNextBtn').disabled = true;
-            document.getElementById('agreeNextBtn').disabled = true;
+        //     document.getElementById('departmentSelect').value = '';
+        //     document.getElementById('employeeSection').style.display = 'none';
+        //     document.getElementById('selectedHost').innerHTML = `<span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>`;
+        //     document.getElementById('captureBtn').style.display = 'block';
+        //     document.getElementById('retakeBtn').style.display = 'none';
+        //     document.getElementById('capturedImage').style.display = 'none';
+        //     document.getElementById('photoSkipBtn').style.display = 'block';
+        //     document.getElementById('photoNextBtn').style.display = 'none';
+        //     document.getElementById('hostNextBtn').disabled = true;
+        //     document.getElementById('purposeNextBtn').disabled = true;
+        //     document.getElementById('agreeNextBtn').disabled = true;
+
+        //     // Hard refresh the page
+        //     window.location.href = window.location.href.split('?')[0]; // Removes any query parameters
+        //     // OR use this for a complete reload:
+        //     // window.location.reload(true); // true forces reload from server, not cache
             
-            showScreen(1);
-        }
+        //     showScreen(1);
+        // }
 
         // Pre-scheduled visit functions
         function showPreScheduled() {
@@ -2536,89 +2725,89 @@
 
 
 
-        // Updated completeCheckIn function to connect with database
-        function completeCheckIn() {
-            showLoading();
+        // // Updated completeCheckIn function to connect with database
+        // function completeCheckIn() {
+        //     showLoading();
             
-            // Prepare data for database insertion
-            const checkInData = {
-                firstName: visitorData.firstName,
-                lastName: visitorData.lastName,
-                email: visitorData.email,
-                phone: visitorData.phone,
-                company: visitorData.company,
-                photo: visitorData.photo || null,
-                type: visitorData.type,
-                host: {
-                    id: selectedHost.id || selectedHost.employeeId,
-                    name: selectedHost.name,
-                    email: selectedHost.email,
-                    department: selectedHost.department,
-                    departmentCode: selectedHost.departmentCode
-                },
-                purpose: selectedPurpose,
-                notes: visitorData.notes || null,
-                booking_code: visitorData.booking_code || null
-            };
+        //     // Prepare data for database insertion
+        //     const checkInData = {
+        //         firstName: visitorData.firstName,
+        //         lastName: visitorData.lastName,
+        //         email: visitorData.email,
+        //         phone: visitorData.phone,
+        //         company: visitorData.company,
+        //         photo: visitorData.photo || null,
+        //         type: visitorData.type,
+        //         host: {
+        //             id: selectedHost.id || selectedHost.employeeId,
+        //             name: selectedHost.name,
+        //             email: selectedHost.email,
+        //             department: selectedHost.department,
+        //             departmentCode: selectedHost.departmentCode
+        //         },
+        //         purpose: selectedPurpose,
+        //         notes: visitorData.notes || null,
+        //         booking_code: visitorData.booking_code || null
+        //     };
             
-            // Send data to server for database insertion
-            fetch('<?= base_url("kiosk/complete_checkin") ?>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(checkInData)
-            })
-            .then(response => response.json())
-            .then(result => {
-                hideLoading();
+        //     // Send data to server for database insertion
+        //     fetch('<?= base_url("kiosk/complete_checkin") ?>', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'X-Requested-With': 'XMLHttpRequest'
+        //         },
+        //         body: JSON.stringify(checkInData)
+        //     })
+        //     .then(response => response.json())
+        //     .then(result => {
+        //         hideLoading();
                 
-                if (result.status === 'success') {
-                    // Update success screen with actual data from database
-                    updateSuccessScreen(result.data);
+        //         if (result.status === 'success') {
+        //             // Update success screen with actual data from database
+        //             updateSuccessScreen(result.data);
                     
-                    // Update step indicator to show final step
-                    updateStepIndicator(8);
+        //             // Update step indicator to show final step
+        //             updateStepIndicator(8);
                     
-                    // Show success screen
-                    showScreen(8);
+        //             // Show success screen
+        //             showScreen(8);
                     
-                    // Start countdown timer
-                    startCountdown();
+        //             // Start countdown timer
+        //             startCountdown();
                     
-                    console.log('Check-in successful:', result.data);
+        //             console.log('Check-in successful:', result.data);
                     
-                    // Store photo locally if available (for QR code reference)
-                    if (visitorData.photo && result.data.visit_id) {
-                        try {
-                            localStorage.setItem(`visitor_photo_${result.data.visit_id}`, visitorData.photo);
-                        } catch (e) {
-                            console.error('Could not store photo:', e);
-                        }
-                    }
-                } else {
-                    // Show error message
-                    Swal.fire({
-                        title: 'Check-in Failed',
-                        text: result.message || 'An error occurred during check-in. Please try again.',
-                        icon: 'error',
-                        confirmButtonColor: '#e74c3c'
-                    });
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Check-in error:', error);
+        //             // Store photo locally if available (for QR code reference)
+        //             if (visitorData.photo && result.data.visit_id) {
+        //                 try {
+        //                     localStorage.setItem(`visitor_photo_${result.data.visit_id}`, visitorData.photo);
+        //                 } catch (e) {
+        //                     console.error('Could not store photo:', e);
+        //                 }
+        //             }
+        //         } else {
+        //             // Show error message
+        //             Swal.fire({
+        //                 title: 'Check-in Failed',
+        //                 text: result.message || 'An error occurred during check-in. Please try again.',
+        //                 icon: 'error',
+        //                 confirmButtonColor: '#e74c3c'
+        //             });
+        //         }
+        //     })
+        //     .catch(error => {
+        //         hideLoading();
+        //         console.error('Check-in error:', error);
                 
-                Swal.fire({
-                    title: 'Connection Error',
-                    text: 'Unable to connect to the server. Please check your connection and try again.',
-                    icon: 'error',
-                    confirmButtonColor: '#e74c3c'
-                });
-            });
-        }
+        //         Swal.fire({
+        //             title: 'Connection Error',
+        //             text: 'Unable to connect to the server. Please check your connection and try again.',
+        //             icon: 'error',
+        //             confirmButtonColor: '#e74c3c'
+        //         });
+        //     });
+        // }
 
         // // Update success screen with actual database data
         // function updateSuccessScreen(data) {
@@ -3143,9 +3332,23 @@
         //     });
         // }
 
-        // UPDATED: Complete check-in function with QR generation
         function completeCheckIn() {
             showLoading();
+            
+            // Get current time in Philippines timezone
+            const now = new Date();
+            const phTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+            
+            // Format as MySQL datetime: YYYY-MM-DD HH:MM:SS
+            const formatDateTime = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            };
             
             // Prepare data for database insertion
             const checkInData = {
@@ -3166,8 +3369,17 @@
                 purpose: selectedPurpose,
                 notes: visitorData.notes || null,
                 booking_code: visitorData.booking_code || null,
-                company_visited: COMPANY_VISITED
+                company_visited: COMPANY_VISITED,
+                // ADD THESE LINES FOR TIMEZONE FIX:
+                check_in_time: formatDateTime(phTime),
+                client_timezone: 'Asia/Manila',
+                timezone_offset: now.getTimezoneOffset()
             };
+            
+            // Debug: Log times to console
+            console.log('Browser time:', now.toString());
+            console.log('Philippines time:', phTime.toString());
+            console.log('Sending to DB:', checkInData.check_in_time);
             
             // Send data to server for database insertion
             fetch('<?= base_url("kiosk/complete_checkin") ?>', {
@@ -3277,8 +3489,13 @@
             document.getElementById('photoNextBtn').style.display = 'none';
             document.getElementById('hostNextBtn').disabled = true;
             document.getElementById('purposeNextBtn').disabled = true;
-            document.getElementById('agreeNextBtn').disabled = true;
-            
+            document.getElementById('agreeNextBtn').disabled = true;            
+
+            // Hard refresh the page
+            // window.location.href = window.location.href.split('?')[0]; // Removes any query parameters
+            // OR use this for a complete reload:
+            window.location.reload(true); // true forces reload from server, not cache
+        
             showScreen(1);
         }
 

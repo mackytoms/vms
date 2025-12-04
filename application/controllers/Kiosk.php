@@ -465,4 +465,159 @@ class Kiosk extends CI_Controller {
             ]);
         }
     }
+    
+    // Add these methods to your existing Kiosk.php controller
+
+    /**
+     * Get all active purposes for kiosk display
+     */
+    public function get_purposes() {
+        $purposes = $this->db->select('purpose_id, purpose_code, purpose_name, icon_class, color_class')
+                            ->from('purposes')
+                            ->where('is_active', 1)
+                            ->order_by('display_order', 'ASC')
+                            ->get()
+                            ->result_array();
+        
+        echo json_encode(['status' => 'success', 'purposes' => $purposes]);
+    }
+
+    /**
+     * Get all purposes for admin (including inactive)
+     */
+    public function get_all_purposes() {
+        $purposes = $this->db->select('*')
+                            ->from('purposes')
+                            ->order_by('display_order', 'ASC')
+                            ->get()
+                            ->result_array();
+        
+        echo json_encode(['status' => 'success', 'purposes' => $purposes]);
+    }
+
+    /**
+     * Add a new purpose
+     */
+    public function add_purpose() {
+        if ($this->input->method() !== 'post') {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
+            return;
+        }
+        
+        $purpose_code = strtolower(trim($this->input->post('purpose_code')));
+        $purpose_name = trim($this->input->post('purpose_name'));
+        $icon_class = trim($this->input->post('icon_class'));
+        $color_class = trim($this->input->post('color_class'));
+        $is_active = $this->input->post('is_active') ? 1 : 0;
+        
+        // Validate required fields
+        if (empty($purpose_code) || empty($purpose_name)) {
+            echo json_encode(['status' => 'error', 'message' => 'Purpose code and name are required']);
+            return;
+        }
+        
+        // Check if purpose code already exists
+        $existing = $this->db->get_where('purposes', ['purpose_code' => $purpose_code])->row();
+        if ($existing) {
+            echo json_encode(['status' => 'error', 'message' => 'Purpose code already exists']);
+            return;
+        }
+        
+        // Get the next display order
+        $max_order = $this->db->select_max('display_order')->get('purposes')->row()->display_order;
+        $display_order = $max_order ? $max_order + 1 : 1;
+        
+        $data = [
+            'purpose_code' => $purpose_code,
+            'purpose_name' => $purpose_name,
+            'icon_class' => $icon_class ?: 'bi-circle',
+            'color_class' => $color_class ?: 'text-primary',
+            'display_order' => $display_order,
+            'is_active' => $is_active,
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+        
+        if ($this->db->insert('purposes', $data)) {
+            echo json_encode(['status' => 'success', 'message' => 'Purpose added successfully']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to add purpose']);
+        }
+    }
+
+    /**
+     * Toggle purpose active status
+     */
+    public function toggle_purpose_status() {
+        if ($this->input->method() !== 'post') {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
+            return;
+        }
+        
+        $purpose_id = $this->input->post('purpose_id');
+        $new_status = $this->input->post('new_status') ? 1 : 0;
+        
+        if (!$purpose_id) {
+            echo json_encode(['status' => 'error', 'message' => 'Purpose ID required']);
+            return;
+        }
+        
+        if ($this->db->where('purpose_id', $purpose_id)->update('purposes', ['is_active' => $new_status])) {
+            echo json_encode(['status' => 'success', 'new_status' => $new_status]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to update purpose status']);
+        }
+    }
+
+    /**
+     * Update purpose display order
+     */
+    public function update_purpose_order() {
+        if ($this->input->method() !== 'post') {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
+            return;
+        }
+        
+        $purpose_id = $this->input->post('purpose_id');
+        $direction = $this->input->post('direction'); // 'up' or 'down'
+        
+        if (!$purpose_id || !$direction) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid parameters']);
+            return;
+        }
+        
+        // Get current purpose
+        $current = $this->db->get_where('purposes', ['purpose_id' => $purpose_id])->row();
+        if (!$current) {
+            echo json_encode(['status' => 'error', 'message' => 'Purpose not found']);
+            return;
+        }
+        
+        // Get adjacent purpose
+        if ($direction === 'up') {
+            $this->db->where('display_order <', $current->display_order);
+            $this->db->order_by('display_order', 'DESC');
+        } else {
+            $this->db->where('display_order >', $current->display_order);
+            $this->db->order_by('display_order', 'ASC');
+        }
+        $adjacent = $this->db->limit(1)->get('purposes')->row();
+        
+        if (!$adjacent) {
+            echo json_encode(['status' => 'error', 'message' => 'Cannot move further']);
+            return;
+        }
+        
+        // Swap display orders
+        $this->db->trans_start();
+        $this->db->where('purpose_id', $current->purpose_id)->update('purposes', ['display_order' => $adjacent->display_order]);
+        $this->db->where('purpose_id', $adjacent->purpose_id)->update('purposes', ['display_order' => $current->display_order]);
+        $this->db->trans_complete();
+        
+        if ($this->db->trans_status()) {
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to update order']);
+        }
+    }
+
 }

@@ -254,6 +254,34 @@
                 <div class="form-screen">
                     <h2 class="form-title" data-translate="purposeTitle">What brings you here today?</h2>
                     
+                    <!-- Purpose cards will be populated dynamically -->
+                    <div class="purpose-grid" id="purposeGrid">
+                        <!-- Purposes loaded from database -->
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label class="form-label" data-translate="additionalNotes">Additional notes (optional)</label>
+                        <textarea class="form-control form-control-lg" id="visitNotes" rows="2" 
+                                data-translate-placeholder="notesPlaceholder"
+                                placeholder="Any additional information..."></textarea>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <button class="btn-large btn-back" onclick="previousScreen()">
+                            <i class="bi bi-arrow-left"></i> <span data-translate="back">Back</span>
+                        </button>
+                        <button class="btn-large btn-next" onclick="nextScreen()" disabled id="purposeNextBtn">
+                            <span data-translate="continue">Continue</span> <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 6: Purpose Selection -->
+            <!-- <div class="screen" id="purposeScreen">
+                <div class="form-screen">
+                    <h2 class="form-title" data-translate="purposeTitle">What brings you here today?</h2>
+                    
                     <div class="purpose-grid">
                         <div class="purpose-card" onclick="selectPurpose('meeting', this)">
                             <i class="bi bi-people text-primary"></i>
@@ -305,7 +333,7 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Screen 7: Agreements -->
             <div class="screen" id="agreementScreen">
@@ -1180,7 +1208,9 @@
         // Global variable for QR Code instance
         let qrCodeInstance = null;
         // Add this flag near the top with other state variables
-        let isProcessingQR = false;
+        let isProcessingQR = false;        
+        // Purpose
+        let availablePurposes = [];
 
         let isScannerStopping = false;
 
@@ -1325,6 +1355,7 @@
             setInterval(updateDateTime, 1000);
             translatePage();
             populateDepartments();
+            loadPurposesFromDatabase(); // ADD THIS LINE
 
             // ADD THIS SECTION - Auto-convert to lowercase
             const textInputs = document.querySelectorAll('#firstName, #lastName, #email, #phone, #company, #visitNotes');
@@ -2358,6 +2389,67 @@
         //     visitorData.purpose = purpose;
         //     document.getElementById('purposeNextBtn').disabled = false;
         // }
+
+        // Add this function to load purposes from database
+        function loadPurposesFromDatabase() {
+            fetch('<?= base_url("kiosk/get_purposes") ?>', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    availablePurposes = result.purposes;
+                    populatePurposeGrid();
+                } else {
+                    console.error('Failed to load purposes');
+                    // Fallback to default purposes if API fails
+                    loadDefaultPurposes();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading purposes:', error);
+                loadDefaultPurposes();
+            });
+        }
+
+        // Populate the purpose grid with database purposes
+        function populatePurposeGrid() {
+            const purposeGrid = document.querySelector('.purpose-grid');
+            if (!purposeGrid) return;
+            
+            purposeGrid.innerHTML = '';
+            
+            availablePurposes.forEach(purpose => {
+                const card = document.createElement('div');
+                card.className = 'purpose-card';
+                card.setAttribute('onclick', `selectPurpose('${purpose.purpose_code}', this)`);
+                
+                card.innerHTML = `
+                    <i class="bi ${purpose.icon_class} ${purpose.color_class}"></i>
+                    <h5 data-translate="${purpose.purpose_code}">${purpose.purpose_name}</h5>
+                `;
+                
+                purposeGrid.appendChild(card);
+            });
+        }
+
+        // Fallback function for default purposes (in case API fails)
+        function loadDefaultPurposes() {
+            availablePurposes = [
+                { purpose_code: 'meeting', purpose_name: 'Meeting', icon_class: 'bi-people', color_class: 'text-primary' },
+                { purpose_code: 'interview', purpose_name: 'Interview', icon_class: 'bi-briefcase', color_class: 'text-success' },
+                { purpose_code: 'delivery', purpose_name: 'Delivery', icon_class: 'bi-box', color_class: 'text-warning' },
+                { purpose_code: 'service', purpose_name: 'Service/Repair', icon_class: 'bi-tools', color_class: 'text-info' },
+                { purpose_code: 'training', purpose_name: 'Training', icon_class: 'bi-mortarboard', color_class: 'text-danger' },
+                { purpose_code: 'tour', purpose_name: 'Tour', icon_class: 'bi-map', color_class: 'text-secondary' },
+                { purpose_code: 'event', purpose_name: 'Event', icon_class: 'bi-calendar-event', color_class: 'text-purple' },
+                { purpose_code: 'other', purpose_name: 'Other', icon_class: 'bi-three-dots', color_class: 'text-dark' }
+            ];
+            populatePurposeGrid();
+        }
 
         // Agreement check
         function checkAgreement() {
