@@ -534,6 +534,50 @@ if(isset($_GET['action'])) {
             }
             break;
 
+        case 'check_emergency_alerts':
+            $filterSQL = $companyFilter 
+                ? " WHERE company_visited = '" . $conn->real_escape_string($companyFilter) . "' AND acknowledged = 0" 
+                : " WHERE acknowledged = 0";
+            
+            $sql = "SELECT * FROM emergency_alerts" . $filterSQL . " ORDER BY created_at DESC LIMIT 10";
+            $result = $conn->query($sql);
+            $alerts = array();
+            
+            if ($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    $alerts[] = $row;
+                }
+            }
+            
+            echo json_encode(['status' => 'success', 'alerts' => $alerts]);
+            break;
+
+        case 'get_last_alert_id':
+            $filterSQL = $companyFilter 
+                ? " WHERE company_visited = '" . $conn->real_escape_string($companyFilter) . "'" 
+                : "";
+            
+            $sql = "SELECT MAX(alert_id) as last_id FROM emergency_alerts" . $filterSQL;
+            $result = $conn->query($sql);
+            $row = $result->fetch_assoc();
+            
+            echo json_encode(['status' => 'success', 'last_alert_id' => $row['last_id'] ?? 0]);
+            break;
+
+        case 'acknowledge_emergency_alert':
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $alert_id = intval($_POST['alert_id']);
+                
+                $sql = "UPDATE emergency_alerts SET acknowledged = 1 WHERE alert_id = $alert_id";
+                
+                if($conn->query($sql)) {
+                    echo json_encode(['status' => 'success']);
+                } else {
+                    echo json_encode(['status' => 'error', 'message' => $conn->error]);
+                }
+            }
+            break;
+
     }
     exit;
 }
@@ -2573,6 +2617,180 @@ if ($companyFilter === 'Toms World') {
                 Swal.fire('Error', 'Failed to add purpose', 'error');
             });
         });
+
+        // Check for emergency alerts every 10 seconds
+        let lastAlertId = 0;
+
+        function checkEmergencyAlerts() {
+            fetch('?action=check_emergency_alerts' + filterParam)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success' && data.alerts.length > 0) {
+                        // Get new alerts only
+                        const newAlerts = data.alerts.filter(alert => alert.alert_id > lastAlertId);
+                        
+                        if (newAlerts.length > 0) {
+                            // Update last alert ID
+                            lastAlertId = Math.max(...data.alerts.map(a => a.alert_id));
+                            
+                            // Show Swal for each new alert
+                            newAlerts.forEach((alert, index) => {
+                                setTimeout(() => {
+                                    showEmergencyAlertSwal(alert);
+                                }, index * 500); // Stagger alerts by 500ms if multiple
+                            });
+                        }
+                    }
+                })
+                .catch(e => console.error('Error checking emergency alerts:', e));
+        }
+
+        function showEmergencyAlertSwal(alert) {
+            // Determine company-specific styling
+            let companyIcon, companyColor, companyName, companyBg;
+            
+            if (alert.company_visited === 'Toms World') {
+                companyIcon = '🎮';
+                companyColor = '#f39c12';
+                companyName = "Tom's World";
+                companyBg = '#fff3cd';
+            } else if (alert.company_visited === 'Pan Asia') {
+                companyIcon = '🏢';
+                companyColor = '#1e9338';
+                companyName = 'Pan-Asia';
+                companyBg = '#d4edda';
+            } else {
+                companyIcon = '🏢';
+                companyColor = '#95a5a6';
+                companyName = alert.company_visited;
+                companyBg = '#f8f9fa';
+            }
+            
+            Swal.fire({
+                title: '<span style="color: #e74c3c;">🚨 EMERGENCY ASSISTANCE NEEDED!</span>',
+                html: `
+                    <div style="text-align: left; padding: 15px; background: white; border-radius: 8px;">
+                        <div style="background: ${companyBg}; padding: 12px; border-radius: 8px; border: 2px solid ${companyColor}; margin-bottom: 15px;">
+                            <p style="font-size: 1.3em; margin: 0; color: ${companyColor}; font-weight: bold;">
+                                ${companyIcon} ${companyName}
+                            </p>
+                        </div>
+                        
+                        <p style="font-size: 1.1em; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 5px;">
+                            <strong>👤 Visitor:</strong> ${alert.visitor_name}
+                        </p>
+                        <p style="font-size: 1.1em; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 5px;">
+                            <strong>📍 Location:</strong> ${alert.location}
+                        </p>
+                        <p style="font-size: 1.1em; margin-bottom: 0; padding: 8px; background: #f8f9fa; border-radius: 5px;">
+                            <strong>🕒 Time:</strong> ${new Date(alert.created_at).toLocaleString()}
+                        </p>
+                    </div>
+                    <div style="background: #fee; padding: 12px; border-radius: 8px; margin-top: 15px; border: 2px solid #e74c3c;">
+                        <strong style="color: #e74c3c; font-size: 1.1em;">
+                            ⚠️ Immediate assistance required at ${companyName}!
+                        </strong>
+                    </div>
+                `,
+                icon: 'error',
+                confirmButtonColor: '#27ae60',
+                confirmButtonText: '✓ Acknowledged & Responding',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showClass: {
+                    popup: 'animate__animated animate__shakeX'
+                },
+                customClass: {
+                    popup: 'emergency-alert-popup'
+                },
+                width: '600px'
+            }).then(() => {
+                acknowledgeEmergencyAlert(alert.alert_id);
+            });
+            
+            playEmergencySound();
+        }
+
+        function playEmergencySound() {
+            try {
+                // Create a simple beep sound
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+        
+        // Second beep
+        setTimeout(() => {
+            const oscillator2 = audioContext.createOscillator();
+            const gainNode2 = audioContext.createGain();
+            
+            oscillator2.connect(gainNode2);
+            gainNode2.connect(audioContext.destination);
+            
+            oscillator2.frequency.value = 1000;
+            oscillator2.type = 'sine';
+            
+            gainNode2.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator2.start(audioContext.currentTime);
+            oscillator2.stop(audioContext.currentTime + 0.5);
+        }, 200);
+    } catch (e) {
+        console.log('Audio not supported:', e);
+    }
+}
+
+function acknowledgeEmergencyAlert(alertId) {
+    const formData = new FormData();
+    formData.append('alert_id', alertId);
+    
+    fetch('?action=acknowledge_emergency_alert', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .catch(e => console.error('Error acknowledging alert:', e));
+}
+
+// Start checking for emergency alerts
+setInterval(checkEmergencyAlerts, 10000); // Check every 10 seconds
+checkEmergencyAlerts(); // Initial check
+
+// Add CSS for emergency alert animation
+const style = document.createElement('style');
+style.textContent = `
+    .emergency-alert-popup {
+        border: 3px solid #e74c3c !important;
+        box-shadow: 0 0 30px rgba(231, 76, 60, 0.5) !important;
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+        20%, 40%, 60%, 80% { transform: translateX(10px); }
+    }
+`;
+document.head.appendChild(style);
+
+// Initialize lastAlertId on page load
+fetch('?action=get_last_alert_id' + filterParam)
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === 'success') {
+            lastAlertId = data.last_alert_id || 0;
+        }
+    });
 
     </script>
 </body>

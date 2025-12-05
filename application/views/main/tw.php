@@ -3094,7 +3094,7 @@
             });
         }
 
-        // Emergency call
+        // Emergency call - FOR TOM'S WORLD
         function callEmergency() {
             Swal.fire({
                 title: translations[currentLanguage].emergencyTitle || 'Emergency Assistance',
@@ -3107,11 +3107,56 @@
                 cancelButtonText: translations[currentLanguage].emergencyCancel || 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: translations[currentLanguage].emergencyNotified || 'Security has been notified!',
-                        text: translations[currentLanguage].emergencyMessage || 'Help is on the way. Please stay where you are.',
-                        icon: 'success',
-                        confirmButtonColor: '#27ae60'
+                    const emergencyData = {
+                        visitor_name: visitorData.firstName && visitorData.lastName 
+                            ? `${visitorData.firstName} ${visitorData.lastName}` 
+                            : 'Anonymous Visitor',
+                        location: 'Tom\'s World Kiosk',
+                        company_visited: 'Toms World'
+                    };
+                    
+                    fetch('<?= base_url("kiosk/emergency_alert") ?>', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify(emergencyData)
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.status === 'success') {
+                            Swal.fire({
+                                title: translations[currentLanguage].emergencyNotified || 'Security has been notified!',
+                                html: `
+                                    <p>${translations[currentLanguage].emergencyMessage || 'Help is on the way. Please stay where you are.'}</p>
+                                    <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-radius: 8px; border: 2px solid #f39c12;">
+                                        <strong style="color: #f39c12;">
+                                            <i class="bi bi-building"></i> Tom's World Security Team Notified
+                                        </strong>
+                                    </div>
+                                `,
+                                icon: 'success',
+                                confirmButtonColor: '#27ae60',
+                                allowOutsideClick: false
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Notification Failed',
+                                text: 'Please contact Tom\'s World staff directly at the reception desk.',
+                                icon: 'error',
+                                confirmButtonColor: '#e74c3c'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Emergency alert error:', error);
+                        Swal.fire({
+                            title: 'Connection Error',
+                            text: 'Please contact Tom\'s World staff directly at the reception desk.',
+                            icon: 'error',
+                            confirmButtonColor: '#e74c3c'
+                        });
                     });
                 }
             });

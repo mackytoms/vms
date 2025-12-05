@@ -330,6 +330,35 @@ class Kiosk extends CI_Controller {
     //         echo json_encode(['status' => 'not_found', 'message' => 'Visitor not found']);
     //     }
     // }
+
+    public function emergency_alert() {
+        header('Content-Type: application/json');
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
+            return;
+        }
+        
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$input) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid data']);
+            return;
+        }
+        
+        $visitor_name = $this->db->escape_str($input['visitor_name'] ?? 'Anonymous Visitor');
+        $location = $this->db->escape_str($input['location'] ?? 'Kiosk Station');
+        $company_visited = $this->db->escape_str($input['company_visited'] ?? 'Toms World');
+        
+        $sql = "INSERT INTO emergency_alerts (visitor_name, location, company_visited, created_at) 
+                VALUES ('$visitor_name', '$location', '$company_visited', NOW())";
+        
+        if ($this->db->query($sql)) {
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to save alert']);
+        }
+    }
     
     // Get pre-scheduled visits
     public function get_prescheduled() {
