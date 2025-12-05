@@ -124,7 +124,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" data-translate="email">Email Address *</label>
+                        <label class="form-label" data-translate="email">Email Address</label>
+                        <small class="text-muted">(At least one required: email or phone)</small>
                         <input type="email" class="form-control form-control-lg" id="email">
                         <div class="invalid-feedback" data-translate="emailInvalid">Please enter a valid email address</div>
                     </div>
@@ -132,7 +133,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="form-label" data-translate="phone">Phone Number *</label>
+                                <label class="form-label" data-translate="phone">Phone Number</label>
+                                <small class="text-muted">(At least one required: email or phone)</small>
                                 <div class="input-group">
                                     <span class="input-group-text">+63</span>
                                     <input 
@@ -140,7 +142,6 @@
                                         class="form-control form-control-lg" 
                                         id="phone"
                                         name="phone"
-                                        required
                                         maxlength="10"
                                         pattern="^[9][0-9]{9}$"
                                     >
@@ -699,6 +700,7 @@
                 lastName: "Last Name *",
                 email: "Email Address *",
                 phone: "Phone Number *",
+                emailOrPhoneRequired: "At least one required: email or phone",
                 company: "Company / Branch *",
                 companyPlaceholder: "Your Company Name",
                 back: "Back",
@@ -801,6 +803,7 @@
                 lastName: "姓氏 *",
                 email: "電子郵件地址 *",
                 phone: "電話號碼 *",
+                emailOrPhoneRequired: "至少需要一項：電子郵件或電話",
                 company: "公司 / 分支 *",
                 companyPlaceholder: "您的公司名稱",
                 back: "返回",
@@ -903,6 +906,7 @@
                 lastName: "姓氏 *",
                 email: "电子邮件地址 *",
                 phone: "电话号码 *",
+                emailOrPhoneRequired: "至少需要一项：电子邮件或电话",
                 company: "公司 / 分支 *",
                 companyPlaceholder: "您的公司名称",
                 back: "返回",
@@ -1005,6 +1009,7 @@
                 lastName: "Apelyido *",
                 email: "Email Address *",
                 phone: "Numero ng Telepono *",
+                emailOrPhoneRequired: "Kailangan ang kahit isa: email o telepono",
                 company: "Kumpanya / Sangay *",
                 companyPlaceholder: "Pangalan ng Kumpanya",
                 back: "Bumalik",
@@ -1107,6 +1112,7 @@
                 lastName: "姓 *",
                 email: "メールアドレス *",
                 phone: "電話番号 *",
+                emailOrPhoneRequired: "いずれか1つ必須：メールまたは電話",
                 company: "会社 / 支店 *",
                 companyPlaceholder: "会社名を入力",
                 back: "戻る",
@@ -2413,24 +2419,56 @@
                         visitorData.lastName = lastNameValue;
                     }
                     
+                    // EMAIL AND PHONE VALIDATION - At least one required
                     const email = document.getElementById('email');
                     const emailValue = email.value.trim();
-                    if (!emailValue || !validateEmail(emailValue)) {
-                        email.classList.add('is-invalid');
-                        isValid = false;
-                    } else {
-                        email.classList.remove('is-invalid');
-                        visitorData.email = emailValue.toLowerCase();
-                    }
+                    const isEmailProvided = emailValue.length > 0;
+                    const isEmailValid = isEmailProvided && validateEmail(emailValue);
                     
                     const phone = document.getElementById('phone');
                     const phoneValue = phone.value.trim();
-                    if (!phoneValue || !validatePhone(phoneValue)) {
+                    const isPhoneProvided = phoneValue.length > 0;
+                    const isPhoneValid = isPhoneProvided && validatePhone(phoneValue);
+                    
+                    // Check if at least one is provided
+                    if (!isEmailProvided && !isPhoneProvided) {
+                        // Both are empty - show error
+                        email.classList.add('is-invalid');
                         phone.classList.add('is-invalid');
+                        showNotification('Please provide either email address or phone number');
                         isValid = false;
                     } else {
-                        phone.classList.remove('is-invalid');
-                        visitorData.phone = phoneValue;
+                        // At least one is provided - validate each one that has input
+                        
+                        // Validate email if provided
+                        if (isEmailProvided) {
+                            if (!isEmailValid) {
+                                email.classList.add('is-invalid');
+                                isValid = false;
+                            } else {
+                                email.classList.remove('is-invalid');
+                                visitorData.email = emailValue.toLowerCase();
+                            }
+                        } else {
+                            // Email not provided but phone is - that's okay
+                            email.classList.remove('is-invalid');
+                            visitorData.email = null;
+                        }
+                        
+                        // Validate phone if provided
+                        if (isPhoneProvided) {
+                            if (!isPhoneValid) {
+                                phone.classList.add('is-invalid');
+                                isValid = false;
+                            } else {
+                                phone.classList.remove('is-invalid');
+                                visitorData.phone = phoneValue;
+                            }
+                        } else {
+                            // Phone not provided but email is - that's okay
+                            phone.classList.remove('is-invalid');
+                            visitorData.phone = null;
+                        }
                     }
                     
                     const company = document.getElementById('company');
