@@ -720,6 +720,68 @@ if ($companyFilter === 'Toms World') {
         .text-purple {
             color: #800080 !important;
         }
+        /* Bootstrap badge backgrounds for all purposes */
+        .badge.bg-purple {
+            background-color: #800080 !important;
+            color: white;
+        }
+
+        /* Keep existing purpose-badge styles as fallback */
+        .purpose-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .purpose-badge.meeting {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--info-color);
+        }
+
+        .purpose-badge.interview {
+            background: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+        }
+
+        .purpose-badge.delivery {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--primary-color);
+        }
+
+        .purpose-badge.service {
+            background: rgba(13, 202, 240, 0.1);
+            color: #0dcaf0;
+        }
+
+        .purpose-badge.training {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .purpose-badge.tour {
+            background: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+        }
+
+        .purpose-badge.event {
+            background: rgba(128, 0, 128, 0.1);
+            color: #800080;
+        }
+
+        .purpose-badge.other {
+            background: rgba(33, 37, 41, 0.1);
+            color: #212529;
+        }
+
+        /* Ensure Bootstrap badges have consistent styling */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -813,7 +875,7 @@ if ($companyFilter === 'Toms World') {
                             <th>Badge #</th><th>Visitor</th><th>Company</th><th>Host</th><th>Purpose</th><th>Notes</th><th>Visiting</th><th>Check-In</th><th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="recentActivityTableBody">
+                    <!-- <tbody id="recentActivityTableBody">
                         <?php foreach($recentActivity as $activity): 
                             $companyBadge = '';
                             if ($activity['company_visited'] == 'Toms World') {
@@ -830,6 +892,64 @@ if ($companyFilter === 'Toms World') {
                             <td><?php echo $activity['company']; ?></td>
                             <td><?php echo $activity['host_name']; ?></td>
                             <td><span class="purpose-badge <?php echo strtolower($activity['purpose']); ?>"><?php echo $activity['purpose']; ?></span></td>
+                            <td><span class="notes-text" title="<?php echo htmlspecialchars($activity['additional_notes'] ?? ''); ?>"><?php echo $activity['additional_notes'] ? htmlspecialchars($activity['additional_notes']) : '-'; ?></span></td>
+                            <td><?php echo $companyBadge; ?></td>
+                            <td><?php echo date('H:i:s', strtotime($activity['check_in_time'])); ?></td>
+                            <td><?php echo $activity['check_out_time'] ? '<span class="status-badge checked-out">Checked Out</span>' : '<span class="status-badge checked-in">Checked In</span>'; ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody> -->
+                    <tbody id="recentActivityTableBody">
+                        <?php 
+                        // Load purposes for badge styling
+                        $purposes_query = $conn->query("SELECT purpose_code, purpose_name, color_class FROM purposes");
+                        $purposes_style_map = array();
+                        while ($p = $purposes_query->fetch_assoc()) {
+                            // Map text color classes to badge background classes
+                            $color_map = array(
+                                'text-primary' => 'bg-primary',
+                                'text-success' => 'bg-success',
+                                'text-warning' => 'bg-warning',
+                                'text-danger' => 'bg-danger',
+                                'text-info' => 'bg-info',
+                                'text-secondary' => 'bg-secondary',
+                                'text-dark' => 'bg-dark',
+                                'text-purple' => 'bg-purple'
+                            );
+                            $badge_class = isset($color_map[$p['color_class']]) ? $color_map[$p['color_class']] : 'bg-secondary';
+                            $purposes_style_map[$p['purpose_code']] = array(
+                                'name' => $p['purpose_name'],
+                                'class' => $badge_class
+                            );
+                        }
+                        
+                        foreach($recentActivity as $activity): 
+                            $companyBadge = '';
+                            if ($activity['company_visited'] == 'Toms World') {
+                                $companyBadge = '<span class="company-badge toms-world"><i class="bi bi-building"></i> Tom\'s World</span>';
+                            } elseif ($activity['company_visited'] == 'Pan Asia') {
+                                $companyBadge = '<span class="company-badge pan-asia"><i class="bi bi-building"></i> Pan-Asia</span>';
+                            } else {
+                                $companyBadge = '<span class="badge bg-secondary">' . ($activity['company_visited'] ?? 'N/A') . '</span>';
+                            }
+                            
+                            // Get purpose badge styling
+                            $purpose_code = $activity['purpose'];
+                            $purpose_html = '<span class="badge bg-secondary">N/A</span>';
+                            if (isset($purposes_style_map[$purpose_code])) {
+                                $purpose_html = '<span class="badge ' . $purposes_style_map[$purpose_code]['class'] . '">' 
+                                            . $purposes_style_map[$purpose_code]['name'] . '</span>';
+                            } elseif ($purpose_code) {
+                                // Fallback to old style
+                                $purpose_html = '<span class="purpose-badge ' . strtolower($purpose_code) . '">' . $purpose_code . '</span>';
+                            }
+                        ?>
+                        <tr>
+                            <td><span class="badge-number"><?php echo $activity['badge_number']; ?></span></td>
+                            <td><?php echo $activity['first_name'] . ' ' . $activity['last_name']; ?></td>
+                            <td><?php echo $activity['company']; ?></td>
+                            <td><?php echo $activity['host_name']; ?></td>
+                            <td><?php echo $purpose_html; ?></td>
                             <td><span class="notes-text" title="<?php echo htmlspecialchars($activity['additional_notes'] ?? ''); ?>"><?php echo $activity['additional_notes'] ? htmlspecialchars($activity['additional_notes']) : '-'; ?></span></td>
                             <td><?php echo $companyBadge; ?></td>
                             <td><?php echo date('H:i:s', strtotime($activity['check_in_time'])); ?></td>
@@ -1327,6 +1447,8 @@ if ($companyFilter === 'Toms World') {
         let currentVisitId = null;
         let currentVisitorData = null;
         let dataTableInstances = {};
+        // Global variable to store all purposes with their styling
+        let purposesMap = {};
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('collapsed');
@@ -1358,6 +1480,7 @@ if ($companyFilter === 'Toms World') {
         //         }
         //     }
         // }
+
         function showSection(section) {
             document.querySelectorAll('.dashboard-content').forEach(c => c.style.display = 'none');
             document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
@@ -1411,6 +1534,78 @@ if ($companyFilter === 'Toms World') {
             });
         }
 
+        // Load purposes on page load for dynamic badge rendering
+        function loadPurposesMap() {
+            fetch('?action=get_all_purposes')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Create a map for quick lookup
+                        data.purposes.forEach(p => {
+                            purposesMap[p.purpose_code] = {
+                                name: p.purpose_name,
+                                color_class: p.color_class,
+                                icon_class: p.icon_class
+                            };
+                        });
+                        console.log('Purposes loaded:', purposesMap);
+                    }
+                })
+                .catch(e => console.error('Error loading purposes map:', e));
+        }
+
+        // Helper function to get purpose badge HTML
+        function getPurposeBadgeHTML(purposeCode) {
+            if (!purposeCode) return '<span class="badge bg-secondary">N/A</span>';
+            
+            // Check if purpose exists in our map
+            if (purposesMap[purposeCode]) {
+                const purpose = purposesMap[purposeCode];
+                // Map color classes to Bootstrap badge classes
+                const colorMap = {
+                    'text-primary': 'bg-primary',
+                    'text-success': 'bg-success',
+                    'text-warning': 'bg-warning',
+                    'text-danger': 'bg-danger',
+                    'text-info': 'bg-info',
+                    'text-secondary': 'bg-secondary',
+                    'text-dark': 'bg-dark',
+                    'text-purple': 'bg-purple'
+                };
+                
+                const badgeClass = colorMap[purpose.color_class] || 'bg-secondary';
+                return `<span class="badge ${badgeClass}">${purpose.name}</span>`;
+            }
+            
+            // Fallback to old style for backward compatibility
+            return `<span class="purpose-badge ${purposeCode.toLowerCase()}">${purposeCode}</span>`;
+        }
+
+        // function loadActiveVisits() {
+        //     fetch('?action=active_visits' + filterParam)
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             initDataTable('activeVisitsTable', data, (v) => `
+        //                 <td><span class="badge-number">${v.badge_number}</span></td>
+        //                 <td><strong>${v.first_name} ${v.last_name}</strong></td>
+        //                 <td>${v.company}</td>
+        //                 <td>${v.host_name}</td>
+        //                 <td>${v.department_name}</td>
+        //                 <td><span class="purpose-badge ${(v.purpose||'').toLowerCase()}">${v.purpose}</span></td>
+        //                 <td><span class="notes-text" title="${v.additional_notes || ''}">${v.additional_notes || '-'}</span></td>
+        //                 <td>${getCompanyBadgeHTML(v.company_visited)}</td>
+        //                 <td>${new Date(v.check_in_time).toLocaleString()}</td>
+        //                 <td>${new Date(v.valid_until).toLocaleString()}</td>
+        //                 <td>
+        //                     <button class="action-btn view" onclick="viewVisitDetails(${v.visit_id})" title="View"><i class="bi bi-eye"></i></button>
+        //                     <button class="action-btn delete" onclick="checkOutVisitor(${v.visit_id})" title="Check Out"><i class="bi bi-box-arrow-right"></i></button>
+        //                 </td>
+        //             `);
+        //             document.getElementById('activeVisitCount').textContent = data.length;
+        //         })
+        //         .catch(e => console.error('Error loading active visits:', e));
+        // }
+
         function loadActiveVisits() {
             fetch('?action=active_visits' + filterParam)
                 .then(r => r.json())
@@ -1421,7 +1616,7 @@ if ($companyFilter === 'Toms World') {
                         <td>${v.company}</td>
                         <td>${v.host_name}</td>
                         <td>${v.department_name}</td>
-                        <td><span class="purpose-badge ${(v.purpose||'').toLowerCase()}">${v.purpose}</span></td>
+                        <td>${getPurposeBadgeHTML(v.purpose)}</td>
                         <td><span class="notes-text" title="${v.additional_notes || ''}">${v.additional_notes || '-'}</span></td>
                         <td>${getCompanyBadgeHTML(v.company_visited)}</td>
                         <td>${new Date(v.check_in_time).toLocaleString()}</td>
@@ -1659,6 +1854,71 @@ if ($companyFilter === 'Toms World') {
                 });
         }
 
+        // function viewVisitorHistory(visitorId, visitorName) {
+        //     document.getElementById('visitorHistoryName').textContent = visitorName;
+            
+        //     if ($.fn.DataTable.isDataTable('#visitorHistoryTable')) {
+        //         $('#visitorHistoryTable').DataTable().clear().destroy();
+        //     }
+            
+        //     fetch(`?action=visitor_history&visitor_id=${visitorId}`)
+        //         .then(r => r.json())
+        //         .then(visits => {
+        //             const tbody = document.getElementById('visitorHistoryTableBody');
+        //             tbody.innerHTML = '';
+                    
+        //             if (visits.length === 0) {
+        //                 tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No visit history found</td></tr>';
+        //                 new bootstrap.Modal(document.getElementById('visitorHistoryModal')).show();
+        //             } else {
+        //                 visits.forEach(visit => {
+        //                     const checkIn = new Date(visit.check_in_time);
+        //                     const checkOut = visit.check_out_time ? new Date(visit.check_out_time) : null;
+        //                     let duration = 'In Progress';
+                            
+        //                     if (checkOut) {
+        //                         const diff = checkOut - checkIn;
+        //                         const hours = Math.floor(diff / 3600000);
+        //                         const minutes = Math.floor((diff % 3600000) / 60000);
+        //                         duration = `${hours}h ${minutes}m`;
+        //                     }
+                            
+        //                     const status = checkOut 
+        //                         ? '<span class="status-badge checked-out">Checked Out</span>' 
+        //                         : '<span class="status-badge checked-in">Checked In</span>';
+                            
+        //                     const tr = document.createElement('tr');
+        //                     tr.innerHTML = `
+        //                         <td><span class="badge-number">${visit.badge_number || 'N/A'}</span></td>
+        //                         <td>${visit.host_name}</td>
+        //                         <td>${visit.department_name}</td>
+        //                         <td><span class="purpose-badge ${(visit.purpose||'').toLowerCase()}">${visit.purpose}</span></td>
+        //                         <td>${checkIn.toLocaleString()}</td>
+        //                         <td>${checkOut ? checkOut.toLocaleString() : 'N/A'}</td>
+        //                         <td>${duration}</td>
+        //                         <td>${status}</td>
+        //                     `;
+        //                     tbody.appendChild(tr);
+        //                 });
+                        
+        //                 dataTableInstances['visitorHistoryTable'] = $('#visitorHistoryTable').DataTable({
+        //                     pageLength: 10,
+        //                     order: [[4, 'desc']],
+        //                     language: {
+        //                         emptyTable: "No visit history found",
+        //                         zeroRecords: "No matching records found"
+        //                     }
+        //                 });
+                        
+        //                 new bootstrap.Modal(document.getElementById('visitorHistoryModal')).show();
+        //             }
+        //         })
+        //         .catch(e => {
+        //             console.error('Error:', e);
+        //             Swal.fire('Error', 'Failed to load visitor history', 'error');
+        //         });
+        // }
+
         function viewVisitorHistory(visitorId, visitorName) {
             document.getElementById('visitorHistoryName').textContent = visitorName;
             
@@ -1697,7 +1957,7 @@ if ($companyFilter === 'Toms World') {
                                 <td><span class="badge-number">${visit.badge_number || 'N/A'}</span></td>
                                 <td>${visit.host_name}</td>
                                 <td>${visit.department_name}</td>
-                                <td><span class="purpose-badge ${(visit.purpose||'').toLowerCase()}">${visit.purpose}</span></td>
+                                <td>${getPurposeBadgeHTML(visit.purpose)}</td>
                                 <td>${checkIn.toLocaleString()}</td>
                                 <td>${checkOut ? checkOut.toLocaleString() : 'N/A'}</td>
                                 <td>${duration}</td>
@@ -1723,6 +1983,71 @@ if ($companyFilter === 'Toms World') {
                     Swal.fire('Error', 'Failed to load visitor history', 'error');
                 });
         }
+
+        // function viewEmployeeHistory(employeeId, employeeName) {
+        //     document.getElementById('employeeHistoryName').textContent = employeeName;
+            
+        //     if ($.fn.DataTable.isDataTable('#employeeHistoryTable')) {
+        //         $('#employeeHistoryTable').DataTable().clear().destroy();
+        //     }
+            
+        //     fetch(`?action=employee_history&employee_id=${employeeId}`)
+        //         .then(r => r.json())
+        //         .then(visits => {
+        //             const tbody = document.getElementById('employeeHistoryTableBody');
+        //             tbody.innerHTML = '';
+                    
+        //             if (visits.length === 0) {
+        //                 tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No visits hosted yet</td></tr>';
+        //                 new bootstrap.Modal(document.getElementById('employeeHistoryModal')).show();
+        //             } else {
+        //                 visits.forEach(visit => {
+        //                     const checkIn = new Date(visit.check_in_time);
+        //                     const checkOut = visit.check_out_time ? new Date(visit.check_out_time) : null;
+        //                     let duration = 'In Progress';
+                            
+        //                     if (checkOut) {
+        //                         const diff = checkOut - checkIn;
+        //                         const hours = Math.floor(diff / 3600000);
+        //                         const minutes = Math.floor((diff % 3600000) / 60000);
+        //                         duration = `${hours}h ${minutes}m`;
+        //                     }
+                            
+        //                     const status = checkOut 
+        //                         ? '<span class="status-badge checked-out">Checked Out</span>' 
+        //                         : '<span class="status-badge checked-in">Checked In</span>';
+                            
+        //                     const tr = document.createElement('tr');
+        //                     tr.innerHTML = `
+        //                         <td><span class="badge-number">${visit.badge_number || 'N/A'}</span></td>
+        //                         <td><strong>${visit.first_name} ${visit.last_name}</strong></td>
+        //                         <td>${visit.company || 'N/A'}</td>
+        //                         <td><span class="purpose-badge ${(visit.purpose||'').toLowerCase()}">${visit.purpose}</span></td>
+        //                         <td>${checkIn.toLocaleString()}</td>
+        //                         <td>${checkOut ? checkOut.toLocaleString() : 'N/A'}</td>
+        //                         <td>${duration}</td>
+        //                         <td>${status}</td>
+        //                     `;
+        //                     tbody.appendChild(tr);
+        //                 });
+                        
+        //                 dataTableInstances['employeeHistoryTable'] = $('#employeeHistoryTable').DataTable({
+        //                     pageLength: 10,
+        //                     order: [[4, 'desc']],
+        //                     language: {
+        //                         emptyTable: "No visits hosted yet",
+        //                         zeroRecords: "No matching records found"
+        //                     }
+        //                 });
+                        
+        //                 new bootstrap.Modal(document.getElementById('employeeHistoryModal')).show();
+        //             }
+        //         })
+        //         .catch(e => {
+        //             console.error('Error:', e);
+        //             Swal.fire('Error', 'Failed to load employee history', 'error');
+        //         });
+        // }
 
         function viewEmployeeHistory(employeeId, employeeName) {
             document.getElementById('employeeHistoryName').textContent = employeeName;
@@ -1762,7 +2087,7 @@ if ($companyFilter === 'Toms World') {
                                 <td><span class="badge-number">${visit.badge_number || 'N/A'}</span></td>
                                 <td><strong>${visit.first_name} ${visit.last_name}</strong></td>
                                 <td>${visit.company || 'N/A'}</td>
-                                <td><span class="purpose-badge ${(visit.purpose||'').toLowerCase()}">${visit.purpose}</span></td>
+                                <td>${getPurposeBadgeHTML(visit.purpose)}</td>
                                 <td>${checkIn.toLocaleString()}</td>
                                 <td>${checkOut ? checkOut.toLocaleString() : 'N/A'}</td>
                                 <td>${duration}</td>
@@ -1902,6 +2227,39 @@ if ($companyFilter === 'Toms World') {
             });
         }
 
+        // function refreshDashboard() {
+        //     fetch('?action=dashboard_stats' + filterParam)
+        //         .then(r => r.json())
+        //         .then(stats => {
+        //             document.getElementById('todayTotal').textContent = stats.today_total;
+        //             document.getElementById('currentlyIn').textContent = stats.currently_in;
+        //             document.getElementById('avgDuration').textContent = stats.avg_duration;
+        //             document.getElementById('activeVisitCount').textContent = stats.currently_in;
+        //         });
+            
+        //     fetch('?action=recent_activity' + filterParam)
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             const tbody = document.getElementById('recentActivityTableBody');
+        //             tbody.innerHTML = '';
+        //             data.forEach(a => {
+        //                 tbody.innerHTML += `
+        //                     <tr>
+        //                         <td><span class="badge-number">${a.badge_number}</span></td>
+        //                         <td>${a.first_name} ${a.last_name}</td>
+        //                         <td>${a.company}</td>
+        //                         <td>${a.host_name}</td>
+        //                         <td><span class="purpose-badge ${(a.purpose||'').toLowerCase()}">${a.purpose}</span></td>
+        //                         <td><span class="notes-text" title="${a.additional_notes || ''}">${a.additional_notes || '-'}</span></td>
+        //                         <td>${getCompanyBadgeHTML(a.company_visited)}</td>
+        //                         <td>${new Date(a.check_in_time).toLocaleTimeString()}</td>
+        //                         <td>${a.check_out_time ? '<span class="status-badge checked-out">Checked Out</span>' : '<span class="status-badge checked-in">Checked In</span>'}</td>
+        //                     </tr>
+        //                 `;
+        //             });
+        //         });
+        // }
+
         function refreshDashboard() {
             fetch('?action=dashboard_stats' + filterParam)
                 .then(r => r.json())
@@ -1924,7 +2282,7 @@ if ($companyFilter === 'Toms World') {
                                 <td>${a.first_name} ${a.last_name}</td>
                                 <td>${a.company}</td>
                                 <td>${a.host_name}</td>
-                                <td><span class="purpose-badge ${(a.purpose||'').toLowerCase()}">${a.purpose}</span></td>
+                                <td>${getPurposeBadgeHTML(a.purpose)}</td>
                                 <td><span class="notes-text" title="${a.additional_notes || ''}">${a.additional_notes || '-'}</span></td>
                                 <td>${getCompanyBadgeHTML(a.company_visited)}</td>
                                 <td>${new Date(a.check_in_time).toLocaleTimeString()}</td>
@@ -1997,6 +2355,9 @@ if ($companyFilter === 'Toms World') {
                 $('#recentActivityTable').DataTable({ pageLength: 10, order: [] });
             }
             
+            // ADD THIS LINE:
+            loadPurposesMap();
+
             $('#visitorHistoryModal').on('hidden.bs.modal', function () {
                 if ($.fn.DataTable.isDataTable('#visitorHistoryTable')) {
                     $('#visitorHistoryTable').DataTable().clear().destroy();
@@ -2014,6 +2375,7 @@ if ($companyFilter === 'Toms World') {
                     $('#departmentEmployeesTable').DataTable().clear().destroy();
                 }
             });
+            
         });
 
         setInterval(() => {
