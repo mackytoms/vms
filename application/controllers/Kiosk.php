@@ -157,6 +157,7 @@ class Kiosk extends CI_Controller {
                 'company_visited' => $company_visited
             ]
         ]);
+        
     }
     
     // // Complete check-in and insert visitor data
@@ -566,6 +567,7 @@ class Kiosk extends CI_Controller {
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Failed to update purpose status']);
         }
+        
     }
 
     /**
@@ -617,6 +619,96 @@ class Kiosk extends CI_Controller {
             echo json_encode(['status' => 'success']);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Failed to update order']);
+        }
+    }
+
+
+    /**
+     * Get visitor information by badge number (for QR code scanning)
+     */
+    public function get_visitor_by_badge() {
+        header('Content-Type: application/json');
+        
+        if ($this->input->method() !== 'post') {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Invalid request method'
+            ]);
+            return;
+        }
+        
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        
+        if (!$data || !isset($data['badge_number'])) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Badge number is required'
+            ]);
+            return;
+        }
+        
+        $badge_number = trim($data['badge_number']);
+        
+        // Validate badge number format
+        if (!preg_match('/^V-\d{4}-\d{4}$/', $badge_number)) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Invalid badge number format'
+            ]);
+            return;
+        }
+        
+        // Query database
+        $this->db->select('
+            vis.visitor_id,
+            vis.first_name,
+            vis.last_name,
+            vis.email,
+            vis.phone,
+            vis.company,
+            vis.photo,
+            vis.visitor_type,
+            vis.company_visited,
+            v.visit_id,
+            v.badge_number,
+            v.check_in_time,
+            v.valid_until,
+            (SELECT COUNT(*) FROM visits WHERE visitor_id = vis.visitor_id) as total_visits
+        ')
+        ->from('visits v')
+        ->join('visitors vis', 'v.visitor_id = vis.visitor_id', 'inner')
+        ->where('v.badge_number', $badge_number)
+        ->order_by('v.visit_id', 'DESC')
+        ->limit(1);
+        
+        $query = $this->db->get();
+        
+        if ($query->num_rows() > 0) {
+            $visitor = $query->row();
+            
+            echo json_encode([
+                'status' => 'success',
+                'visitor' => [
+                    'visitor_id' => $visitor->visitor_id,
+                    'first_name' => $visitor->first_name,
+                    'last_name' => $visitor->last_name,
+                    'email' => $visitor->email,
+                    'phone' => $visitor->phone,
+                    'company' => $visitor->company,
+                    'photo' => $visitor->photo,
+                    'visitor_type' => $visitor->visitor_type,
+                    'company_visited' => $visitor->company_visited,
+                    'badge_number' => $visitor->badge_number,
+                    'total_visits' => (int)$visitor->total_visits,
+                    'last_visit' => $visitor->check_in_time
+                ]
+            ]);
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Badge number not found in our records'
+            ]);
         }
     }
 

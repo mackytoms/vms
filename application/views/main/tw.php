@@ -709,7 +709,7 @@
                 lastName: "Last Name *",
                 email: "Email Address *",
                 phone: "Phone Number *",
-                company: "Company *",
+                company: "Company / Branch *",
                 companyPlaceholder: "Your Company Name",
                 back: "Back",
                 continue: "Continue",
@@ -811,7 +811,7 @@
                 lastName: "姓氏 *",
                 email: "電子郵件地址 *",
                 phone: "電話號碼 *",
-                company: "公司 *",
+                company: "公司 / 分支 *",
                 companyPlaceholder: "您的公司名稱",
                 back: "返回",
                 continue: "繼續",
@@ -913,7 +913,7 @@
                 lastName: "姓氏 *",
                 email: "电子邮件地址 *",
                 phone: "电话号码 *",
-                company: "公司 *",
+                company: "公司 / 分支 *",
                 companyPlaceholder: "您的公司名称",
                 back: "返回",
                 continue: "继续",
@@ -1015,7 +1015,7 @@
                 lastName: "Apelyido *",
                 email: "Email Address *",
                 phone: "Numero ng Telepono *",
-                company: "Kumpanya *",
+                company: "Kumpanya / Sangay *",
                 companyPlaceholder: "Pangalan ng Kumpanya",
                 back: "Bumalik",
                 continue: "Magpatuloy",
@@ -1117,7 +1117,7 @@
                 lastName: "姓 *",
                 email: "メールアドレス *",
                 phone: "電話番号 *",
-                company: "会社名 *",
+                company: "会社 / 支店 *",
                 companyPlaceholder: "会社名を入力",
                 back: "戻る",
                 continue: "続ける",
@@ -1304,18 +1304,59 @@
         // });
 
         
-        // Function to generate QR code data
+        // // Function to generate QR code data
+        // function generateQRCodeData() {
+        //     const qrData = {
+        //         firstName: visitorData.firstName,
+        //         lastName: visitorData.lastName,
+        //         email: visitorData.email,
+        //         phone: visitorData.phone,
+        //         company: visitorData.company,
+        //         timestamp: new Date().toISOString()
+        //     };
+        //     return JSON.stringify(qrData);
+        // }
+
         function generateQRCodeData() {
-            const qrData = {
-                firstName: visitorData.firstName,
-                lastName: visitorData.lastName,
-                email: visitorData.email,
-                phone: visitorData.phone,
-                company: visitorData.company,
-                timestamp: new Date().toISOString()
-            };
-            return JSON.stringify(qrData);
+            // Only return the badge number - much smaller QR code!
+            return visitorData.badge_number;
         }
+
+        // // Function to generate and display QR code on success screen
+        // function generateVisitorQRCode() {
+        //     const qrContainer = document.getElementById('qrCodeContainer');
+        //     if (!qrContainer) return;
+            
+        //     // Clear previous QR code
+        //     qrContainer.innerHTML = '';
+            
+        //     // Generate QR data
+        //     const qrData = generateQRCodeData();
+            
+        //     // Store photo separately in localStorage with email as key
+        //     if (visitorData.photo && visitorData.email) {
+        //         try {
+        //             localStorage.setItem(`visitor_photo_${visitorData.email}`, visitorData.photo);
+        //         } catch (e) {
+        //             console.error('Could not store photo in localStorage:', e);
+        //         }
+        //     }
+            
+        //     // Create QR code
+        //     try {
+        //         qrCodeInstance = new QRCode(qrContainer, {
+        //             text: qrData,
+        //             width: 180,
+        //             height: 180,
+        //             colorDark: "#2c3e50",
+        //             colorLight: "#ffffff",
+        //             correctLevel: QRCode.CorrectLevel.M
+        //         });
+        //     } catch (e) {
+        //         console.error('Error generating QR code:', e);
+        //         qrContainer.innerHTML = '<p class="text-danger">Could not generate QR code</p>';
+        //     }
+        // }
 
         // Function to generate and display QR code on success screen
         function generateVisitorQRCode() {
@@ -1325,28 +1366,36 @@
             // Clear previous QR code
             qrContainer.innerHTML = '';
             
-            // Generate QR data
-            const qrData = generateQRCodeData();
+            // Make sure we have a badge_number
+            if (!visitorData.badge_number) {
+                qrContainer.innerHTML = '<p class="text-danger">Badge number not available</p>';
+                return;
+            }
             
-            // Store photo separately in localStorage with email as key
-            if (visitorData.photo && visitorData.email) {
+            // Generate simple QR data - just the badge number
+            const qrData = generateQRCodeData(); // Returns just badge_number string
+            
+            // Store photo separately in localStorage with badge_number as key
+            if (visitorData.photo && visitorData.badge_number) {
                 try {
-                    localStorage.setItem(`visitor_photo_${visitorData.email}`, visitorData.photo);
+                    localStorage.setItem(`visitor_photo_${visitorData.badge_number}`, visitorData.photo);
                 } catch (e) {
                     console.error('Could not store photo in localStorage:', e);
                 }
             }
             
-            // Create QR code
+            // Create QR code with MUCH simpler data
             try {
                 qrCodeInstance = new QRCode(qrContainer, {
-                    text: qrData,
+                    text: qrData, // Just "V-2025-9859" instead of huge JSON
                     width: 180,
                     height: 180,
                     colorDark: "#2c3e50",
                     colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.M
+                    correctLevel: QRCode.CorrectLevel.H // High error correction
                 });
+                
+                console.log('QR Code generated with badge:', qrData);
             } catch (e) {
                 console.error('Error generating QR code:', e);
                 qrContainer.innerHTML = '<p class="text-danger">Could not generate QR code</p>';
@@ -1782,6 +1831,100 @@
         //     }
         // }
 
+        // // FIXED: Handle QR code success for returning visitors
+        // function handleQRCodeSuccess(decodedText) {
+        //     // Prevent multiple calls
+        //     if (isProcessingQR) {
+        //         return;
+        //     }
+        //     isProcessingQR = true;
+            
+        //     try {
+        //         let qrData;
+                
+        //         // Try to parse as JSON first
+        //         try {
+        //             qrData = JSON.parse(decodedText);
+        //         } catch (e) {
+        //             try {
+        //                 qrData = JSON.parse(atob(decodedText));
+        //             } catch (e2) {
+        //                 isProcessingQR = false;
+        //                 throw new Error('Invalid QR format');
+        //             }
+        //         }
+                
+        //         // Validate QR data has required fields
+        //         if (!qrData.email || !qrData.firstName || !qrData.lastName) {
+        //             isProcessingQR = false;
+        //             throw new Error('Missing required fields in QR code');
+        //         }
+                
+        //         // Stop QR scanner safely (don't await, let it happen in background)
+        //         stopQRScanner();
+                
+        //         // Retrieve stored photo from localStorage using email as key
+        //         const storedPhoto = localStorage.getItem(`visitor_photo_${qrData.email}`);
+                
+        //         // Populate visitor data from QR code - this skips basicInfoScreen & photoScreen
+        //         visitorData = {
+        //             ...visitorData,
+        //             firstName: qrData.firstName,
+        //             lastName: qrData.lastName,
+        //             email: qrData.email,
+        //             phone: qrData.phone || '',
+        //             company: qrData.company || '',
+        //             photo: storedPhoto || null,
+        //             type: 'returning'
+        //         };
+                
+        //         // Update flow for returning visitor - skips screens 3 (basicInfo) and 4 (photo)
+        //         // Flow: Welcome(1) -> QR(2) -> Host(5) -> Purpose(6) -> Agreement(7) -> Success(8)
+        //         currentFlow = [1, 2, 5, 6, 7, 8];
+        //         currentFlowIndex = 2; // Position 2 in array = screen 5 (hostScreen)
+                
+        //         // Show success message and then navigate to hostScreen
+        //         Swal.fire({
+        //             title: translations[currentLanguage].qrScanSuccess || 'QR Code Scanned!',
+        //             html: `<p>${translations[currentLanguage].welcomeBackQR || 'Welcome back!'}</p>
+        //                 <p><strong>${qrData.firstName} ${qrData.lastName}</strong></p>
+        //                 <p>${qrData.company || ''}</p>`,
+        //             icon: 'success',
+        //             confirmButtonColor: '#27ae60',
+        //             timer: 3000,
+        //             timerProgressBar: true,
+        //             showConfirmButton: true,
+        //             confirmButtonText: 'OK'
+        //         }).then(() => {
+        //             // Reset the processing flag
+        //             isProcessingQR = false;
+        //             // Navigate to hostScreen (screen 5) - skipping basicInfo and photo screens
+        //             showScreen(5);
+        //         });
+                
+        //     } catch (e) {
+        //         console.error('QR decode error:', e);
+        //         isProcessingQR = false;
+                
+        //         Swal.fire({
+        //             title: translations[currentLanguage].invalidQRMessage || 'Invalid QR Code',
+        //             text: translations[currentLanguage].qrScanFailed || 'Could not read QR code.',
+        //             icon: 'error',
+        //             showCancelButton: true,
+        //             confirmButtonColor: '#3498db',
+        //             cancelButtonColor: '#95a5a6',
+        //             confirmButtonText: 'Try Again',
+        //             cancelButtonText: 'Continue Manually'
+        //         }).then((result) => {
+        //             if (result.isConfirmed) {
+        //                 initQRScanner();
+        //             } else {
+        //                 skipQRScan();
+        //             }
+        //         });
+        //     }
+        // }
+
         // FIXED: Handle QR code success for returning visitors
         function handleQRCodeSuccess(decodedText) {
             // Prevent multiple calls
@@ -1790,76 +1933,26 @@
             }
             isProcessingQR = true;
             
-            try {
-                let qrData;
-                
-                // Try to parse as JSON first
-                try {
-                    qrData = JSON.parse(decodedText);
-                } catch (e) {
-                    try {
-                        qrData = JSON.parse(atob(decodedText));
-                    } catch (e2) {
-                        isProcessingQR = false;
-                        throw new Error('Invalid QR format');
-                    }
-                }
-                
-                // Validate QR data has required fields
-                if (!qrData.email || !qrData.firstName || !qrData.lastName) {
-                    isProcessingQR = false;
-                    throw new Error('Missing required fields in QR code');
-                }
-                
-                // Stop QR scanner safely (don't await, let it happen in background)
-                stopQRScanner();
-                
-                // Retrieve stored photo from localStorage using email as key
-                const storedPhoto = localStorage.getItem(`visitor_photo_${qrData.email}`);
-                
-                // Populate visitor data from QR code - this skips basicInfoScreen & photoScreen
-                visitorData = {
-                    ...visitorData,
-                    firstName: qrData.firstName,
-                    lastName: qrData.lastName,
-                    email: qrData.email,
-                    phone: qrData.phone || '',
-                    company: qrData.company || '',
-                    photo: storedPhoto || null,
-                    type: 'returning'
-                };
-                
-                // Update flow for returning visitor - skips screens 3 (basicInfo) and 4 (photo)
-                // Flow: Welcome(1) -> QR(2) -> Host(5) -> Purpose(6) -> Agreement(7) -> Success(8)
-                currentFlow = [1, 2, 5, 6, 7, 8];
-                currentFlowIndex = 2; // Position 2 in array = screen 5 (hostScreen)
-                
-                // Show success message and then navigate to hostScreen
-                Swal.fire({
-                    title: translations[currentLanguage].qrScanSuccess || 'QR Code Scanned!',
-                    html: `<p>${translations[currentLanguage].welcomeBackQR || 'Welcome back!'}</p>
-                        <p><strong>${qrData.firstName} ${qrData.lastName}</strong></p>
-                        <p>${qrData.company || ''}</p>`,
-                    icon: 'success',
-                    confirmButtonColor: '#27ae60',
-                    timer: 3000,
-                    timerProgressBar: true,
-                    showConfirmButton: true,
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    // Reset the processing flag
-                    isProcessingQR = false;
-                    // Navigate to hostScreen (screen 5) - skipping basicInfo and photo screens
-                    showScreen(5);
-                });
-                
-            } catch (e) {
-                console.error('QR decode error:', e);
+            console.log('QR Scanned:', decodedText);
+            
+            // Stop QR scanner safely
+            stopQRScanner();
+            
+            // Show loading
+            showLoading();
+            
+            // The decoded text should be just the badge number (e.g., "V-2025-9859")
+            const badgeNumber = decodedText.trim();
+            
+            // Validate badge number format
+            const badgePattern = /^V-\d{4}-\d{4}$/;
+            if (!badgePattern.test(badgeNumber)) {
+                hideLoading();
                 isProcessingQR = false;
                 
                 Swal.fire({
                     title: translations[currentLanguage].invalidQRMessage || 'Invalid QR Code',
-                    text: translations[currentLanguage].qrScanFailed || 'Could not read QR code.',
+                    text: 'QR code does not contain a valid badge number.',
                     icon: 'error',
                     showCancelButton: true,
                     confirmButtonColor: '#3498db',
@@ -1873,7 +1966,109 @@
                         skipQRScan();
                     }
                 });
+                return;
             }
+            
+            // Fetch visitor data from database using badge number
+            fetch('<?= base_url("kiosk/get_visitor_by_badge") ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ badge_number: badgeNumber })
+            })
+            .then(response => response.json())
+            .then(result => {
+                hideLoading();
+                
+                if (result.status === 'success' && result.visitor) {
+                    const visitor = result.visitor;
+                    
+                    // Retrieve stored photo from localStorage using badge number
+                    const storedPhoto = localStorage.getItem(`visitor_photo_${badgeNumber}`);
+                    
+                    // Populate visitor data from database
+                    visitorData = {
+                        ...visitorData,
+                        visitor_id: visitor.visitor_id,
+                        firstName: visitor.first_name,
+                        lastName: visitor.last_name,
+                        email: visitor.email,
+                        phone: visitor.phone || '',
+                        company: visitor.company || '',
+                        photo: storedPhoto || visitor.photo || null,
+                        type: 'returning',
+                        total_visits: visitor.total_visits || 0
+                    };
+                    
+                    // Update flow for returning visitor
+                    currentFlow = [1, 2, 5, 6, 7, 8];
+                    currentFlowIndex = 2;
+                    
+                    // Show welcome back message
+                    Swal.fire({
+                        title: translations[currentLanguage].qrScanSuccess || 'QR Code Scanned!',
+                        html: `
+                            <p>${translations[currentLanguage].welcomeBackQR || 'Welcome back!'}</p>
+                            <p><strong>${visitor.first_name} ${visitor.last_name}</strong></p>
+                            <p>${visitor.company || ''}</p>
+                            <p class="text-muted">Total Visits: ${visitor.total_visits || 1}</p>
+                        `,
+                        icon: 'success',
+                        confirmButtonColor: '#27ae60',
+                        timer: 3000,
+                        timerProgressBar: true,
+                        showConfirmButton: true,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        isProcessingQR = false;
+                        showScreen(5);
+                    });
+                    
+                } else {
+                    isProcessingQR = false;
+                    
+                    Swal.fire({
+                        title: 'Visitor Not Found',
+                        text: result.message || 'This badge number was not found in our records.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3498db',
+                        cancelButtonColor: '#95a5a6',
+                        confirmButtonText: 'Try Again',
+                        cancelButtonText: 'Continue as New Visitor'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            initQRScanner();
+                        } else {
+                            skipQRScan();
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                isProcessingQR = false;
+                console.error('Error fetching visitor data:', error);
+                
+                Swal.fire({
+                    title: 'Connection Error',
+                    text: 'Unable to retrieve visitor information. Please try again or continue manually.',
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3498db',
+                    cancelButtonColor: '#95a5a6',
+                    confirmButtonText: 'Try Again',
+                    cancelButtonText: 'Continue Manually'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        initQRScanner();
+                    } else {
+                        skipQRScan();
+                    }
+                });
+            });
         }
 
         // FIXED: Handle QR upload for returning visitors
@@ -3074,11 +3269,11 @@
                 badgePhotoDiv.innerHTML = '<i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>';
             }
             
-            // Store visit ID for potential future reference
+            // Store visit ID and badge number FIRST
             visitorData.visit_id = data.visit_id;
             visitorData.badge_number = data.badge_number;
-            
-            // Generate QR code for the visitor
+
+            // THEN generate QR code (needs badge_number to be set)
             generateVisitorQRCode();
         }
 
