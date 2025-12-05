@@ -57,14 +57,36 @@ class Kiosk extends CI_Controller {
             return;
         }
         
-        // Get company_visited from request (defaults to 'Toms World' if not provided)
-        $company_visited = isset($data['company_visited']) ? $data['company_visited'] : 'Toms World';
+        // VALIDATE: At least one of email or phone must be provided
+        $has_email = !empty($data['email']);
+        $has_phone = !empty($data['phone']);
+        
+        if (!$has_email && !$has_phone) {
+            echo json_encode([
+                'status' => 'error', 
+                'message' => 'At least one contact method (email or phone) is required'
+            ]);
+            return;
+        }
+        
+        // Get company_visited from request (defaults to 'Pan Asia' if not provided)
+        $company_visited = isset($data['company_visited']) ? $data['company_visited'] : 'Pan Asia';
         
         // Start transaction
         $this->db->trans_start();
         
-        // Check if visitor already exists by email
-        $existing_visitor = $this->db->get_where('visitors', ['email' => $data['email']])->row();
+        // Check if visitor already exists by email OR phone
+        $existing_visitor = null;
+        
+        if ($has_email) {
+            // Try to find by email first
+            $existing_visitor = $this->db->get_where('visitors', ['email' => $data['email']])->row();
+        }
+        
+        // If not found by email and phone is provided, try phone
+        if (!$existing_visitor && $has_phone) {
+            $existing_visitor = $this->db->get_where('visitors', ['phone' => $data['phone']])->row();
+        }
         
         if ($existing_visitor) {
             $visitor_id = $existing_visitor->visitor_id;
@@ -73,7 +95,8 @@ class Kiosk extends CI_Controller {
             $visitor_update = [
                 'first_name' => $data['firstName'],
                 'last_name' => $data['lastName'],
-                'phone' => $data['phone'],
+                'email' => $has_email ? $data['email'] : null,
+                'phone' => $has_phone ? $data['phone'] : null,
                 'company' => $data['company'],
                 'visitor_type' => $data['type'],
                 'company_visited' => $company_visited,
@@ -92,8 +115,8 @@ class Kiosk extends CI_Controller {
             $visitor_data = [
                 'first_name' => $data['firstName'],
                 'last_name' => $data['lastName'],
-                'email' => $data['email'],
-                'phone' => $data['phone'],
+                'email' => $has_email ? $data['email'] : null,
+                'phone' => $has_phone ? $data['phone'] : null,
                 'company' => $data['company'],
                 'photo' => isset($data['photo']) ? $data['photo'] : null,
                 'visitor_type' => $data['type'],
@@ -157,7 +180,6 @@ class Kiosk extends CI_Controller {
                 'company_visited' => $company_visited
             ]
         ]);
-        
     }
     
     // // Complete check-in and insert visitor data
@@ -421,23 +443,37 @@ class Kiosk extends CI_Controller {
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
         
-        if (!$data || !isset($data['email'])) {
+        if (!$data || (!isset($data['email']) && !isset($data['phone']))) {
             echo json_encode([
                 'status' => 'error',
-                'message' => 'Email is required'
+                'message' => 'Email or phone is required'
             ]);
             return;
         }
         
-        $email = strtolower(trim($data['email']));
+        // Try to find by email first if provided
+        $visitor = null;
         
-        // Search for visitor by email
-        $this->db->where('LOWER(email)', $email);
-        $query = $this->db->get('visitors');
+        if (!empty($data['email'])) {
+            $email = strtolower(trim($data['email']));
+            $this->db->where('LOWER(email)', $email);
+            $query = $this->db->get('visitors');
+            if ($query->num_rows() > 0) {
+                $visitor = $query->row();
+            }
+        }
         
-        if ($query->num_rows() > 0) {
-            $visitor = $query->row();
-            
+        // If not found by email, try phone if provided
+        if (!$visitor && !empty($data['phone'])) {
+            $phone = trim($data['phone']);
+            $this->db->where('phone', $phone);
+            $query = $this->db->get('visitors');
+            if ($query->num_rows() > 0) {
+                $visitor = $query->row();
+            }
+        }
+        
+        if ($visitor) {
             // Get total visits count
             $this->db->where('visitor_id', $visitor->visitor_id);
             $visits_query = $this->db->get('visits');
@@ -622,7 +658,7 @@ class Kiosk extends CI_Controller {
         }
     }
 
-
+    
     /**
      * Get visitor information by badge number (for QR code scanning)
      */
