@@ -1,56 +1,29 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Main extends CI_Controller {
-    
+class Admin extends CI_Controller {
+
     public function __construct() {
         parent::__construct();
-        $this->load->library('session');
-        $this->load->helper('url');
         $this->load->database();
+        $this->load->model('Admin_model');
+        $this->load->helper('url'); // ADD THIS
+        
+        // Check if user is logged in
+        if (!$this->session->userdata('logged_in')) {
+            redirect('auth/login');
+        }
+        
+        // Get user info from session
+        $this->data = []; // INITIALIZE THIS
+        $this->data['logged_in_user'] = strtolower($this->session->userdata('username'));
+        $this->data['user_role'] = $this->session->userdata('role');
+        $this->data['companyFilter'] = $this->getCompanyFilter($this->data['logged_in_user']);
+        
+        // Set page title and welcome message
+        $this->setPageInfo();
     }
     
-    // Template helper method for TW (Toms World) - WITH header and footer
-    private function render_template_tw($content_view, $data = array()) {
-        $default_data = array(
-            'company' => 'TOMS WORLD',
-            'company_code' => 'tw'
-        );
-        $data = array_merge($default_data, $data);
-        
-        $this->load->view('partials/__header_tw', $data);
-        $this->load->view($content_view, $data);
-        $this->load->view('partials/__footer', $data);
-    }
-
-    // Template helper method for PA (Pan Asia) - WITH header and footer
-    private function render_template_pa($content_view, $data = array()) {
-        $default_data = array(
-            'company' => 'PAN-ASIA INTERNATIONAL',
-            'company_code' => 'pa'
-        );
-        $data = array_merge($default_data, $data);
-        
-        $this->load->view('partials/__header_pa', $data);
-        $this->load->view($content_view, $data);
-        $this->load->view('partials/__footer', $data);
-    }
-
-    // Template helper method for Admin - NO header and footer
-    private function render_template_admin($content_view, $data = array()) {
-        $current_page = $this->router->fetch_method();
-        $data['current_page'] = $current_page;
-        $this->load->view($content_view, $data);
-    }
-
-    // Template helper method for Login - NO header and footer
-    private function render_template_login($content_view, $data = array()) {
-        $current_page = $this->router->fetch_method();
-        $data['current_page'] = $current_page;
-        $this->load->view($content_view, $data);
-    }
-
-    // Helper method to get company filter based on username
     private function getCompanyFilter($username) {
         $username = strtolower($username);
         if ($username === 'tw_admin') {
@@ -61,80 +34,32 @@ class Main extends CI_Controller {
         return null;
     }
     
-    // Helper method to set page info based on company filter
-    private function setPageInfo($companyFilter) {
-        $pageInfo = array();
+    private function setPageInfo() {
+        $filter = $this->data['companyFilter'];
         
-        if ($companyFilter === 'Toms World') {
-            $pageInfo['pageTitle'] = "Tom's World";
-            $pageInfo['welcomeMessage'] = "Welcome back! Here's what's happening today at Tom's World.";
-            $pageInfo['modalHeaderClass'] = 'tw-admin';
-        } elseif ($companyFilter === 'Pan Asia') {
-            $pageInfo['pageTitle'] = "Pan-Asia";
-            $pageInfo['welcomeMessage'] = "Welcome back! Here's what's happening today at Pan-Asia.";
-            $pageInfo['modalHeaderClass'] = 'pa-admin';
+        if ($filter === 'Toms World') {
+            $this->data['pageTitle'] = "Tom's World";
+            $this->data['welcomeMessage'] = "Welcome back! Here's what's happening today at Tom's World.";
+            $this->data['modalHeaderClass'] = 'tw-admin';
+        } elseif ($filter === 'Pan Asia') {
+            $this->data['pageTitle'] = "Pan-Asia";
+            $this->data['welcomeMessage'] = "Welcome back! Here's what's happening today at Pan-Asia.";
+            $this->data['modalHeaderClass'] = 'pa-admin';
         } else {
-            $pageInfo['pageTitle'] = "Tom's World & Pan-Asia";
-            $pageInfo['welcomeMessage'] = "Welcome back! Here's what's happening today at Tom's World & Pan-Asia.";
-            $pageInfo['modalHeaderClass'] = 'super-admin';
+            $this->data['pageTitle'] = "Tom's World & Pan-Asia";
+            $this->data['welcomeMessage'] = "Welcome back! Here's what's happening today at Tom's World & Pan-Asia.";
+            $this->data['modalHeaderClass'] = 'super-admin';
         }
-        
-        return $pageInfo;
     }
 
-    // ==================== PUBLIC METHODS ====================
-    
-    // Welcome/Index page - Show login
     public function index() {
-        // If already logged in, go to admin
-        if ($this->session->userdata('logged_in')) {
-            redirect('main/admin');
-        }
-        $this->load->view('auth/login');
-    }
-
-    // Admin page - Protected, requires login
-    public function admin() {
-        // Check if user is logged in
-        if (!$this->session->userdata('logged_in')) {
-            // Not logged in, redirect to login page
-            $this->session->set_flashdata('error', 'Please login to access admin panel');
-            redirect('auth/login');
-        }
-        
-        // Load the Admin model
-        $this->load->model('Admin_model');
-        
-        // Get user info from session
-        $logged_in_user = strtolower($this->session->userdata('username'));
-        $user_role = $this->session->userdata('role');
-        $companyFilter = $this->getCompanyFilter($logged_in_user);
-        
-        // Get page info
-        $pageInfo = $this->setPageInfo($companyFilter);
-        
+        // Load initial dashboard data - ADD ERROR HANDLING
         try {
-            // Load initial dashboard data
-            $dashboardStats = $this->Admin_model->getDashboardStats($companyFilter);
-            $recentActivity = $this->Admin_model->getRecentActivity($companyFilter);
-            $activeVisits = $this->Admin_model->getActiveVisits($companyFilter);
+            $this->data['dashboardStats'] = $this->Admin_model->getDashboardStats($this->data['companyFilter']);
+            $this->data['recentActivity'] = $this->Admin_model->getRecentActivity($this->data['companyFilter']);
+            $this->data['activeVisits'] = $this->Admin_model->getActiveVisits($this->data['companyFilter']);
             
-            // Prepare data for view
-            $data = array(
-                'page_title' => 'Admin Dashboard',
-                'logged_in_user' => $logged_in_user,
-                'user_role' => $user_role,
-                'companyFilter' => $companyFilter,
-                'pageTitle' => $pageInfo['pageTitle'],
-                'welcomeMessage' => $pageInfo['welcomeMessage'],
-                'modalHeaderClass' => $pageInfo['modalHeaderClass'],
-                'dashboardStats' => $dashboardStats,
-                'recentActivity' => $recentActivity,
-                'activeVisits' => $activeVisits
-            );
-            
-            $this->render_template_admin('main/admin', $data);
-            
+            $this->load->view('main/admin', $this->data);
         } catch (Exception $e) {
             // Log the error
             log_message('error', 'Admin Dashboard Error: ' . $e->getMessage());
@@ -143,12 +68,9 @@ class Main extends CI_Controller {
             show_error('Unable to load admin dashboard. Please check database connection.', 500);
         }
     }
-
-    // AJAX Handler for admin operations
+    
+    // AJAX Handlers
     public function ajax_handler() {
-        // Load the Admin model
-        $this->load->model('Admin_model');
-        
         $action = $this->input->get('action');
         $companyFilter = $this->input->get('company_filter');
         
@@ -304,39 +226,5 @@ class Main extends CI_Controller {
             log_message('error', 'AJAX Error: ' . $e->getMessage());
             echo json_encode(['error' => 'Server error occurred', 'message' => $e->getMessage()]);
         }
-    }
-    
-    // TW (Toms World) page - WITH header and footer (orange theme)
-    public function tw() {
-        $data = array(
-            'page_title' => 'TOMS WORLD Portal',
-            'theme' => 'orange'
-        );
-        $this->render_template_tw('main/tw', $data);
-    }
-    
-    // PA (Pan Asia) page - WITH header and footer (green theme)
-    public function pa() {
-        $data = array(
-            'page_title' => 'PAN-ASIA INTERNATIONAL Portal',
-            'theme' => 'green'
-        );
-        $this->render_template_pa('main/pa', $data);
-    }
-
-    public function revisit() {
-        $data = array(
-            'page_title' => 'PAN-ASIA INTERNATIONAL Portal',
-            'theme' => 'green'
-        );
-        $this->render_template_pa('main/revisit', $data);
-    }
-
-    // Login page - NO header/footer
-    public function login() {
-        $data = array(
-            'page_title' => 'Login'
-        );
-        $this->render_template_login('auth/login', $data);
     }
 }

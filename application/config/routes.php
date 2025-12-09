@@ -52,3 +52,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'main';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+// File: application/config/routes.php
+$route['main/admin'] = 'main/admin';
+$route['main/ajax'] = 'main/ajax_handler';  // Change this line

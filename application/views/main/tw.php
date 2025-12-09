@@ -2368,6 +2368,86 @@
             });
         }
 
+        // Add this new function to check for existing visitors
+        async function checkExistingVisitor() {
+            showLoading();
+            
+            try {
+                const response = await fetch('<?= base_url("kiosk/check_duplicate_visitor") ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        email: visitorData.email,
+                        phone: visitorData.phone
+                    })
+                });
+                
+                const result = await response.json();
+                hideLoading();
+                
+                if (result.status === 'found') {
+                    // Visitor with similar contact info exists
+                    const choice = await Swal.fire({
+                        title: 'Returning Visitor Detected',
+                        html: `
+                            <p>We found an existing visitor record:</p>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                                <strong>${result.visitor.first_name} ${result.visitor.last_name}</strong><br>
+                                <span style="color: #7f8c8d;">
+                                    ${result.visitor.company}<br>
+                                    Email: ${result.visitor.email || 'Not provided'}<br>
+                                    Phone: ${result.visitor.phone || 'Not provided'}<br>
+                                    Previous visits: ${result.visitor.total_visits}
+                                </span>
+                            </div>
+                            <p><strong>Is this you?</strong></p>
+                        `,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#27ae60',
+                        cancelButtonColor: '#3498db',
+                        confirmButtonText: 'Yes, that\'s me',
+                        cancelButtonText: 'No, I\'m a new visitor'
+                    });
+                    
+                    if (choice.isConfirmed) {
+                        // Use existing visitor record
+                        visitorData.visitor_id = result.visitor.visitor_id;
+                        visitorData.type = 'returning';
+                        
+                        // Optionally update their contact info
+                        const updateInfo = await Swal.fire({
+                            title: 'Update Contact Information?',
+                            text: 'Would you like to update your contact details?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, update',
+                            cancelButtonText: 'No, keep as is'
+                        });
+                        
+                        if (updateInfo.isConfirmed) {
+                            visitorData.update_contact_info = true;
+                        }
+                        
+                        return true; // Proceed with check-in as returning visitor
+                    } else {
+                        // Continue as new visitor
+                        return true;
+                    }
+                }
+                
+                return true; // No duplicate found, proceed normally
+                
+            } catch (error) {
+                hideLoading();
+                console.error('Error checking for duplicate visitor:', error);
+                return true; // On error, allow check-in to proceed
+            }
+        }
+
         // // Screen navigation
         // function showScreen(screenNumber) {
         //     if (currentScreen === 2 && html5QrCode) {
@@ -2804,6 +2884,11 @@
                     }
                     return isValid;
                     
+                    // NEW: Check for duplicate before proceeding
+                    // This returns a promise, so we need to handle it differently
+                    return true; // Will check duplicates in nextScreen instead
+                    
+                    
                 case 4:
                     visitorData.photo = capturedPhotoData;
                     return true;
@@ -2838,6 +2923,37 @@
             }
         }
 
+        // MODIFY nextScreen function:
+        async function nextScreen() {
+            if (!validateCurrentScreen()) {
+                return;
+            }
+            
+            // NEW: If moving from basic info screen, check for duplicates first
+            if (currentScreen === 3) {
+                const canProceed = await checkExistingVisitor();
+                if (!canProceed) {
+                    return;
+                }
+            }
+            
+            // Rest of existing nextScreen code...
+            if (currentFlow.length > 0) {
+                currentFlowIndex++;
+                if (currentFlowIndex < currentFlow.length) {
+                    const nextScreenNumber = currentFlow[currentFlowIndex];
+                    
+                    if (nextScreenNumber === 6 && visitorData.initialPurpose === 'delivery') {
+                        showScreen(nextScreenNumber);
+                    } else {
+                        showScreen(nextScreenNumber);
+                    }
+                }
+            } else {
+                showScreen(currentScreen + 1);
+            }
+        }
+        
         // Clear validation errors on input
         document.addEventListener('DOMContentLoaded', function() {
             const inputs = document.querySelectorAll('.form-control-lg');

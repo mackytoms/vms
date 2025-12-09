@@ -72,73 +72,73 @@ class Kiosk extends CI_Controller {
         // Get company_visited from request (defaults to 'Pan Asia' if not provided)
         $company_visited = isset($data['company_visited']) ? $data['company_visited'] : 'Pan Asia';
         
-        // ========================================
-        // NEW: CHECK FOR ACTIVE VISIT BEFORE ALLOWING CHECK-IN
-        // ========================================
-        $active_visit_check = "SELECT 
-                                vis.visit_id,
-                                vis.badge_number,
-                                vis.check_in_time,
-                                vis.valid_until,
-                                vis.purpose,
-                                v.visitor_id,
-                                v.first_name,
-                                v.last_name,
-                                v.company,
-                                e.name as host_name,
-                                d.name as department
-                            FROM visits vis
-                            JOIN visitors v ON vis.visitor_id = v.visitor_id
-                            JOIN employees e ON vis.host_employee_id = e.employee_id
-                            JOIN departments d ON e.department_code = d.department_code
-                            WHERE vis.check_out_time IS NULL
-                            AND vis.company_visited = ?
-                            AND (";
+        // // ========================================
+        // // NEW: CHECK FOR ACTIVE VISIT BEFORE ALLOWING CHECK-IN
+        // // ========================================
+        // $active_visit_check = "SELECT 
+        //                         vis.visit_id,
+        //                         vis.badge_number,
+        //                         vis.check_in_time,
+        //                         vis.valid_until,
+        //                         vis.purpose,
+        //                         v.visitor_id,
+        //                         v.first_name,
+        //                         v.last_name,
+        //                         v.company,
+        //                         e.name as host_name,
+        //                         d.name as department
+        //                     FROM visits vis
+        //                     JOIN visitors v ON vis.visitor_id = v.visitor_id
+        //                     JOIN employees e ON vis.host_employee_id = e.employee_id
+        //                     JOIN departments d ON e.department_code = d.department_code
+        //                     WHERE vis.check_out_time IS NULL
+        //                     AND vis.company_visited = ?
+        //                     AND (";
         
-        $params = array($company_visited);
-        $conditions = array();
+        // $params = array($company_visited);
+        // $conditions = array();
         
-        if ($has_email) {
-            $conditions[] = "LOWER(v.email) = ?";
-            $params[] = strtolower($data['email']);
-        }
+        // if ($has_email) {
+        //     $conditions[] = "LOWER(v.email) = ?";
+        //     $params[] = strtolower($data['email']);
+        // }
         
-        if ($has_phone) {
-            $conditions[] = "v.phone = ?";
-            $params[] = $data['phone'];
-        }
+        // if ($has_phone) {
+        //     $conditions[] = "v.phone = ?";
+        //     $params[] = $data['phone'];
+        // }
         
-        $active_visit_check .= implode(' OR ', $conditions) . ")
-                            ORDER BY vis.check_in_time DESC
-                            LIMIT 1";
+        // $active_visit_check .= implode(' OR ', $conditions) . ")
+        //                     ORDER BY vis.check_in_time DESC
+        //                     LIMIT 1";
         
-        $active_visit_result = $this->db->query($active_visit_check, $params);
+        // $active_visit_result = $this->db->query($active_visit_check, $params);
         
-        if ($active_visit_result->num_rows() > 0) {
-            $active_visit = $active_visit_result->row_array();
+        // if ($active_visit_result->num_rows() > 0) {
+        //     $active_visit = $active_visit_result->row_array();
             
-            // Visitor already has an active visit - DENY check-in
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'You are already checked in at the premises',
-                'has_active_visit' => true,
-                'active_visit' => [
-                    'visit_id' => $active_visit['visit_id'],
-                    'badge_number' => $active_visit['badge_number'],
-                    'visitor_name' => $active_visit['first_name'] . ' ' . $active_visit['last_name'],
-                    'company' => $active_visit['company'],
-                    'host_name' => $active_visit['host_name'],
-                    'department' => $active_visit['department'],
-                    'purpose' => $active_visit['purpose'],
-                    'check_in_time' => $active_visit['check_in_time'],
-                    'valid_until' => $active_visit['valid_until']
-                ]
-            ]);
-            return;
-        }
-        // ========================================
-        // END: ACTIVE VISIT CHECK
-        // ========================================
+        //     // Visitor already has an active visit - DENY check-in
+        //     echo json_encode([
+        //         'status' => 'error',
+        //         'message' => 'You are already checked in at the premises',
+        //         'has_active_visit' => true,
+        //         'active_visit' => [
+        //             'visit_id' => $active_visit['visit_id'],
+        //             'badge_number' => $active_visit['badge_number'],
+        //             'visitor_name' => $active_visit['first_name'] . ' ' . $active_visit['last_name'],
+        //             'company' => $active_visit['company'],
+        //             'host_name' => $active_visit['host_name'],
+        //             'department' => $active_visit['department'],
+        //             'purpose' => $active_visit['purpose'],
+        //             'check_in_time' => $active_visit['check_in_time'],
+        //             'valid_until' => $active_visit['valid_until']
+        //         ]
+        //     ]);
+        //     return;
+        // }
+        // // ========================================
+        // // END: ACTIVE VISIT CHECK
+        // // ========================================
 
         // Start transaction
         $this->db->trans_start();
@@ -248,6 +248,43 @@ class Kiosk extends CI_Controller {
                 'company_visited' => $company_visited
             ]
         ]);
+    }
+
+    public function check_duplicate_visitor() {
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        $email = $input['email'] ?? null;
+        $phone = $input['phone'] ?? null;
+        
+        // Search for existing visitor with matching email OR phone
+        $this->db->group_start();
+        if ($email) {
+            $this->db->or_where('email', $email);
+        }
+        if ($phone) {
+            $this->db->or_where('phone', $phone);
+        }
+        $this->db->group_end();
+        
+        $visitor = $this->db->get('visitors')->row_array();
+        
+        if ($visitor) {
+            // Count total visits
+            $total_visits = $this->db
+                ->where('visitor_id', $visitor['visitor_id'])
+                ->count_all_results('visits');
+            
+            $visitor['total_visits'] = $total_visits;
+            
+            echo json_encode([
+                'status' => 'found',
+                'visitor' => $visitor
+            ]);
+        } else {
+            echo json_encode([
+                'status' => 'not_found'
+            ]);
+        }
     }
     
     // // Complete check-in and insert visitor data

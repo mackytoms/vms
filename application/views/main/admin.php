@@ -1,610 +1,3 @@
-<?php
-// Database configuration
-$servername = "localhost";
-
-// $username = "root";
-// $password = "";
-
-$username = "itsdT0ms";
-$password = "(GrYXU4fOY)wVOr4";
-
-$dbname = "vms";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Get logged in user info from session
-$logged_in_user = isset($_SESSION['username']) ? strtolower($_SESSION['username']) : '';
-$user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
-
-// Determine company filter based on logged-in user
-function getCompanyFilter($username) {
-    $username = strtolower($username);
-    if ($username === 'tw_admin') {
-        return 'Toms World';
-    } elseif ($username === 'pa_admin') {
-        return 'Pan Asia';
-    }
-    return null;
-}
-
-$companyFilter = getCompanyFilter($logged_in_user);
-$companyFilterSQL = $companyFilter ? " AND company_visited = '" . $conn->real_escape_string($companyFilter) . "'" : "";
-$companyFilterSQLWhere = $companyFilter ? " WHERE company_visited = '" . $conn->real_escape_string($companyFilter) . "'" : "";
-
-// Fetch data for dashboard with company filter
-function getDashboardStats($conn, $companyFilter = null) {
-    $stats = array();
-    $filterSQL = $companyFilter ? " AND company_visited = '" . $conn->real_escape_string($companyFilter) . "'" : "";
-    
-    $sql = "SELECT COUNT(DISTINCT visitor_id) as today_total FROM visits WHERE DATE(check_in_time) = CURDATE()" . $filterSQL;
-    $result = $conn->query($sql);
-    $stats['today_total'] = $result->fetch_assoc()['today_total'];
-    
-    $sql = "SELECT COUNT(*) as currently_in FROM visits WHERE check_out_time IS NULL" . $filterSQL;
-    $result = $conn->query($sql);
-    $stats['currently_in'] = $result->fetch_assoc()['currently_in'];
-    
-    $sql = "SELECT AVG(TIMESTAMPDIFF(HOUR, check_in_time, IFNULL(check_out_time, NOW()))) as avg_duration 
-            FROM visits WHERE DATE(check_in_time) = CURDATE()" . $filterSQL;
-    $result = $conn->query($sql);
-    $avg = $result->fetch_assoc()['avg_duration'];
-    $stats['avg_duration'] = $avg ? round($avg, 1) . 'h' : '0h';
-    
-    return $stats;
-}
-
-function getRecentActivity($conn, $companyFilter = null) {
-    $filterSQL = $companyFilter ? " AND v.company_visited = '" . $conn->real_escape_string($companyFilter) . "'" : "";
-    
-    $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, e.name as host_name, v.company_visited, v.additional_notes
-            FROM visits v 
-            JOIN visitors vi ON v.visitor_id = vi.visitor_id 
-            JOIN employees e ON v.host_employee_id = e.employee_id 
-            WHERE 1=1" . $filterSQL . "
-            ORDER BY v.check_in_time DESC LIMIT 10";
-    
-    $result = $conn->query($sql);
-    $activities = array();
-    
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $activities[] = $row;
-        }
-    }
-    return $activities;
-}
-
-function getActiveVisits($conn, $companyFilter = null) {
-    $filterSQL = $companyFilter ? " AND v.company_visited = '" . $conn->real_escape_string($companyFilter) . "'" : "";
-    
-    $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, vi.email, vi.phone, vi.photo,
-            e.name as host_name, d.name as department_name, v.company_visited, v.additional_notes
-            FROM visits v 
-            JOIN visitors vi ON v.visitor_id = vi.visitor_id 
-            JOIN employees e ON v.host_employee_id = e.employee_id
-            JOIN departments d ON e.department_code = d.department_code
-            WHERE v.check_out_time IS NULL" . $filterSQL;
-    
-    $result = $conn->query($sql);
-    $visits = array();
-    
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $visits[] = $row;
-        }
-    }
-    return $visits;
-}
-
-function getAllVisitors($conn, $companyFilter = null) {
-    if ($companyFilter) {
-        $sql = "SELECT vi.*, COUNT(v.visit_id) as total_visits, MAX(v.check_in_time) as last_visit 
-                FROM visitors vi 
-                LEFT JOIN visits v ON vi.visitor_id = v.visitor_id AND v.company_visited = '" . $conn->real_escape_string($companyFilter) . "'
-                GROUP BY vi.visitor_id
-                HAVING total_visits > 0";
-    } else {
-        $sql = "SELECT vi.*, COUNT(v.visit_id) as total_visits, MAX(v.check_in_time) as last_visit 
-                FROM visitors vi 
-                LEFT JOIN visits v ON vi.visitor_id = v.visitor_id 
-                GROUP BY vi.visitor_id";
-    }
-    
-    $result = $conn->query($sql);
-    $visitors = array();
-    
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $visitors[] = $row;
-        }
-    }
-    return $visitors;
-}
-
-function getDashboardStatsByCompany($conn, $companyFilter = null) {
-    $stats = array();
-    
-    if ($companyFilter === 'Toms World' || $companyFilter === null) {
-        $sql = "SELECT COUNT(DISTINCT visitor_id) as count FROM visits 
-                WHERE DATE(check_in_time) = CURDATE() AND company_visited = 'Toms World'";
-        $result = $conn->query($sql);
-        $stats['toms_world_today'] = $result->fetch_assoc()['count'];
-        
-        $sql = "SELECT COUNT(*) as count FROM visits 
-                WHERE check_out_time IS NULL AND company_visited = 'Toms World'";
-        $result = $conn->query($sql);
-        $stats['toms_world_active'] = $result->fetch_assoc()['count'];
-    }
-    
-    if ($companyFilter === 'Pan Asia' || $companyFilter === null) {
-        $sql = "SELECT COUNT(DISTINCT visitor_id) as count FROM visits 
-                WHERE DATE(check_in_time) = CURDATE() AND company_visited = 'Pan Asia'";
-        $result = $conn->query($sql);
-        $stats['pan_asia_today'] = $result->fetch_assoc()['count'];
-        
-        $sql = "SELECT COUNT(*) as count FROM visits 
-                WHERE check_out_time IS NULL AND company_visited = 'Pan Asia'";
-        $result = $conn->query($sql);
-        $stats['pan_asia_active'] = $result->fetch_assoc()['count'];
-    }
-    
-    return $stats;
-}
-
-function getEmployees($conn) {
-    $sql = "SELECT e.*, d.name as department_name, COUNT(v.visit_id) as total_visits 
-            FROM employees e 
-            JOIN departments d ON e.department_code = d.department_code
-            LEFT JOIN visits v ON e.employee_id = v.host_employee_id
-            GROUP BY e.employee_id";
-    
-    $result = $conn->query($sql);
-    $employees = array();
-    
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $employees[] = $row;
-        }
-    }
-    return $employees;
-}
-
-function getDepartments($conn) {
-    $sql = "SELECT d.*, COUNT(DISTINCT e.employee_id) as employee_count, 
-            COUNT(DISTINCT v.visit_id) as visit_count
-            FROM departments d
-            LEFT JOIN employees e ON d.department_code = e.department_code
-            LEFT JOIN visits v ON e.employee_id = v.host_employee_id
-            GROUP BY d.department_code";
-    
-    $result = $conn->query($sql);
-    $departments = array();
-    
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $departments[] = $row;
-        }
-    }
-    return $departments;
-}
-
-function getVisitorById($conn, $visitor_id) {
-    $visitor_id = $conn->real_escape_string($visitor_id);
-    $sql = "SELECT vi.*, COUNT(v.visit_id) as total_visits, MAX(v.check_in_time) as last_visit 
-            FROM visitors vi 
-            LEFT JOIN visits v ON vi.visitor_id = v.visitor_id 
-            WHERE vi.visitor_id = $visitor_id
-            GROUP BY vi.visitor_id";
-    
-    $result = $conn->query($sql);
-    if ($result->num_rows > 0) {
-        return $result->fetch_assoc();
-    }
-    return null;
-}
-
-function getVisitById($conn, $visit_id) {
-    $visit_id = $conn->real_escape_string($visit_id);
-    $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, vi.email, vi.phone, vi.photo,
-            e.name as host_name, d.name as department_name, v.company_visited
-            FROM visits v 
-            JOIN visitors vi ON v.visitor_id = vi.visitor_id 
-            JOIN employees e ON v.host_employee_id = e.employee_id
-            JOIN departments d ON e.department_code = d.department_code
-            WHERE v.visit_id = $visit_id";
-    
-    $result = $conn->query($sql);
-    if ($result->num_rows > 0) {
-        return $result->fetch_assoc();
-    }
-    return null;
-}
-
-// NEW FUNCTIONS FOR ENHANCED FEATURES
-function getVisitorHistory($conn, $visitor_id) {
-    $visitor_id = $conn->real_escape_string($visitor_id);
-    $sql = "SELECT v.*, e.name as host_name, d.name as department_name
-            FROM visits v 
-            JOIN employees e ON v.host_employee_id = e.employee_id
-            JOIN departments d ON e.department_code = d.department_code
-            WHERE v.visitor_id = $visitor_id
-            ORDER BY v.check_in_time DESC";
-    
-    $result = $conn->query($sql);
-    $visits = array();
-    
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $visits[] = $row;
-        }
-    }
-    return $visits;
-}
-
-function getEmployeeVisitHistory($conn, $employee_id) {
-    $employee_id = $conn->real_escape_string($employee_id);
-    $sql = "SELECT v.*, vi.first_name, vi.last_name, vi.company, vi.email, vi.phone
-            FROM visits v 
-            JOIN visitors vi ON v.visitor_id = vi.visitor_id
-            WHERE v.host_employee_id = '$employee_id'
-            ORDER BY v.check_in_time DESC";
-    
-    $result = $conn->query($sql);
-    $visits = array();
-    
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $visits[] = $row;
-        }
-    }
-    return $visits;
-}
-
-function getEmployeesByDepartment($conn, $department_code) {
-    $department_code = $conn->real_escape_string($department_code);
-    $sql = "SELECT e.*, d.name as department_name, COUNT(v.visit_id) as total_visits 
-            FROM employees e 
-            JOIN departments d ON e.department_code = d.department_code
-            LEFT JOIN visits v ON e.employee_id = v.host_employee_id
-            WHERE e.department_code = '$department_code'
-            GROUP BY e.employee_id
-            ORDER BY e.name";
-    
-    $result = $conn->query($sql);
-    $employees = array();
-    
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $employees[] = $row;
-        }
-    }
-    return $employees;
-}
-
-// Handle AJAX requests
-if(isset($_GET['action'])) {
-    header('Content-Type: application/json');
-    
-    $ajaxCompanyFilter = isset($_GET['company_filter']) ? $_GET['company_filter'] : null;
-    if ($ajaxCompanyFilter === 'null' || $ajaxCompanyFilter === '') {
-        $ajaxCompanyFilter = null;
-    }
-    
-    switch($_GET['action']) {
-        case 'dashboard_stats':
-            echo json_encode(getDashboardStats($conn, $ajaxCompanyFilter));
-            break;
-        case 'recent_activity':
-            echo json_encode(getRecentActivity($conn, $ajaxCompanyFilter));
-            break;
-        case 'active_visits':
-            echo json_encode(getActiveVisits($conn, $ajaxCompanyFilter));
-            break;
-        case 'all_visitors':
-            echo json_encode(getAllVisitors($conn, $ajaxCompanyFilter));
-            break;
-        case 'get_visitor':
-            if(isset($_GET['visitor_id'])) {
-                $visitor = getVisitorById($conn, $_GET['visitor_id']);
-                echo json_encode($visitor ? $visitor : ['error' => 'Visitor not found']);
-            }
-            break;
-        case 'get_visit':
-            if(isset($_GET['visit_id'])) {
-                $visit = getVisitById($conn, $_GET['visit_id']);
-                echo json_encode($visit ? $visit : ['error' => 'Visit not found']);
-            }
-            break;
-        case 'employees':
-            echo json_encode(getEmployees($conn));
-            break;
-        case 'departments':
-            echo json_encode(getDepartments($conn));
-            break;
-        case 'dashboard_stats_by_company':
-            echo json_encode(getDashboardStatsByCompany($conn, $ajaxCompanyFilter));
-            break;
-        case 'visitor_history':
-            if(isset($_GET['visitor_id'])) {
-                $history = getVisitorHistory($conn, $_GET['visitor_id']);
-                echo json_encode($history);
-            }
-            break;
-        case 'employee_history':
-            if(isset($_GET['employee_id'])) {
-                $history = getEmployeeVisitHistory($conn, $_GET['employee_id']);
-                echo json_encode($history);
-            }
-            break;
-        case 'department_employees':
-            if(isset($_GET['department_code'])) {
-                $employees = getEmployeesByDepartment($conn, $_GET['department_code']);
-                echo json_encode($employees);
-            }
-            break;
-        case 'checkout':
-            if(isset($_POST['visit_id'])) {
-                $visit_id = $conn->real_escape_string($_POST['visit_id']);
-                $sql = "UPDATE visits SET check_out_time = NOW() WHERE visit_id = $visit_id AND check_out_time IS NULL";
-                if($conn->query($sql) && $conn->affected_rows > 0) {
-                    echo json_encode(['success' => true]);
-                } else {
-                    echo json_encode(['success' => false, 'error' => $conn->error ?: 'Already checked out or invalid visit']);
-                }
-            } else {
-                echo json_encode(['success' => false, 'error' => 'Visit ID required']);
-            }
-            break;
-        case 'add_employee':
-            if($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $name = $conn->real_escape_string($_POST['name']);
-                $email = $conn->real_escape_string($_POST['email']);
-                $department_code = $conn->real_escape_string($_POST['department_code']);
-                $is_active = isset($_POST['is_active']) ? 1 : 0;
-                
-                $count_sql = "SELECT COUNT(*) as cnt FROM employees WHERE department_code = '$department_code'";
-                $count_result = $conn->query($count_sql);
-                $count = $count_result->fetch_assoc()['cnt'] + 1;
-                $employee_id = $department_code . str_pad($count, 3, '0', STR_PAD_LEFT);
-                
-                $sql = "INSERT INTO employees (employee_id, name, email, department_code, is_active, created_at) 
-                        VALUES ('$employee_id', '$name', '$email', '$department_code', $is_active, NOW())";
-                
-                if($conn->query($sql)) {
-                    echo json_encode(['success' => true, 'employee_id' => $employee_id]);
-                } else {
-                    echo json_encode(['success' => false, 'error' => $conn->error]);
-                }
-            }
-            break;
-        case 'toggle_employee_status':
-            if($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $employee_id = $conn->real_escape_string($_POST['employee_id']);
-                $new_status = isset($_POST['new_status']) ? intval($_POST['new_status']) : 0;
-                
-                $sql = "UPDATE employees SET is_active = $new_status WHERE employee_id = '$employee_id'";
-                
-                if($conn->query($sql)) {
-                    echo json_encode(['success' => true, 'new_status' => $new_status]);
-                } else {
-                    echo json_encode(['success' => false, 'error' => $conn->error]);
-                }
-            }
-            break;
-        case 'add_department':
-            if($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $department_code = $conn->real_escape_string($_POST['department_code']);
-                $name = $conn->real_escape_string($_POST['name']);
-                $description = $conn->real_escape_string($_POST['description'] ?? '');
-                
-                $sql = "INSERT INTO departments (department_code, name, description, created_at) 
-                        VALUES ('$department_code', '$name', '$description', NOW())";
-                
-                if($conn->query($sql)) {
-                    echo json_encode(['success' => true]);
-                } else {
-                    echo json_encode(['success' => false, 'error' => $conn->error]);
-                }
-            }
-            break;
-            
-            // Find the AJAX request handler section in admin.php
-            // Add these cases to the switch statement (around line 200-400):
-
-        case 'get_all_purposes':
-            $sql = "SELECT * FROM purposes ORDER BY display_order ASC";
-            $result = $conn->query($sql);
-            $purposes = array();
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
-                    $purposes[] = $row;
-                }
-            }
-            echo json_encode(['status' => 'success', 'purposes' => $purposes]);
-            break;
-
-        case 'add_purpose':
-            if($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $purpose_code = strtolower(trim($conn->real_escape_string($_POST['purpose_code'])));
-                $purpose_name = trim($conn->real_escape_string($_POST['purpose_name']));
-                $icon_class = trim($conn->real_escape_string($_POST['icon_class'] ?? 'bi-circle'));
-                $color_class = trim($conn->real_escape_string($_POST['color_class'] ?? 'text-primary'));
-                $is_active = isset($_POST['is_active']) ? 1 : 0;
-                
-                // Check if purpose code already exists
-                $check_sql = "SELECT purpose_id FROM purposes WHERE purpose_code = '$purpose_code'";
-                $check_result = $conn->query($check_sql);
-                
-                if ($check_result->num_rows > 0) {
-                    echo json_encode(['status' => 'error', 'message' => 'Purpose code already exists']);
-                } else {
-                    // Get max display order
-                    $max_order_sql = "SELECT MAX(display_order) as max_order FROM purposes";
-                    $max_result = $conn->query($max_order_sql);
-                    $max_row = $max_result->fetch_assoc();
-                    $display_order = ($max_row['max_order'] ?? 0) + 1;
-                    
-                    $sql = "INSERT INTO purposes (purpose_code, purpose_name, icon_class, color_class, display_order, is_active, created_at) 
-                            VALUES ('$purpose_code', '$purpose_name', '$icon_class', '$color_class', $display_order, $is_active, NOW())";
-                    
-                    if($conn->query($sql)) {
-                        echo json_encode(['status' => 'success']);
-                    } else {
-                        echo json_encode(['status' => 'error', 'message' => $conn->error]);
-                    }
-                }
-            }
-            break;
-
-        case 'toggle_purpose_status':
-            if($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $purpose_id = intval($conn->real_escape_string($_POST['purpose_id']));
-                $new_status = intval($_POST['new_status']);
-                
-                $sql = "UPDATE purposes SET is_active = $new_status WHERE purpose_id = $purpose_id";
-                
-                if($conn->query($sql)) {
-                    echo json_encode(['status' => 'success', 'new_status' => $new_status]);
-                } else {
-                    echo json_encode(['status' => 'error', 'message' => $conn->error]);
-                }
-            }
-            break;
-
-        case 'update_purpose_order':
-            if($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $purpose_id = intval($conn->real_escape_string($_POST['purpose_id']));
-                $direction = $conn->real_escape_string($_POST['direction']);
-                
-                // Get current purpose
-                $current_sql = "SELECT * FROM purposes WHERE purpose_id = $purpose_id";
-                $current_result = $conn->query($current_sql);
-                
-                if ($current_result->num_rows === 0) {
-                    echo json_encode(['status' => 'error', 'message' => 'Purpose not found']);
-                    break;
-                }
-                
-                $current = $current_result->fetch_assoc();
-                
-                // Get adjacent purpose
-                if ($direction === 'up') {
-                    $adjacent_sql = "SELECT * FROM purposes 
-                                WHERE display_order < {$current['display_order']} 
-                                ORDER BY display_order DESC 
-                                LIMIT 1";
-                } else {
-                    $adjacent_sql = "SELECT * FROM purposes 
-                                WHERE display_order > {$current['display_order']} 
-                                ORDER BY display_order ASC 
-                                LIMIT 1";
-                }
-                
-                $adjacent_result = $conn->query($adjacent_sql);
-                
-                if ($adjacent_result->num_rows === 0) {
-                    echo json_encode(['status' => 'error', 'message' => 'Cannot move further']);
-                    break;
-                }
-                
-                $adjacent = $adjacent_result->fetch_assoc();
-                
-                // Swap display orders
-                $conn->begin_transaction();
-                
-                try {
-                    $sql1 = "UPDATE purposes SET display_order = {$adjacent['display_order']} WHERE purpose_id = {$current['purpose_id']}";
-                    $sql2 = "UPDATE purposes SET display_order = {$current['display_order']} WHERE purpose_id = {$adjacent['purpose_id']}";
-                    
-                    $conn->query($sql1);
-                    $conn->query($sql2);
-                    
-                    $conn->commit();
-                    echo json_encode(['status' => 'success']);
-                } catch (Exception $e) {
-                    $conn->rollback();
-                    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
-                }
-            }
-            break;
-
-        case 'check_emergency_alerts':
-            $filterSQL = $companyFilter 
-                ? " WHERE company_visited = '" . $conn->real_escape_string($companyFilter) . "' AND acknowledged = 0" 
-                : " WHERE acknowledged = 0";
-            
-            $sql = "SELECT * FROM emergency_alerts" . $filterSQL . " ORDER BY created_at DESC LIMIT 10";
-            $result = $conn->query($sql);
-            $alerts = array();
-            
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
-                    $alerts[] = $row;
-                }
-            }
-            
-            echo json_encode(['status' => 'success', 'alerts' => $alerts]);
-            break;
-
-        case 'get_last_alert_id':
-            $filterSQL = $companyFilter 
-                ? " WHERE company_visited = '" . $conn->real_escape_string($companyFilter) . "'" 
-                : "";
-            
-            $sql = "SELECT MAX(alert_id) as last_id FROM emergency_alerts" . $filterSQL;
-            $result = $conn->query($sql);
-            $row = $result->fetch_assoc();
-            
-            echo json_encode(['status' => 'success', 'last_alert_id' => $row['last_id'] ?? 0]);
-            break;
-
-        case 'acknowledge_emergency_alert':
-            if($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $alert_id = intval($_POST['alert_id']);
-                
-                $sql = "UPDATE emergency_alerts SET acknowledged = 1 WHERE alert_id = $alert_id";
-                
-                if($conn->query($sql)) {
-                    echo json_encode(['status' => 'success']);
-                } else {
-                    echo json_encode(['status' => 'error', 'message' => $conn->error]);
-                }
-            }
-            break;
-
-    }
-    exit;
-}
-
-$dashboardStats = getDashboardStats($conn, $companyFilter);
-$recentActivity = getRecentActivity($conn, $companyFilter);
-$activeVisits = getActiveVisits($conn, $companyFilter);
-
-$pageTitle = "Tom's World & Pan-Asia";
-$welcomeMessage = "Welcome back! Here's what's happening today at Tom's World & Pan-Asia.";
-if ($companyFilter === 'Toms World') {
-    $pageTitle = "Tom's World";
-    $welcomeMessage = "Welcome back! Here's what's happening today at Tom's World.";
-} elseif ($companyFilter === 'Pan Asia') {
-    $pageTitle = "Pan-Asia";
-    $welcomeMessage = "Welcome back! Here's what's happening today at Pan-Asia.";
-}
-
-// Determine modal header class based on user
-$modalHeaderClass = 'super-admin';
-if ($companyFilter === 'Toms World') {
-    $modalHeaderClass = 'tw-admin';
-} elseif ($companyFilter === 'Pan Asia') {
-    $modalHeaderClass = 'pa-admin';
-}
-
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -650,15 +43,7 @@ if ($companyFilter === 'Toms World') {
         .topbar { background: white; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
         .topbar-left { display: flex; align-items: center; gap: 20px; }
         .menu-toggle { font-size: 1.5em; cursor: pointer; color: var(--sidebar-bg); }
-        .search-box { position: relative; width: 300px; }
-        .search-box input { width: 100%; padding: 8px 40px 8px 15px; border: 1px solid #dee2e6; border-radius: 20px; font-size: 0.95em; }
-        .search-box i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #95a5a6; }
         .topbar-right { display: flex; align-items: center; gap: 20px; }
-        .notification-icon { position: relative; cursor: pointer; font-size: 1.3em; color: #7f8c8d; }
-        .notification-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7em; }
-        .user-profile { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 10px; border-radius: 20px; transition: background 0.3s ease; }
-        .user-profile:hover { background: #f8f9fa; }
-        .user-avatar { width: 35px; height: 35px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
         .dashboard-content { padding: 30px; }
         .page-title { font-size: 2em; color: var(--sidebar-bg); margin-bottom: 10px; }
         .page-subtitle { color: #7f8c8d; margin-bottom: 30px; }
@@ -679,15 +64,6 @@ if ($companyFilter === 'Toms World') {
         .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
         .status-badge.checked-in { background: rgba(39, 174, 96, 0.1); color: var(--success-color); }
         .status-badge.checked-out { background: rgba(52, 152, 219, 0.1); color: var(--info-color); }
-        .purpose-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
-        .purpose-badge.meeting { background: rgba(52, 152, 219, 0.1); color: var(--info-color); }
-        .purpose-badge.interview { background: rgba(155, 89, 182, 0.1); color: #9b59b6; }
-        .purpose-badge.delivery { background: rgba(243, 156, 18, 0.1); color: var(--primary-color); }
-        .purpose-badge.service { background: rgba(13, 202, 240, 0.1); color: #0dcaf0; }
-        .purpose-badge.training { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
-        .purpose-badge.tour { background: rgba(108, 117, 125, 0.1); color: #6c757d; }
-        .purpose-badge.event { background: rgba(128, 0, 128, 0.1); color: #800080; }
-        .purpose-badge.other { background: rgba(33, 37, 41, 0.1); color: #212529; }
         .badge-number { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 2px 8px; border-radius: 6px; font-size: 0.85em; font-weight: 600; }
         .action-btn { padding: 5px 10px; border: none; background: none; cursor: pointer; font-size: 1.1em; transition: all 0.3s ease; }
         .action-btn:hover { transform: scale(1.2); }
@@ -703,128 +79,27 @@ if ($companyFilter === 'Toms World') {
         .user-filter-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.85em; margin-top: 10px; display: inline-block; }
         .notes-text { font-size: 0.85em; color: #6c757d; font-style: italic; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .notes-text:hover { overflow: visible; white-space: normal; word-wrap: break-word; }
+        .modal-header.tw-admin { background: linear-gradient(135deg, #f39c12, #e67e22) !important; color: white; }
+        .modal-header.pa-admin { background: linear-gradient(135deg, #1e9338, #0e7a28) !important; color: white; }
+        .modal-header.super-admin { background: linear-gradient(135deg, #f39c12, #1e9338) !important; color: white; }
+        .modal-header.history-modal.tw-admin { background: linear-gradient(135deg, #f39c12, #e67e22) !important; }
+        .modal-header.history-modal.pa-admin { background: linear-gradient(135deg, #1e9338, #0e7a28) !important; }
+        .modal-header.history-modal.super-admin { background: linear-gradient(135deg, #3498db, #2980b9) !important; }
+        .modal-header.employee-modal.tw-admin, .modal-header.employee-modal.pa-admin { background: linear-gradient(135deg, #9b59b6, #8e44ad) !important; }
+        .modal-header.department-modal.tw-admin, .modal-header.department-modal.pa-admin { background: linear-gradient(135deg, #e67e22, #d35400) !important; }
+        .text-purple { color: #800080 !important; }
+        .badge.bg-purple { background-color: #800080 !important; color: white; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
+        .emergency-alert-popup { border: 3px solid #e74c3c !important; box-shadow: 0 0 30px rgba(231, 76, 60, 0.5) !important; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; }
-            .search-box { width: 150px; }
-        }
-        /* Dynamic Modal Header Colors */
-        .modal-header.tw-admin {
-            background: linear-gradient(135deg, #f39c12, #e67e22) !important;
-            color: white;
-        }
-
-        .modal-header.pa-admin {
-            background: linear-gradient(135deg, #1e9338, #0e7a28) !important;
-            color: white;
-        }
-
-        .modal-header.super-admin {
-            background: linear-gradient(135deg, #f39c12, #1e9338) !important;
-            color: white;
-        }
-
-        /* Alternative colored modal headers for different sections */
-        .modal-header.history-modal.tw-admin {
-            background: linear-gradient(135deg, #f39c12, #e67e22) !important;
-        }
-
-        .modal-header.history-modal.pa-admin {
-            background: linear-gradient(135deg, #1e9338, #0e7a28) !important;
-        }
-
-        .modal-header.history-modal.super-admin {
-            background: linear-gradient(135deg, #3498db, #2980b9) !important;
-        }
-
-        .modal-header.employee-modal.tw-admin,
-        .modal-header.employee-modal.pa-admin {
-            background: linear-gradient(135deg, #9b59b6, #8e44ad) !important;
-        }
-
-        .modal-header.department-modal.tw-admin,
-        .modal-header.department-modal.pa-admin {
-            background: linear-gradient(135deg, #e67e22, #d35400) !important;
-        }
-        .notes-text {
-            font-size: 0.85em;
-            color: #6c757d;
-            font-style: italic;
-            max-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .notes-text:hover {
-            overflow: visible;
-            white-space: normal;
-            word-wrap: break-word;
-        }
-        .text-purple {
-            color: #800080 !important;
-        }
-        /* Bootstrap badge backgrounds for all purposes */
-        .badge.bg-purple {
-            background-color: #800080 !important;
-            color: white;
-        }
-
-        /* Keep existing purpose-badge styles as fallback */
-        .purpose-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 500;
-            display: inline-block;
-        }
-
-        .purpose-badge.meeting {
-            background: rgba(52, 152, 219, 0.1);
-            color: var(--info-color);
-        }
-
-        .purpose-badge.interview {
-            background: rgba(155, 89, 182, 0.1);
-            color: #9b59b6;
-        }
-
-        .purpose-badge.delivery {
-            background: rgba(243, 156, 18, 0.1);
-            color: var(--primary-color);
-        }
-
-        .purpose-badge.service {
-            background: rgba(13, 202, 240, 0.1);
-            color: #0dcaf0;
-        }
-
-        .purpose-badge.training {
-            background: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-        }
-
-        .purpose-badge.tour {
-            background: rgba(108, 117, 125, 0.1);
-            color: #6c757d;
-        }
-
-        .purpose-badge.event {
-            background: rgba(128, 0, 128, 0.1);
-            color: #800080;
-        }
-
-        .purpose-badge.other {
-            background: rgba(33, 37, 41, 0.1);
-            color: #212529;
-        }
-
-        /* Ensure Bootstrap badges have consistent styling */
-        .badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 500;
         }
     </style>
 </head>
@@ -919,37 +194,11 @@ if ($companyFilter === 'Toms World') {
                             <th>Badge #</th><th>Visitor</th><th>Company</th><th>Host</th><th>Purpose</th><th>Notes</th><th>Visiting</th><th>Check-In</th><th>Status</th>
                         </tr>
                     </thead>
-                    <!-- <tbody id="recentActivityTableBody">
-                        <?php foreach($recentActivity as $activity): 
-                            $companyBadge = '';
-                            if ($activity['company_visited'] == 'Toms World') {
-                                $companyBadge = '<span class="company-badge toms-world"><i class="bi bi-building"></i> Tom\'s World</span>';
-                            } elseif ($activity['company_visited'] == 'Pan Asia') {
-                                $companyBadge = '<span class="company-badge pan-asia"><i class="bi bi-building"></i> Pan-Asia</span>';
-                            } else {
-                                $companyBadge = '<span class="badge bg-secondary">' . ($activity['company_visited'] ?? 'N/A') . '</span>';
-                            }
-                        ?>
-                        <tr>
-                            <td><span class="badge-number"><?php echo $activity['badge_number']; ?></span></td>
-                            <td><?php echo $activity['first_name'] . ' ' . $activity['last_name']; ?></td>
-                            <td><?php echo $activity['company']; ?></td>
-                            <td><?php echo $activity['host_name']; ?></td>
-                            <td><span class="purpose-badge <?php echo strtolower($activity['purpose']); ?>"><?php echo $activity['purpose']; ?></span></td>
-                            <td><span class="notes-text" title="<?php echo htmlspecialchars($activity['additional_notes'] ?? ''); ?>"><?php echo $activity['additional_notes'] ? htmlspecialchars($activity['additional_notes']) : '-'; ?></span></td>
-                            <td><?php echo $companyBadge; ?></td>
-                            <td><?php echo date('H:i:s', strtotime($activity['check_in_time'])); ?></td>
-                            <td><?php echo $activity['check_out_time'] ? '<span class="status-badge checked-out">Checked Out</span>' : '<span class="status-badge checked-in">Checked In</span>'; ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody> -->
                     <tbody id="recentActivityTableBody">
                         <?php 
-                        // Load purposes for badge styling
-                        $purposes_query = $conn->query("SELECT purpose_code, purpose_name, color_class FROM purposes");
+                        $purposes_query = $this->db->query("SELECT purpose_code, purpose_name, color_class FROM purposes");
                         $purposes_style_map = array();
-                        while ($p = $purposes_query->fetch_assoc()) {
-                            // Map text color classes to badge background classes
+                        foreach ($purposes_query->result_array() as $p) {
                             $color_map = array(
                                 'text-primary' => 'bg-primary',
                                 'text-success' => 'bg-success',
@@ -977,15 +226,13 @@ if ($companyFilter === 'Toms World') {
                                 $companyBadge = '<span class="badge bg-secondary">' . ($activity['company_visited'] ?? 'N/A') . '</span>';
                             }
                             
-                            // Get purpose badge styling
                             $purpose_code = $activity['purpose'];
                             $purpose_html = '<span class="badge bg-secondary">N/A</span>';
                             if (isset($purposes_style_map[$purpose_code])) {
                                 $purpose_html = '<span class="badge ' . $purposes_style_map[$purpose_code]['class'] . '">' 
                                             . $purposes_style_map[$purpose_code]['name'] . '</span>';
                             } elseif ($purpose_code) {
-                                // Fallback to old style
-                                $purpose_html = '<span class="purpose-badge ' . strtolower($purpose_code) . '">' . $purpose_code . '</span>';
+                                $purpose_html = '<span class="badge bg-secondary">' . $purpose_code . '</span>';
                             }
                         ?>
                         <tr>
@@ -1139,7 +386,8 @@ if ($companyFilter === 'Toms World') {
         </div>
     </div>
 
-    <!-- View Visitor Modal (Active Visits) -->
+    <!-- Modals (View Visitor, Add Employee, Add Department, Add Purpose, etc.) -->
+    <!-- View Visitor Modal -->
     <div class="modal fade" id="viewVisitorModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -1299,7 +547,58 @@ if ($companyFilter === 'Toms World') {
         </div>
     </div>
 
-    <!-- NEW: Visitor History Modal -->
+    <!-- Add Purpose Modal -->
+    <div class="modal fade" id="addPurposeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
+                    <h5 class="modal-title"><i class="bi bi-flag-fill"></i> Add New Purpose</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addPurposeForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Purpose Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="purpose_code" placeholder="e.g., meeting, interview" required maxlength="20">
+                            <small class="text-muted">Unique identifier (lowercase, no spaces)</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Purpose Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="purpose_name" placeholder="e.g., Meeting, Interview" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Icon Class</label>
+                            <input type="text" class="form-control" name="icon_class" placeholder="e.g., bi-people, bi-briefcase" value="bi-circle">
+                            <small class="text-muted">Bootstrap Icons class (e.g., bi-people)</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Color Class</label>
+                            <select class="form-select" name="color_class">
+                                <option value="text-primary">Primary (Blue)</option>
+                                <option value="text-success">Success (Green)</option>
+                                <option value="text-warning">Warning (Orange)</option>
+                                <option value="text-danger">Danger (Red)</option>
+                                <option value="text-info">Info (Cyan)</option>
+                                <option value="text-secondary">Secondary (Gray)</option>
+                                <option value="text-dark">Dark</option>
+                                <option value="text-purple">Purple</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" name="is_active" id="purposeActiveCheck" checked>
+                            <label class="form-check-label" for="purposeActiveCheck">Active Purpose</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save Purpose</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visitor History Modal -->
     <div class="modal fade" id="visitorHistoryModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -1337,7 +636,7 @@ if ($companyFilter === 'Toms World') {
         </div>
     </div>
 
-    <!-- NEW: Employee Visit History Modal -->
+    <!-- Employee Visit History Modal -->
     <div class="modal fade" id="employeeHistoryModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -1375,7 +674,7 @@ if ($companyFilter === 'Toms World') {
         </div>
     </div>
 
-    <!-- NEW: Department Employees Modal -->
+    <!-- Department Employees Modal -->
     <div class="modal fade" id="departmentEmployeesModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -1411,73 +710,6 @@ if ($companyFilter === 'Toms World') {
         </div>
     </div>
 
-    <!-- Add Purpose Modal (place with other modals at the bottom) -->
-    <div class="modal fade" id="addPurposeModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header <?php echo $modalHeaderClass; ?>">
-                    <h5 class="modal-title"><i class="bi bi-flag-fill"></i> Add New Purpose</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <form id="addPurposeForm">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Purpose Code <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="purpose_code" placeholder="e.g., meeting, interview" required maxlength="20">
-                            <small class="text-muted">Unique identifier (lowercase, no spaces)</small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Purpose Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="purpose_name" placeholder="e.g., Meeting, Interview" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Icon Class</label>
-                            <input type="text" class="form-control" name="icon_class" placeholder="e.g., bi-people, bi-briefcase" value="bi-circle">
-                            <small class="text-muted">Bootstrap Icons class (e.g., bi-people)</small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Color Class</label>
-                            <!-- <select class="form-select" name="color_class">
-                                <option value="text-primary">Primary (Blue)</option>
-                                <option value="text-success">Success (Green)</option>
-                                <option value="text-warning">Warning (Orange)</option>
-                                <option value="text-danger">Danger (Red)</option>
-                                <option value="text-info">Info (Cyan)</option>
-                                <option value="text-secondary">Secondary (Gray)</option>
-                                <option value="text-dark">Dark</option>
-                                <option value="text-purple">Purple</option>
-                            </select> -->
-                            <select class="form-select" name="color_class">
-                                <option value="text-primary">Primary (Blue)</option>
-                                <option value="text-success">Success (Green)</option>
-                                <option value="text-warning">Warning (Orange)</option>
-                                <option value="text-danger">Danger (Red)</option>
-                                <option value="text-info">Info (Cyan)</option>
-                                <option value="text-secondary">Secondary (Gray)</option>
-                                <option value="text-dark">Dark</option>
-                                <option value="text-purple">Purple</option>
-                                <!-- Additional color options -->
-                                <option value="text-light">Light (Light Gray)</option>
-                                <option value="text-muted">Muted (Faded Gray)</option>
-                                <option value="text-black-50">Black 50% Opacity</option>
-                                <option value="text-white">White</option>
-                                <option value="text-transparent">Transparent</option>
-                            </select>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" name="is_active" id="purposeActiveCheck" checked>
-                            <label class="form-check-label" for="purposeActiveCheck">Active Purpose</label>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save Purpose</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -1487,43 +719,18 @@ if ($companyFilter === 'Toms World') {
     <script>
         const companyFilter = <?php echo json_encode($companyFilter); ?>;
         const filterParam = companyFilter ? `&company_filter=${encodeURIComponent(companyFilter)}` : '&company_filter=null';
+        const ajaxUrl = '<?= base_url("admin/ajax_handler") ?>';
         
         let currentVisitId = null;
         let currentVisitorData = null;
         let dataTableInstances = {};
-        // Global variable to store all purposes with their styling
         let purposesMap = {};
+        let lastAlertId = 0;
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('collapsed');
             document.getElementById('mainContent').classList.toggle('expanded');
         }
-
-        // function showSection(section) {
-        //     document.querySelectorAll('.dashboard-content').forEach(c => c.style.display = 'none');
-        //     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-            
-        //     const sectionMap = {
-        //         'dashboard': 'dashboardSection',
-        //         'active-visits': 'active-visitsSection',
-        //         'visitors': 'visitorsSection',
-        //         'employees': 'employeesSection',
-        //         'departments': 'departmentsSection',
-        //         'settings': 'settingsSection'
-        //     };
-            
-        //     if (sectionMap[section]) {
-        //         document.getElementById(sectionMap[section]).style.display = 'block';
-        //         event.target.closest('.sidebar-item').classList.add('active');
-                
-        //         switch(section) {
-        //             case 'active-visits': loadActiveVisits(); break;
-        //             case 'visitors': loadAllVisitors(); break;
-        //             case 'employees': loadEmployees(); break;
-        //             case 'departments': loadDepartments(); break;
-        //         }
-        //     }
-        // }
 
         function showSection(section) {
             document.querySelectorAll('.dashboard-content').forEach(c => c.style.display = 'none');
@@ -1535,7 +742,7 @@ if ($companyFilter === 'Toms World') {
                 'visitors': 'visitorsSection',
                 'employees': 'employeesSection',
                 'departments': 'departmentsSection',
-                'purposes': 'purposesSection',  // ADD THIS LINE
+                'purposes': 'purposesSection',
                 'settings': 'settingsSection'
             };
             
@@ -1548,7 +755,7 @@ if ($companyFilter === 'Toms World') {
                     case 'visitors': loadAllVisitors(); break;
                     case 'employees': loadEmployees(); break;
                     case 'departments': loadDepartments(); break;
-                    case 'purposes': loadPurposes(); break;  // ADD THIS LINE
+                    case 'purposes': loadPurposes(); break;
                 }
             }
         }
@@ -1578,13 +785,11 @@ if ($companyFilter === 'Toms World') {
             });
         }
 
-        // Load purposes on page load for dynamic badge rendering
         function loadPurposesMap() {
-            fetch('?action=get_all_purposes')
+            fetch(ajaxUrl + '?action=get_all_purposes')
                 .then(r => r.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        // Create a map for quick lookup
                         data.purposes.forEach(p => {
                             purposesMap[p.purpose_code] = {
                                 name: p.purpose_name,
@@ -1592,20 +797,16 @@ if ($companyFilter === 'Toms World') {
                                 icon_class: p.icon_class
                             };
                         });
-                        console.log('Purposes loaded:', purposesMap);
                     }
                 })
                 .catch(e => console.error('Error loading purposes map:', e));
         }
 
-        // Helper function to get purpose badge HTML
         function getPurposeBadgeHTML(purposeCode) {
             if (!purposeCode) return '<span class="badge bg-secondary">N/A</span>';
             
-            // Check if purpose exists in our map
             if (purposesMap[purposeCode]) {
                 const purpose = purposesMap[purposeCode];
-                // Map color classes to Bootstrap badge classes
                 const colorMap = {
                     'text-primary': 'bg-primary',
                     'text-success': 'bg-success',
@@ -1621,37 +822,11 @@ if ($companyFilter === 'Toms World') {
                 return `<span class="badge ${badgeClass}">${purpose.name}</span>`;
             }
             
-            // Fallback to old style for backward compatibility
-            return `<span class="purpose-badge ${purposeCode.toLowerCase()}">${purposeCode}</span>`;
+            return `<span class="badge bg-secondary">${purposeCode}</span>`;
         }
 
-        // function loadActiveVisits() {
-        //     fetch('?action=active_visits' + filterParam)
-        //         .then(r => r.json())
-        //         .then(data => {
-        //             initDataTable('activeVisitsTable', data, (v) => `
-        //                 <td><span class="badge-number">${v.badge_number}</span></td>
-        //                 <td><strong>${v.first_name} ${v.last_name}</strong></td>
-        //                 <td>${v.company}</td>
-        //                 <td>${v.host_name}</td>
-        //                 <td>${v.department_name}</td>
-        //                 <td><span class="purpose-badge ${(v.purpose||'').toLowerCase()}">${v.purpose}</span></td>
-        //                 <td><span class="notes-text" title="${v.additional_notes || ''}">${v.additional_notes || '-'}</span></td>
-        //                 <td>${getCompanyBadgeHTML(v.company_visited)}</td>
-        //                 <td>${new Date(v.check_in_time).toLocaleString()}</td>
-        //                 <td>${new Date(v.valid_until).toLocaleString()}</td>
-        //                 <td>
-        //                     <button class="action-btn view" onclick="viewVisitDetails(${v.visit_id})" title="View"><i class="bi bi-eye"></i></button>
-        //                     <button class="action-btn delete" onclick="checkOutVisitor(${v.visit_id})" title="Check Out"><i class="bi bi-box-arrow-right"></i></button>
-        //                 </td>
-        //             `);
-        //             document.getElementById('activeVisitCount').textContent = data.length;
-        //         })
-        //         .catch(e => console.error('Error loading active visits:', e));
-        // }
-
         function loadActiveVisits() {
-            fetch('?action=active_visits' + filterParam)
+            fetch(ajaxUrl + '?action=active_visits' + filterParam)
                 .then(r => r.json())
                 .then(data => {
                     initDataTable('activeVisitsTable', data, (v) => `
@@ -1676,7 +851,7 @@ if ($companyFilter === 'Toms World') {
         }
 
         function loadAllVisitors() {
-            fetch('?action=all_visitors' + filterParam)
+            fetch(ajaxUrl + '?action=all_visitors' + filterParam)
                 .then(r => r.json())
                 .then(data => {
                     initDataTable('allVisitorsTable', data, (v) => `
@@ -1699,7 +874,7 @@ if ($companyFilter === 'Toms World') {
 
         function loadEmployees() {
             loadDepartmentsForSelect();
-            fetch('?action=employees')
+            fetch(ajaxUrl + '?action=employees')
                 .then(r => r.json())
                 .then(data => {
                     initDataTable('employeeTable', data, (e) => `
@@ -1744,7 +919,7 @@ if ($companyFilter === 'Toms World') {
                     formData.append('employee_id', employeeId);
                     formData.append('new_status', newStatus);
                     
-                    fetch('?action=toggle_employee_status', {
+                    fetch(ajaxUrl + '?action=toggle_employee_status', {
                         method: 'POST',
                         body: formData
                     })
@@ -1773,7 +948,7 @@ if ($companyFilter === 'Toms World') {
         }
 
         function loadDepartments() {
-            fetch('?action=departments')
+            fetch(ajaxUrl + '?action=departments')
                 .then(r => r.json())
                 .then(data => {
                     initDataTable('departmentTable', data, (d) => `
@@ -1791,7 +966,7 @@ if ($companyFilter === 'Toms World') {
         }
 
         function loadDepartmentsForSelect() {
-            fetch('?action=departments')
+            fetch(ajaxUrl + '?action=departments')
                 .then(r => r.json())
                 .then(data => {
                     const select = document.getElementById('employeeDepartmentSelect');
@@ -1812,7 +987,7 @@ if ($companyFilter === 'Toms World') {
         }
 
         function viewVisitDetails(visitId) {
-            fetch(`?action=get_visit&visit_id=${visitId}`)
+            fetch(ajaxUrl + `?action=get_visit&visit_id=${visitId}`)
                 .then(r => r.json())
                 .then(visit => {
                     if (visit.error) {
@@ -1822,7 +997,7 @@ if ($companyFilter === 'Toms World') {
                     
                     currentVisitId = visit.visit_id;
                     
-                    let photoSrc = 'assets/images/default-avatar.png';
+                    let photoSrc = '<?= base_url("assets/images/default-avatar.png") ?>';
                     if (visit.photo) {
                         photoSrc = visit.photo.startsWith('data:image') ? visit.photo : 
                                    (visit.photo.startsWith('/') || visit.photo.startsWith('assets/')) ? visit.photo :
@@ -1830,7 +1005,7 @@ if ($companyFilter === 'Toms World') {
                     }
                     
                     document.getElementById('modalVisitorPhoto').src = photoSrc;
-                    document.getElementById('modalVisitorPhoto').onerror = function() { this.src = 'assets/images/default-avatar.png'; };
+                    document.getElementById('modalVisitorPhoto').onerror = function() { this.src = '<?= base_url("assets/images/default-avatar.png") ?>'; };
                     document.getElementById('modalBadgeNumber').textContent = visit.badge_number;
                     document.getElementById('modalVisitorName').textContent = `${visit.first_name} ${visit.last_name}`;
                     document.getElementById('modalEmail').textContent = visit.email || 'N/A';
@@ -1859,7 +1034,7 @@ if ($companyFilter === 'Toms World') {
         }
 
         function viewVisitor(visitorId) {
-            fetch(`?action=get_visitor&visitor_id=${visitorId}`)
+            fetch(ajaxUrl + `?action=get_visitor&visitor_id=${visitorId}`)
                 .then(r => r.json())
                 .then(visitor => {
                     if (visitor.error) {
@@ -1869,7 +1044,7 @@ if ($companyFilter === 'Toms World') {
                     
                     currentVisitorData = visitor;
                     
-                    let photoSrc = 'assets/images/default-avatar.png';
+                    let photoSrc = '<?= base_url("assets/images/default-avatar.png") ?>';
                     if (visitor.photo) {
                         photoSrc = visitor.photo.startsWith('data:image') ? visitor.photo : 
                                    (visitor.photo.startsWith('/') || visitor.photo.startsWith('assets/')) ? visitor.photo :
@@ -1877,7 +1052,7 @@ if ($companyFilter === 'Toms World') {
                     }
                     
                     document.getElementById('allVisitorPhoto').src = photoSrc;
-                    document.getElementById('allVisitorPhoto').onerror = function() { this.src = 'assets/images/default-avatar.png'; };
+                    document.getElementById('allVisitorPhoto').onerror = function() { this.src = '<?= base_url("assets/images/default-avatar.png") ?>'; };
                     document.getElementById('visitorTypeText').textContent = (visitor.visitor_type || 'new').charAt(0).toUpperCase() + (visitor.visitor_type || 'new').slice(1);
                     document.getElementById('allVisitorFullName').textContent = `${visitor.first_name} ${visitor.last_name}`;
                     document.getElementById('allVisitorEmail').textContent = visitor.email || 'Not provided';
@@ -1898,71 +1073,6 @@ if ($companyFilter === 'Toms World') {
                 });
         }
 
-        // function viewVisitorHistory(visitorId, visitorName) {
-        //     document.getElementById('visitorHistoryName').textContent = visitorName;
-            
-        //     if ($.fn.DataTable.isDataTable('#visitorHistoryTable')) {
-        //         $('#visitorHistoryTable').DataTable().clear().destroy();
-        //     }
-            
-        //     fetch(`?action=visitor_history&visitor_id=${visitorId}`)
-        //         .then(r => r.json())
-        //         .then(visits => {
-        //             const tbody = document.getElementById('visitorHistoryTableBody');
-        //             tbody.innerHTML = '';
-                    
-        //             if (visits.length === 0) {
-        //                 tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No visit history found</td></tr>';
-        //                 new bootstrap.Modal(document.getElementById('visitorHistoryModal')).show();
-        //             } else {
-        //                 visits.forEach(visit => {
-        //                     const checkIn = new Date(visit.check_in_time);
-        //                     const checkOut = visit.check_out_time ? new Date(visit.check_out_time) : null;
-        //                     let duration = 'In Progress';
-                            
-        //                     if (checkOut) {
-        //                         const diff = checkOut - checkIn;
-        //                         const hours = Math.floor(diff / 3600000);
-        //                         const minutes = Math.floor((diff % 3600000) / 60000);
-        //                         duration = `${hours}h ${minutes}m`;
-        //                     }
-                            
-        //                     const status = checkOut 
-        //                         ? '<span class="status-badge checked-out">Checked Out</span>' 
-        //                         : '<span class="status-badge checked-in">Checked In</span>';
-                            
-        //                     const tr = document.createElement('tr');
-        //                     tr.innerHTML = `
-        //                         <td><span class="badge-number">${visit.badge_number || 'N/A'}</span></td>
-        //                         <td>${visit.host_name}</td>
-        //                         <td>${visit.department_name}</td>
-        //                         <td><span class="purpose-badge ${(visit.purpose||'').toLowerCase()}">${visit.purpose}</span></td>
-        //                         <td>${checkIn.toLocaleString()}</td>
-        //                         <td>${checkOut ? checkOut.toLocaleString() : 'N/A'}</td>
-        //                         <td>${duration}</td>
-        //                         <td>${status}</td>
-        //                     `;
-        //                     tbody.appendChild(tr);
-        //                 });
-                        
-        //                 dataTableInstances['visitorHistoryTable'] = $('#visitorHistoryTable').DataTable({
-        //                     pageLength: 10,
-        //                     order: [[4, 'desc']],
-        //                     language: {
-        //                         emptyTable: "No visit history found",
-        //                         zeroRecords: "No matching records found"
-        //                     }
-        //                 });
-                        
-        //                 new bootstrap.Modal(document.getElementById('visitorHistoryModal')).show();
-        //             }
-        //         })
-        //         .catch(e => {
-        //             console.error('Error:', e);
-        //             Swal.fire('Error', 'Failed to load visitor history', 'error');
-        //         });
-        // }
-
         function viewVisitorHistory(visitorId, visitorName) {
             document.getElementById('visitorHistoryName').textContent = visitorName;
             
@@ -1970,7 +1080,7 @@ if ($companyFilter === 'Toms World') {
                 $('#visitorHistoryTable').DataTable().clear().destroy();
             }
             
-            fetch(`?action=visitor_history&visitor_id=${visitorId}`)
+            fetch(ajaxUrl + `?action=visitor_history&visitor_id=${visitorId}`)
                 .then(r => r.json())
                 .then(visits => {
                     const tbody = document.getElementById('visitorHistoryTableBody');
@@ -2028,71 +1138,6 @@ if ($companyFilter === 'Toms World') {
                 });
         }
 
-        // function viewEmployeeHistory(employeeId, employeeName) {
-        //     document.getElementById('employeeHistoryName').textContent = employeeName;
-            
-        //     if ($.fn.DataTable.isDataTable('#employeeHistoryTable')) {
-        //         $('#employeeHistoryTable').DataTable().clear().destroy();
-        //     }
-            
-        //     fetch(`?action=employee_history&employee_id=${employeeId}`)
-        //         .then(r => r.json())
-        //         .then(visits => {
-        //             const tbody = document.getElementById('employeeHistoryTableBody');
-        //             tbody.innerHTML = '';
-                    
-        //             if (visits.length === 0) {
-        //                 tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No visits hosted yet</td></tr>';
-        //                 new bootstrap.Modal(document.getElementById('employeeHistoryModal')).show();
-        //             } else {
-        //                 visits.forEach(visit => {
-        //                     const checkIn = new Date(visit.check_in_time);
-        //                     const checkOut = visit.check_out_time ? new Date(visit.check_out_time) : null;
-        //                     let duration = 'In Progress';
-                            
-        //                     if (checkOut) {
-        //                         const diff = checkOut - checkIn;
-        //                         const hours = Math.floor(diff / 3600000);
-        //                         const minutes = Math.floor((diff % 3600000) / 60000);
-        //                         duration = `${hours}h ${minutes}m`;
-        //                     }
-                            
-        //                     const status = checkOut 
-        //                         ? '<span class="status-badge checked-out">Checked Out</span>' 
-        //                         : '<span class="status-badge checked-in">Checked In</span>';
-                            
-        //                     const tr = document.createElement('tr');
-        //                     tr.innerHTML = `
-        //                         <td><span class="badge-number">${visit.badge_number || 'N/A'}</span></td>
-        //                         <td><strong>${visit.first_name} ${visit.last_name}</strong></td>
-        //                         <td>${visit.company || 'N/A'}</td>
-        //                         <td><span class="purpose-badge ${(visit.purpose||'').toLowerCase()}">${visit.purpose}</span></td>
-        //                         <td>${checkIn.toLocaleString()}</td>
-        //                         <td>${checkOut ? checkOut.toLocaleString() : 'N/A'}</td>
-        //                         <td>${duration}</td>
-        //                         <td>${status}</td>
-        //                     `;
-        //                     tbody.appendChild(tr);
-        //                 });
-                        
-        //                 dataTableInstances['employeeHistoryTable'] = $('#employeeHistoryTable').DataTable({
-        //                     pageLength: 10,
-        //                     order: [[4, 'desc']],
-        //                     language: {
-        //                         emptyTable: "No visits hosted yet",
-        //                         zeroRecords: "No matching records found"
-        //                     }
-        //                 });
-                        
-        //                 new bootstrap.Modal(document.getElementById('employeeHistoryModal')).show();
-        //             }
-        //         })
-        //         .catch(e => {
-        //             console.error('Error:', e);
-        //             Swal.fire('Error', 'Failed to load employee history', 'error');
-        //         });
-        // }
-
         function viewEmployeeHistory(employeeId, employeeName) {
             document.getElementById('employeeHistoryName').textContent = employeeName;
             
@@ -2100,7 +1145,7 @@ if ($companyFilter === 'Toms World') {
                 $('#employeeHistoryTable').DataTable().clear().destroy();
             }
             
-            fetch(`?action=employee_history&employee_id=${employeeId}`)
+            fetch(ajaxUrl + `?action=employee_history&employee_id=${employeeId}`)
                 .then(r => r.json())
                 .then(visits => {
                     const tbody = document.getElementById('employeeHistoryTableBody');
@@ -2165,7 +1210,7 @@ if ($companyFilter === 'Toms World') {
                 $('#departmentEmployeesTable').DataTable().clear().destroy();
             }
             
-            fetch(`?action=department_employees&department_code=${departmentCode}`)
+            fetch(ajaxUrl + `?action=department_employees&department_code=${departmentCode}`)
                 .then(r => r.json())
                 .then(employees => {
                     const tbody = document.getElementById('departmentEmployeesTableBody');
@@ -2246,7 +1291,7 @@ if ($companyFilter === 'Toms World') {
             const formData = new FormData();
             formData.append('visit_id', visitId);
             
-            fetch('?action=checkout', {
+            fetch(ajaxUrl + '?action=checkout', {
                 method: 'POST',
                 body: formData
             })
@@ -2271,41 +1316,8 @@ if ($companyFilter === 'Toms World') {
             });
         }
 
-        // function refreshDashboard() {
-        //     fetch('?action=dashboard_stats' + filterParam)
-        //         .then(r => r.json())
-        //         .then(stats => {
-        //             document.getElementById('todayTotal').textContent = stats.today_total;
-        //             document.getElementById('currentlyIn').textContent = stats.currently_in;
-        //             document.getElementById('avgDuration').textContent = stats.avg_duration;
-        //             document.getElementById('activeVisitCount').textContent = stats.currently_in;
-        //         });
-            
-        //     fetch('?action=recent_activity' + filterParam)
-        //         .then(r => r.json())
-        //         .then(data => {
-        //             const tbody = document.getElementById('recentActivityTableBody');
-        //             tbody.innerHTML = '';
-        //             data.forEach(a => {
-        //                 tbody.innerHTML += `
-        //                     <tr>
-        //                         <td><span class="badge-number">${a.badge_number}</span></td>
-        //                         <td>${a.first_name} ${a.last_name}</td>
-        //                         <td>${a.company}</td>
-        //                         <td>${a.host_name}</td>
-        //                         <td><span class="purpose-badge ${(a.purpose||'').toLowerCase()}">${a.purpose}</span></td>
-        //                         <td><span class="notes-text" title="${a.additional_notes || ''}">${a.additional_notes || '-'}</span></td>
-        //                         <td>${getCompanyBadgeHTML(a.company_visited)}</td>
-        //                         <td>${new Date(a.check_in_time).toLocaleTimeString()}</td>
-        //                         <td>${a.check_out_time ? '<span class="status-badge checked-out">Checked Out</span>' : '<span class="status-badge checked-in">Checked In</span>'}</td>
-        //                     </tr>
-        //                 `;
-        //             });
-        //         });
-        // }
-
         function refreshDashboard() {
-            fetch('?action=dashboard_stats' + filterParam)
+            fetch(ajaxUrl + '?action=dashboard_stats' + filterParam)
                 .then(r => r.json())
                 .then(stats => {
                     document.getElementById('todayTotal').textContent = stats.today_total;
@@ -2314,7 +1326,7 @@ if ($companyFilter === 'Toms World') {
                     document.getElementById('activeVisitCount').textContent = stats.currently_in;
                 });
             
-            fetch('?action=recent_activity' + filterParam)
+            fetch(ajaxUrl + '?action=recent_activity' + filterParam)
                 .then(r => r.json())
                 .then(data => {
                     const tbody = document.getElementById('recentActivityTableBody');
@@ -2356,82 +1368,8 @@ if ($companyFilter === 'Toms World') {
             return false;
         }
 
-        document.getElementById('addEmployeeForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            
-            fetch('?action=add_employee', { method: 'POST', body: formData })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal')).hide();
-                        this.reset();
-                        Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Employee added successfully', showConfirmButton: false, timer: 2000 });
-                        loadEmployees();
-                    } else {
-                        Swal.fire('Error', data.error || 'Failed to add employee', 'error');
-                    }
-                })
-                .catch(e => Swal.fire('Error', 'Failed to add employee', 'error'));
-        });
-
-        document.getElementById('addDepartmentForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            
-            fetch('?action=add_department', { method: 'POST', body: formData })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        bootstrap.Modal.getInstance(document.getElementById('addDepartmentModal')).hide();
-                        this.reset();
-                        Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Department added successfully', showConfirmButton: false, timer: 2000 });
-                        loadDepartments();
-                    } else {
-                        Swal.fire('Error', data.error || 'Failed to add department', 'error');
-                    }
-                })
-                .catch(e => Swal.fire('Error', 'Failed to add department', 'error'));
-        });
-
-        $(document).ready(function() {
-            if (!$.fn.DataTable.isDataTable('#recentActivityTable')) {
-                $('#recentActivityTable').DataTable({ pageLength: 10, order: [] });
-            }
-            
-            // ADD THIS LINE:
-            loadPurposesMap();
-
-            $('#visitorHistoryModal').on('hidden.bs.modal', function () {
-                if ($.fn.DataTable.isDataTable('#visitorHistoryTable')) {
-                    $('#visitorHistoryTable').DataTable().clear().destroy();
-                }
-            });
-            
-            $('#employeeHistoryModal').on('hidden.bs.modal', function () {
-                if ($.fn.DataTable.isDataTable('#employeeHistoryTable')) {
-                    $('#employeeHistoryTable').DataTable().clear().destroy();
-                }
-            });
-            
-            $('#departmentEmployeesModal').on('hidden.bs.modal', function () {
-                if ($.fn.DataTable.isDataTable('#departmentEmployeesTable')) {
-                    $('#departmentEmployeesTable').DataTable().clear().destroy();
-                }
-            });
-            
-        });
-
-        setInterval(() => {
-            if (document.getElementById('active-visitsSection').style.display !== 'none') {
-                loadActiveVisits();
-            }
-            refreshDashboard();
-        }, 30000);
-
-        // Load purposes function
         function loadPurposes() {
-            fetch('?action=get_all_purposes')
+            fetch(ajaxUrl + '?action=get_all_purposes')
                 .then(r => r.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -2484,7 +1422,6 @@ if ($companyFilter === 'Toms World') {
                             tbody.appendChild(tr);
                         });
                         
-                        // Initialize DataTable
                         if ($.fn.DataTable.isDataTable('#purposeTable')) {
                             $('#purposeTable').DataTable().destroy();
                         }
@@ -2503,7 +1440,6 @@ if ($companyFilter === 'Toms World') {
                 });
         }
 
-        // Toggle purpose status
         function togglePurposeStatus(purposeId, currentStatus, purposeName) {
             const newStatus = currentStatus == 1 ? 0 : 1;
             const actionText = newStatus == 1 ? 'activate' : 'deactivate';
@@ -2524,7 +1460,7 @@ if ($companyFilter === 'Toms World') {
                     formData.append('purpose_id', purposeId);
                     formData.append('new_status', newStatus);
                     
-                    fetch('?action=toggle_purpose_status', {
+                    fetch(ajaxUrl + '?action=toggle_purpose_status', {
                         method: 'POST',
                         body: formData
                     })
@@ -2552,13 +1488,12 @@ if ($companyFilter === 'Toms World') {
             });
         }
 
-        // Move purpose up/down
         function movePurpose(purposeId, direction) {
             const formData = new FormData();
             formData.append('purpose_id', purposeId);
             formData.append('direction', direction);
             
-            fetch('?action=update_purpose_order', {
+            fetch(ajaxUrl + '?action=update_purpose_order', {
                 method: 'POST',
                 body: formData
             })
@@ -2576,7 +1511,6 @@ if ($companyFilter === 'Toms World') {
             });
         }
 
-        // View purpose details
         function viewPurposeDetails(purposeId) {
             Swal.fire({
                 title: 'Purpose Details',
@@ -2585,12 +1519,49 @@ if ($companyFilter === 'Toms World') {
             });
         }
 
-        // Add purpose form submission
+        document.getElementById('addEmployeeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch(ajaxUrl + '?action=add_employee', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal')).hide();
+                        this.reset();
+                        Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Employee added successfully', showConfirmButton: false, timer: 2000 });
+                        loadEmployees();
+                    } else {
+                        Swal.fire('Error', data.error || 'Failed to add employee', 'error');
+                    }
+                })
+                .catch(e => Swal.fire('Error', 'Failed to add employee', 'error'));
+        });
+
+        document.getElementById('addDepartmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch(ajaxUrl + '?action=add_department', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('addDepartmentModal')).hide();
+                        this.reset();
+                        Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Department added successfully', showConfirmButton: false, timer: 2000 });
+                        loadDepartments();
+                    } else {
+                        Swal.fire('Error', data.error || 'Failed to add department', 'error');
+                    }
+                })
+                .catch(e => Swal.fire('Error', 'Failed to add department', 'error'));
+        });
+
         document.getElementById('addPurposeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
             
-            fetch('?action=add_purpose', { 
+            fetch(ajaxUrl + '?action=add_purpose', { 
                 method: 'POST', 
                 body: formData 
             })
@@ -2608,6 +1579,7 @@ if ($companyFilter === 'Toms World') {
                         timer: 2000 
                     });
                     loadPurposes();
+                    loadPurposesMap();
                 } else {
                     Swal.fire('Error', data.message || 'Failed to add purpose', 'error');
                 }
@@ -2618,26 +1590,55 @@ if ($companyFilter === 'Toms World') {
             });
         });
 
-        // Check for emergency alerts every 10 seconds
-        let lastAlertId = 0;
+        $(document).ready(function() {
+            if (!$.fn.DataTable.isDataTable('#recentActivityTable')) {
+                $('#recentActivityTable').DataTable({ pageLength: 10, order: [] });
+            }
+            
+            loadPurposesMap();
 
+            $('#visitorHistoryModal').on('hidden.bs.modal', function () {
+                if ($.fn.DataTable.isDataTable('#visitorHistoryTable')) {
+                    $('#visitorHistoryTable').DataTable().clear().destroy();
+                }
+            });
+            
+            $('#employeeHistoryModal').on('hidden.bs.modal', function () {
+                if ($.fn.DataTable.isDataTable('#employeeHistoryTable')) {
+                    $('#employeeHistoryTable').DataTable().clear().destroy();
+                }
+            });
+            
+            $('#departmentEmployeesModal').on('hidden.bs.modal', function () {
+                if ($.fn.DataTable.isDataTable('#departmentEmployeesTable')) {
+                    $('#departmentEmployeesTable').DataTable().clear().destroy();
+                }
+            });
+            
+        });
+
+        setInterval(() => {
+            if (document.getElementById('active-visitsSection').style.display !== 'none') {
+                loadActiveVisits();
+            }
+            refreshDashboard();
+        }, 30000);
+
+        // Emergency alerts
         function checkEmergencyAlerts() {
-            fetch('?action=check_emergency_alerts' + filterParam)
+            fetch(ajaxUrl + '?action=check_emergency_alerts' + filterParam)
                 .then(r => r.json())
                 .then(data => {
                     if (data.status === 'success' && data.alerts.length > 0) {
-                        // Get new alerts only
                         const newAlerts = data.alerts.filter(alert => alert.alert_id > lastAlertId);
                         
                         if (newAlerts.length > 0) {
-                            // Update last alert ID
                             lastAlertId = Math.max(...data.alerts.map(a => a.alert_id));
                             
-                            // Show Swal for each new alert
                             newAlerts.forEach((alert, index) => {
                                 setTimeout(() => {
                                     showEmergencyAlertSwal(alert);
-                                }, index * 500); // Stagger alerts by 500ms if multiple
+                                }, index * 500);
                             });
                         }
                     }
@@ -2646,7 +1647,6 @@ if ($companyFilter === 'Toms World') {
         }
 
         function showEmergencyAlertSwal(alert) {
-            // Determine company-specific styling
             let companyIcon, companyColor, companyName, companyBg;
             
             if (alert.company_visited === 'Toms World') {
@@ -2713,7 +1713,6 @@ if ($companyFilter === 'Toms World') {
 
         function playEmergencySound() {
             try {
-                // Create a simple beep sound
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
@@ -2722,76 +1721,57 @@ if ($companyFilter === 'Toms World') {
                 gainNode.connect(audioContext.destination);
                 
                 oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
-        
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.5);
-        
-        // Second beep
-        setTimeout(() => {
-            const oscillator2 = audioContext.createOscillator();
-            const gainNode2 = audioContext.createGain();
-            
-            oscillator2.connect(gainNode2);
-            gainNode2.connect(audioContext.destination);
-            
-            oscillator2.frequency.value = 1000;
-            oscillator2.type = 'sine';
-            
-            gainNode2.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-            
-            oscillator2.start(audioContext.currentTime);
-            oscillator2.stop(audioContext.currentTime + 0.5);
-        }, 200);
-    } catch (e) {
-        console.log('Audio not supported:', e);
-    }
-}
-
-function acknowledgeEmergencyAlert(alertId) {
-    const formData = new FormData();
-    formData.append('alert_id', alertId);
-    
-    fetch('?action=acknowledge_emergency_alert', {
-        method: 'POST',
-        body: formData
-    })
-    .then(r => r.json())
-    .catch(e => console.error('Error acknowledging alert:', e));
-}
-
-// Start checking for emergency alerts
-setInterval(checkEmergencyAlerts, 10000); // Check every 10 seconds
-checkEmergencyAlerts(); // Initial check
-
-// Add CSS for emergency alert animation
-const style = document.createElement('style');
-style.textContent = `
-    .emergency-alert-popup {
-        border: 3px solid #e74c3c !important;
-        box-shadow: 0 0 30px rgba(231, 76, 60, 0.5) !important;
-    }
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-        20%, 40%, 60%, 80% { transform: translateX(10px); }
-    }
-`;
-document.head.appendChild(style);
-
-// Initialize lastAlertId on page load
-fetch('?action=get_last_alert_id' + filterParam)
-    .then(r => r.json())
-    .then(data => {
-        if (data.status === 'success') {
-            lastAlertId = data.last_alert_id || 0;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+                
+                setTimeout(() => {
+                    const oscillator2 = audioContext.createOscillator();
+                    const gainNode2 = audioContext.createGain();
+                    
+                    oscillator2.connect(gainNode2);
+                    gainNode2.connect(audioContext.destination);
+                    
+                    oscillator2.frequency.value = 1000;
+                    oscillator2.type = 'sine';
+                    
+                    gainNode2.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    oscillator2.start(audioContext.currentTime);
+                    oscillator2.stop(audioContext.currentTime + 0.5);
+                }, 200);
+            } catch (e) {
+                console.log('Audio not supported:', e);
+            }
         }
-    });
 
+        function acknowledgeEmergencyAlert(alertId) {
+            const formData = new FormData();
+            formData.append('alert_id', alertId);
+            
+            fetch(ajaxUrl + '?action=acknowledge_emergency_alert', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .catch(e => console.error('Error acknowledging alert:', e));
+        }
+
+        setInterval(checkEmergencyAlerts, 10000);
+        checkEmergencyAlerts();
+
+        fetch(ajaxUrl + '?action=get_last_alert_id' + filterParam)
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    lastAlertId = data.last_alert_id || 0;
+                }
+            });
     </script>
 </body>
 </html>
