@@ -262,11 +262,47 @@ class Admin_model extends CI_Model {
         return $this->db->get()->result_array();
     }
     
+    // public function checkoutVisit($visit_id) {
+    //     $this->db->where('visit_id', $visit_id);
+    //     $this->db->where('check_out_time IS NULL');
+        
+    //     if ($this->db->update('visits', ['check_out_time' => date('Y-m-d H:i:s')])) {
+    //         if ($this->db->affected_rows() > 0) {
+    //             return ['success' => true];
+    //         }
+    //         return ['success' => false, 'error' => 'Already checked out or invalid visit'];
+    //     }
+        
+    //     return ['success' => false, 'error' => $this->db->error()['message']];
+    // }
+
+    // public function checkoutVisit($visit_id) {
+    //     // Get current server time
+    //     $current_time = date('Y-m-d H:i:s');
+        
+    //     $this->db->where('visit_id', $visit_id);
+    //     $this->db->where('check_out_time IS NULL');
+        
+    //     if ($this->db->update('visits', ['check_out_time' => $current_time])) {
+    //         if ($this->db->affected_rows() > 0) {
+    //             return ['success' => true];
+    //         }
+    //         return ['success' => false, 'error' => 'Already checked out or invalid visit'];
+    //     }
+        
+    //     return ['success' => false, 'error' => $this->db->error()['message']];
+    // }
+
     public function checkoutVisit($visit_id) {
+        // Ensure we're using the correct timezone
+        date_default_timezone_set('Asia/Manila'); // Or your timezone
+        
+        // Get the current timestamp using MySQL's NOW() function for consistency
         $this->db->where('visit_id', $visit_id);
         $this->db->where('check_out_time IS NULL');
         
-        if ($this->db->update('visits', ['check_out_time' => date('Y-m-d H:i:s')])) {
+        // Use MySQL NOW() to ensure consistency with database timezone
+        if ($this->db->set('check_out_time', 'NOW()', FALSE)->update('visits')) {
             if ($this->db->affected_rows() > 0) {
                 return ['success' => true];
             }
@@ -402,4 +438,38 @@ class Admin_model extends CI_Model {
         
         return ['status' => 'error', 'message' => $this->db->error()['message']];
     }
+
+    // // Auto-checkout expired visits
+    // public function autoCheckoutExpiredVisits($companyFilter = null) {
+    //     $current_time = date('Y-m-d H:i:s');
+        
+    //     $this->db->where('check_out_time IS NULL');
+    //     $this->db->where('valid_until <=', $current_time);
+        
+    //     if ($companyFilter) {
+    //         $this->db->where('company_visited', $companyFilter);
+    //     }
+        
+    //     // Get the visits that will be auto-checked out
+    //     $expired_visits = $this->db->get('visits')->result_array();
+        
+    //     if (!empty($expired_visits)) {
+    //         // Update them to check out at CURRENT TIME (not valid_until)
+    //         foreach ($expired_visits as $visit) {
+    //             $this->db->where('visit_id', $visit['visit_id']);
+    //             $this->db->update('visits', [
+    //                 'check_out_time' => $current_time,  // Use current time, not valid_until
+    //                 'auto_checkout' => 1  // Track that it was auto-checked out
+    //             ]);
+    //         }
+            
+    //         return [
+    //             'status' => 'success', 
+    //             'checked_out_count' => count($expired_visits),
+    //             'visits' => $expired_visits
+    //         ];
+    //     }
+        
+    //     return ['status' => 'success', 'checked_out_count' => 0];
+    // }
 }

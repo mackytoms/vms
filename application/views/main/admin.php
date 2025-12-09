@@ -850,6 +850,39 @@
                 .catch(e => console.error('Error loading active visits:', e));
         }
 
+        // function loadActiveVisits() {
+        //     fetch(ajaxUrl + '?action=active_visits' + filterParam)
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             const now = new Date();
+                    
+        //             initDataTable('activeVisitsTable', data, (v) => {
+        //                 const validUntil = new Date(v.valid_until);
+        //                 const isExpired = now > validUntil;
+        //                 const rowClass = isExpired ? 'style="background-color: #ffebee;"' : '';
+                        
+        //                 return `
+        //                     <td ${rowClass}><span class="badge-number">${v.badge_number}</span></td>
+        //                     <td ${rowClass}><strong>${v.first_name} ${v.last_name}</strong>${isExpired ? ' <span class="badge bg-danger ms-2"><i class="bi bi-clock-history"></i> EXPIRED</span>' : ''}</td>
+        //                     <td ${rowClass}>${v.company}</td>
+        //                     <td ${rowClass}>${v.host_name}</td>
+        //                     <td ${rowClass}>${v.department_name}</td>
+        //                     <td ${rowClass}>${getPurposeBadgeHTML(v.purpose)}</td>
+        //                     <td ${rowClass}><span class="notes-text" title="${v.additional_notes || ''}">${v.additional_notes || '-'}</span></td>
+        //                     <td ${rowClass}>${getCompanyBadgeHTML(v.company_visited)}</td>
+        //                     <td ${rowClass}>${new Date(v.check_in_time).toLocaleString()}</td>
+        //                     <td ${rowClass}>${isExpired ? '<strong class="text-danger">' + validUntil.toLocaleString() + ' <br><small>(Expired - will auto-checkout)</small></strong>' : validUntil.toLocaleString()}</td>
+        //                     <td ${rowClass}>
+        //                         <button class="action-btn view" onclick="viewVisitDetails(${v.visit_id})" title="View"><i class="bi bi-eye"></i></button>
+        //                         <button class="action-btn delete" onclick="checkOutVisitor(${v.visit_id})" title="Check Out"><i class="bi bi-box-arrow-right"></i></button>
+        //                     </td>
+        //                 `;
+        //             });
+        //             document.getElementById('activeVisitCount').textContent = data.length;
+        //         })
+        //         .catch(e => console.error('Error loading active visits:', e));
+        // }
+
         function loadAllVisitors() {
             fetch(ajaxUrl + '?action=all_visitors' + filterParam)
                 .then(r => r.json())
@@ -1138,6 +1171,136 @@
                 });
         }
 
+        // function viewVisitorHistory(visitorId, visitorName) {
+        //     document.getElementById('visitorHistoryName').textContent = visitorName;
+            
+        //     if ($.fn.DataTable.isDataTable('#visitorHistoryTable')) {
+        //         $('#visitorHistoryTable').DataTable().clear().destroy();
+        //     }
+            
+        //     fetch(ajaxUrl + `?action=visitor_history&visitor_id=${visitorId}`)
+        //         .then(r => r.json())
+        //         .then(visits => {
+        //             const tbody = document.getElementById('visitorHistoryTableBody');
+        //             tbody.innerHTML = '';
+                    
+        //             if (visits.length === 0) {
+        //                 tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No visit history found</td></tr>';
+        //                 new bootstrap.Modal(document.getElementById('visitorHistoryModal')).show();
+        //             } else {
+        //                 visits.forEach(visit => {
+        //                     const checkIn = new Date(visit.check_in_time);
+        //                     const checkOut = visit.check_out_time ? new Date(visit.check_out_time) : null;
+                            
+        //                     let duration = 'In Progress';
+        //                     let status = '<span class="status-badge checked-in">Checked In</span>';
+        //                     let checkOutDisplay = 'N/A';
+                            
+        //                     if (checkOut) {
+        //                         // Calculate duration: checkout - checkin
+        //                         const diffMs = checkOut.getTime() - checkIn.getTime();
+                                
+        //                         if (diffMs >= 0) {
+        //                             // Positive duration (normal case)
+        //                             const totalMinutes = Math.floor(diffMs / 60000);
+        //                             const hours = Math.floor(totalMinutes / 60);
+        //                             const minutes = totalMinutes % 60;
+                                    
+        //                             if (hours > 0) {
+        //                                 duration = `${hours}h ${minutes}m`;
+        //                             } else {
+        //                                 duration = `${minutes}m`;
+        //                             }
+        //                         } else {
+        //                             // Negative duration (data error)
+        //                             duration = '<span class="text-danger">Data Error</span>';
+        //                         }
+                                
+        //                         // Display actual checkout time
+        //                         checkOutDisplay = checkOut.toLocaleString();
+                                
+        //                         // Check if it was auto-checked out
+        //                         if (visit.auto_checkout == 1) {
+        //                             status = '<span class="status-badge checked-out" title="Automatically checked out"><i class="bi bi-clock"></i> Auto Checkout</span>';
+        //                         } else {
+        //                             status = '<span class="status-badge checked-out">Checked Out</span>';
+        //                         }
+        //                     }
+                            
+        //                     const tr = document.createElement('tr');
+        //                     tr.innerHTML = `
+        //                         <td><span class="badge-number">${visit.badge_number || 'N/A'}</span></td>
+        //                         <td>${visit.host_name}</td>
+        //                         <td>${visit.department_name}</td>
+        //                         <td>${getPurposeBadgeHTML(visit.purpose)}</td>
+        //                         <td>${checkIn.toLocaleString()}</td>
+        //                         <td>${checkOutDisplay}</td>
+        //                         <td><strong>${duration}</strong></td>
+        //                         <td>${status}</td>
+        //                     `;
+        //                     tbody.appendChild(tr);
+        //                 });
+                        
+        //                 dataTableInstances['visitorHistoryTable'] = $('#visitorHistoryTable').DataTable({
+        //                     pageLength: 10,
+        //                     order: [[4, 'desc']],
+        //                     language: {
+        //                         emptyTable: "No visit history found",
+        //                         zeroRecords: "No matching records found"
+        //                     }
+        //                 });
+                        
+        //                 new bootstrap.Modal(document.getElementById('visitorHistoryModal')).show();
+        //             }
+        //         })
+        //         .catch(e => {
+        //             console.error('Error:', e);
+        //             Swal.fire('Error', 'Failed to load visitor history', 'error');
+        //         });
+        // }
+
+        // // Auto-checkout expired visits
+        // function autoCheckoutExpired() {
+        //     fetch(ajaxUrl + '?action=auto_checkout_expired' + filterParam)
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             if (data.status === 'success' && data.checked_out_count > 0) {
+        //                 console.log(`Auto-checked out ${data.checked_out_count} expired visit(s)`);
+                        
+        //                 // Refresh active visits if on that section
+        //                 if (document.getElementById('active-visitsSection').style.display !== 'none') {
+        //                     loadActiveVisits();
+        //                 }
+                        
+        //                 // Refresh dashboard
+        //                 refreshDashboard();
+                        
+        //                 // Optional: Show notification
+        //                 Swal.fire({
+        //                     toast: true,
+        //                     position: 'top-end',
+        //                     icon: 'info',
+        //                     title: `${data.checked_out_count} visitor(s) auto-checked out`,
+        //                     showConfirmButton: false,
+        //                     timer: 3000
+        //                 });
+        //             }
+        //         })
+        //         .catch(e => console.error('Error auto-checking out:', e));
+        // }
+
+        // // Run auto-checkout check every 1 minute
+        // setInterval(autoCheckoutExpired, 60000);
+
+        // // Run immediately on page load
+        // autoCheckoutExpired();
+
+        // // Run auto-checkout check every 1 minute
+        // setInterval(autoCheckoutExpired, 60000);
+
+        // // Run immediately on page load
+        // autoCheckoutExpired();
+
         function viewEmployeeHistory(employeeId, employeeName) {
             document.getElementById('employeeHistoryName').textContent = employeeName;
             
@@ -1158,18 +1321,32 @@
                         visits.forEach(visit => {
                             const checkIn = new Date(visit.check_in_time);
                             const checkOut = visit.check_out_time ? new Date(visit.check_out_time) : null;
+                            
                             let duration = 'In Progress';
+                            let status = '<span class="status-badge checked-in">Checked In</span>';
+                            let checkOutDisplay = 'N/A';
                             
                             if (checkOut) {
-                                const diff = checkOut - checkIn;
-                                const hours = Math.floor(diff / 3600000);
-                                const minutes = Math.floor((diff % 3600000) / 60000);
-                                duration = `${hours}h ${minutes}m`;
+                                // Calculate duration: checkout - checkin
+                                const diffMs = checkOut.getTime() - checkIn.getTime();
+                                
+                                if (diffMs >= 0) {
+                                    const totalMinutes = Math.floor(diffMs / 60000);
+                                    const hours = Math.floor(totalMinutes / 60);
+                                    const minutes = totalMinutes % 60;
+                                    
+                                    if (hours > 0) {
+                                        duration = `${hours}h ${minutes}m`;
+                                    } else {
+                                        duration = `${minutes}m`;
+                                    }
+                                } else {
+                                    duration = '<span class="text-danger">Data Error</span>';
+                                }
+                                
+                                checkOutDisplay = checkOut.toLocaleString();
+                                status = '<span class="status-badge checked-out">Checked Out</span>';
                             }
-                            
-                            const status = checkOut 
-                                ? '<span class="status-badge checked-out">Checked Out</span>' 
-                                : '<span class="status-badge checked-in">Checked In</span>';
                             
                             const tr = document.createElement('tr');
                             tr.innerHTML = `
@@ -1178,8 +1355,8 @@
                                 <td>${visit.company || 'N/A'}</td>
                                 <td>${getPurposeBadgeHTML(visit.purpose)}</td>
                                 <td>${checkIn.toLocaleString()}</td>
-                                <td>${checkOut ? checkOut.toLocaleString() : 'N/A'}</td>
-                                <td>${duration}</td>
+                                <td>${checkOutDisplay}</td>
+                                <td><strong>${duration}</strong></td>
                                 <td>${status}</td>
                             `;
                             tbody.appendChild(tr);
@@ -1622,6 +1799,8 @@
                 loadActiveVisits();
             }
             refreshDashboard();
+            // autoCheckoutExpired(); // Add this line
+
         }, 30000);
 
         // Emergency alerts

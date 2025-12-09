@@ -197,6 +197,10 @@ class Admin extends CI_Controller {
                     $result = $this->Admin_model->togglePurposeStatus($purpose_id, $new_status);
                     echo json_encode($result);
                     break;
+
+                // case 'auto_checkout_expired':
+                //     echo json_encode($this->Admin_model->autoCheckoutExpiredVisits($companyFilter));
+                //     break;
                     
                 case 'update_purpose_order':
                     $purpose_id = (int)$this->input->post('purpose_id');
