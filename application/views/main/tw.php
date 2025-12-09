@@ -1929,7 +1929,153 @@
         //     }
         // }
 
-        // FIXED: Handle QR code success for returning visitors
+        // // FIXED: Handle QR code success for returning visitors
+        // function handleQRCodeSuccess(decodedText) {
+        //     // Prevent multiple calls
+        //     if (isProcessingQR) {
+        //         return;
+        //     }
+        //     isProcessingQR = true;
+            
+        //     console.log('QR Scanned:', decodedText);
+            
+        //     // Stop QR scanner safely
+        //     stopQRScanner();
+            
+        //     // Show loading
+        //     showLoading();
+            
+        //     // The decoded text should be just the badge number (e.g., "V-2025-9859")
+        //     const badgeNumber = decodedText.trim();
+            
+        //     // Validate badge number format
+        //     const badgePattern = /^V-\d{4}-\d{4}$/;
+        //     if (!badgePattern.test(badgeNumber)) {
+        //         hideLoading();
+        //         isProcessingQR = false;
+                
+        //         Swal.fire({
+        //             title: translations[currentLanguage].invalidQRMessage || 'Invalid QR Code',
+        //             text: 'QR code does not contain a valid badge number.',
+        //             icon: 'error',
+        //             showCancelButton: true,
+        //             confirmButtonColor: '#3498db',
+        //             cancelButtonColor: '#95a5a6',
+        //             confirmButtonText: 'Try Again',
+        //             cancelButtonText: 'Continue Manually'
+        //         }).then((result) => {
+        //             if (result.isConfirmed) {
+        //                 initQRScanner();
+        //             } else {
+        //                 skipQRScan();
+        //             }
+        //         });
+        //         return;
+        //     }
+            
+        //     // Fetch visitor data from database using badge number
+        //     fetch('<?= base_url("kiosk/get_visitor_by_badge") ?>', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'X-Requested-With': 'XMLHttpRequest'
+        //         },
+        //         body: JSON.stringify({ badge_number: badgeNumber })
+        //     })
+        //     .then(response => response.json())
+        //     .then(result => {
+        //         hideLoading();
+                
+        //         if (result.status === 'success' && result.visitor) {
+        //             const visitor = result.visitor;
+                    
+        //             // Retrieve stored photo from localStorage using badge number
+        //             const storedPhoto = localStorage.getItem(`visitor_photo_${badgeNumber}`);
+                    
+        //             // Populate visitor data from database
+        //             visitorData = {
+        //                 ...visitorData,
+        //                 visitor_id: visitor.visitor_id,
+        //                 firstName: visitor.first_name,
+        //                 lastName: visitor.last_name,
+        //                 email: visitor.email,
+        //                 phone: visitor.phone || '',
+        //                 company: visitor.company || '',
+        //                 photo: storedPhoto || visitor.photo || null,
+        //                 type: 'returning',
+        //                 total_visits: visitor.total_visits || 0
+        //             };
+                    
+        //             // Update flow for returning visitor
+        //             currentFlow = [1, 2, 5, 6, 7, 8];
+        //             currentFlowIndex = 2;
+                    
+        //             // Show welcome back message
+        //             Swal.fire({
+        //                 title: translations[currentLanguage].qrScanSuccess || 'QR Code Scanned!',
+        //                 html: `
+        //                     <p>${translations[currentLanguage].welcomeBackQR || 'Welcome back!'}</p>
+        //                     <p><strong>${visitor.first_name} ${visitor.last_name}</strong></p>
+        //                     <p>${visitor.company || ''}</p>
+        //                     <p class="text-muted">Total Visits: ${visitor.total_visits || 1}</p>
+        //                 `,
+        //                 icon: 'success',
+        //                 confirmButtonColor: '#27ae60',
+        //                 timer: 3000,
+        //                 timerProgressBar: true,
+        //                 showConfirmButton: true,
+        //                 confirmButtonText: 'OK'
+        //             }).then(() => {
+        //                 isProcessingQR = false;
+        //                 showScreen(5);
+        //             });
+                    
+        //         } else {
+        //             isProcessingQR = false;
+                    
+        //             Swal.fire({
+        //                 title: 'Visitor Not Found',
+        //                 text: result.message || 'This badge number was not found in our records.',
+        //                 icon: 'warning',
+        //                 showCancelButton: true,
+        //                 confirmButtonColor: '#3498db',
+        //                 cancelButtonColor: '#95a5a6',
+        //                 confirmButtonText: 'Try Again',
+        //                 cancelButtonText: 'Continue as New Visitor'
+        //             }).then((result) => {
+        //                 if (result.isConfirmed) {
+        //                     initQRScanner();
+        //                 } else {
+        //                     skipQRScan();
+        //                 }
+        //             });
+        //         }
+        //     })
+        //     .catch(error => {
+        //         hideLoading();
+        //         isProcessingQR = false;
+        //         console.error('Error fetching visitor data:', error);
+                
+        //         Swal.fire({
+        //             title: 'Connection Error',
+        //             text: 'Unable to retrieve visitor information. Please try again or continue manually.',
+        //             icon: 'error',
+        //             showCancelButton: true,
+        //             confirmButtonColor: '#3498db',
+        //             cancelButtonColor: '#95a5a6',
+        //             confirmButtonText: 'Try Again',
+        //             cancelButtonText: 'Continue Manually'
+        //         }).then((result) => {
+        //             if (result.isConfirmed) {
+        //                 initQRScanner();
+        //             } else {
+        //                 skipQRScan();
+        //             }
+        //         });
+        //     });
+        // }
+
+        // UPDATED: Handle QR code success with ACTIVE VISIT CHECK
         function handleQRCodeSuccess(decodedText) {
             // Prevent multiple calls
             if (isProcessingQR) {
@@ -1989,6 +2135,67 @@
                 if (result.status === 'success' && result.visitor) {
                     const visitor = result.visitor;
                     
+                    // ========================================
+                    // NEW: CHECK FOR ACTIVE VISIT
+                    // ========================================
+                    if (result.has_active_visit === true) {
+                        isProcessingQR = false;
+                        
+                        // Show denial message with active visit details
+                        Swal.fire({
+                            title: '⚠️ Already Checked In',
+                            html: `
+                                <div style="text-align: left; padding: 10px;">
+                                    <p style="font-size: 1.1em; margin-bottom: 15px; text-align: center;">
+                                        <strong>${visitor.first_name} ${visitor.last_name}</strong>, 
+                                        you are currently checked in at the premises.
+                                    </p>
+
+                                    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #f39c12; margin-bottom: 15px;">
+                                        <strong style="color: #f39c12;">Active Visit Details:</strong><br>
+                                        <div style="margin-top: 10px; line-height: 1.8;">
+                                            <strong>Badge:</strong> ${result.active_visit.badge_number}<br>
+                                            <strong>Host:</strong> ${result.active_visit.host_name}<br>
+                                            <strong>Department:</strong> ${result.active_visit.department}<br>
+                                            <strong>Check-in Time:</strong> ${new Date(result.active_visit.check_in_time).toLocaleString('en-US', { 
+                                                hour: '2-digit', 
+                                                minute: '2-digit',
+                                                hour12: true,
+                                                month: 'short',
+                                                day: 'numeric'
+                                            })}<br>
+                                            <strong>Valid Until:</strong> ${new Date(result.active_visit.valid_until).toLocaleString('en-US', { 
+                                                hour: '2-digit', 
+                                                minute: '2-digit',
+                                                hour12: true
+                                            })}
+                                        </div>
+                                    </div>
+                                    <p style="color: #e74c3c; font-weight: 600; text-align: center;">
+                                        <i class="bi bi-exclamation-triangle"></i> 
+                                        Please check out first before checking in again.
+                                    </p>
+                                </div>
+                            `,
+                            icon: 'warning',
+                            confirmButtonColor: '#f39c12',
+                            confirmButtonText: 'OK, I Understand',
+                            allowOutsideClick: false,
+                            customClass: {
+                                popup: 'swal-wide'
+                            }
+                        }).then(() => {
+                            // Return to welcome screen
+                            resetKiosk();
+                        });
+                        
+                        return; // Stop execution here
+                    }
+                    // ========================================
+                    // END: ACTIVE VISIT CHECK
+                    // ========================================
+                    
+                    // If no active visit, continue with normal flow
                     // Retrieve stored photo from localStorage using badge number
                     const storedPhoto = localStorage.getItem(`visitor_photo_${badgeNumber}`);
                     
@@ -2074,6 +2281,16 @@
                 });
             });
         }
+
+        // Add custom CSS for wider Swal popup (add this to your CSS or style section)
+        const style = document.createElement('style');
+        style.textContent = `
+            .swal-wide {
+                width: 600px !important;
+                max-width: 90% !important;
+            }
+        `;
+        document.head.appendChild(style);
 
         // FIXED: Handle QR upload for returning visitors
         function handleQRUpload(input) {
