@@ -27,19 +27,54 @@ class Kiosk extends CI_Controller {
     }
     
     // Get employees by department
+    // public function get_employees($department_code = null) {
+    //     if (!$department_code) {
+    //         echo json_encode(['status' => 'error', 'message' => 'Department code required']);
+    //         return;
+    //     }
+        
+    //     $employees = $this->db->select('employee_id, name, email')
+    //                          ->from('employees')
+    //                          ->where('department_code', $department_code)
+    //                          ->where('is_active', 1)
+    //                          ->order_by('name', 'ASC')
+    //                          ->get()
+    //                          ->result_array();
+        
+    //     echo json_encode(['status' => 'success', 'employees' => $employees]);
+    // }
+
+    // Get employees by department - FILTERED BY COMPANY
     public function get_employees($department_code = null) {
         if (!$department_code) {
             echo json_encode(['status' => 'error', 'message' => 'Department code required']);
             return;
         }
         
-        $employees = $this->db->select('employee_id, name, email')
-                             ->from('employees')
-                             ->where('department_code', $department_code)
-                             ->where('is_active', 1)
-                             ->order_by('name', 'ASC')
-                             ->get()
-                             ->result_array();
+        // Get company_visited parameter from query string
+        $company_visited = $this->input->get('company_visited');
+        
+        // Validate company_visited parameter
+        if (empty($company_visited)) {
+            echo json_encode([
+                'status' => 'error', 
+                'message' => 'Company parameter is required'
+            ]);
+            return;
+        }
+        
+        // Query employees that match the department AND (company OR "Both")
+        $this->db->select('employee_id, name, email')
+                ->from('employees')
+                ->where('department_code', $department_code)
+                ->where('is_active', 1)
+                ->group_start()
+                    ->where('company_owned_by', $company_visited)
+                    ->or_where('company_owned_by', 'Both')
+                ->group_end()
+                ->order_by('name', 'ASC');
+        
+        $employees = $this->db->get()->result_array();
         
         echo json_encode(['status' => 'success', 'employees' => $employees]);
     }
@@ -756,13 +791,45 @@ class Kiosk extends CI_Controller {
     /**
      * Get all active purposes for kiosk display
      */
+    // public function get_purposes() {
+    //     $purposes = $this->db->select('purpose_id, purpose_code, purpose_name, icon_class, color_class')
+    //                         ->from('purposes')
+    //                         ->where('is_active', 1)
+    //                         ->order_by('display_order', 'ASC')
+    //                         ->get()
+    //                         ->result_array();
+        
+    //     echo json_encode(['status' => 'success', 'purposes' => $purposes]);
+    // }
+    
+    /**
+     * Get all active purposes for kiosk display - FILTERED BY COMPANY
+     */
     public function get_purposes() {
-        $purposes = $this->db->select('purpose_id, purpose_code, purpose_name, icon_class, color_class')
-                            ->from('purposes')
-                            ->where('is_active', 1)
-                            ->order_by('display_order', 'ASC')
-                            ->get()
-                            ->result_array();
+        // Get company_visited parameter from query string
+        $company_visited = $this->input->get('company_visited');
+        
+        // Validate company_visited parameter
+        if (empty($company_visited)) {
+            echo json_encode([
+                'status' => 'error', 
+                'message' => 'Company parameter is required'
+            ]);
+            return;
+        }
+        
+        // Query purposes that match the company OR are set to "Both"
+        // IMPORTANT: The database column is 'company_owned_by', not 'company_visited'
+        $this->db->select('purpose_id, purpose_code, purpose_name, icon_class, color_class')
+                ->from('purposes')
+                ->where('is_active', 1)
+                ->group_start()
+                    ->where('company_owned_by', $company_visited)
+                    ->or_where('company_owned_by', 'Both')
+                ->group_end()
+                ->order_by('display_order', 'ASC');
+        
+        $purposes = $this->db->get()->result_array();
         
         echo json_encode(['status' => 'success', 'purposes' => $purposes]);
     }
@@ -995,5 +1062,6 @@ class Kiosk extends CI_Controller {
     //         ]);
     //     }
     // }
+
 
 }

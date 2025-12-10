@@ -103,6 +103,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -307,7 +308,14 @@
                 <table class="table table-hover" id="employeeTable">
                     <thead>
                         <tr>
-                            <th>Employee ID</th><th>Name</th><th>Email</th><th>Department</th><th>Status</th><th>Total Visits Hosted</th>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Total Visits Hosted</th>
+                            <th>Company</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="employeeTableBody"></tbody>
@@ -357,6 +365,7 @@
                             <th>Icon</th>
                             <th>Color</th>
                             <th>Status</th>
+                            <th>Company</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -485,6 +494,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <form id="addEmployeeForm">
+                    <!-- Modify Add Employee Modal body -->
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Full Name <span class="text-danger">*</span></label>
@@ -500,6 +510,15 @@
                                 <option value="">Select Department</option>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Company Ownership</label>
+                            <select class="form-select" name="company_owned_by" id="addCompanyOwnedBy">
+                                <option value="Both">Both Companies</option>
+                                <option value="Toms World">Tom's World Only</option>
+                                <option value="Pan Asia">Pan-Asia Only</option>
+                            </select>
+                            <small class="text-muted">Determines which company can see this employee</small>
+                        </div>
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" name="is_active" id="isActiveCheck" checked>
                             <label class="form-check-label" for="isActiveCheck">Active Employee</label>
@@ -508,6 +527,59 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save Employee</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Employee Modal -->
+    <div class="modal fade" id="editEmployeeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Employee</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editEmployeeForm">
+                    <input type="hidden" name="employee_id" id="editEmployeeId">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Employee ID</label>
+                            <input type="text" class="form-control" id="editEmployeeIdDisplay" readonly>
+                            <small class="text-muted">Employee ID cannot be changed</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="name" id="editEmployeeName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" name="email" id="editEmployeeEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Department <span class="text-danger">*</span></label>
+                            <select class="form-select" name="department_code" id="editEmployeeDepartment" required>
+                                <option value="">Select Department</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Company Ownership</label>
+                            <select class="form-select" name="company_owned_by" id="editCompanyOwnedBy">
+                                <option value="Both">Both Companies</option>
+                                <option value="Toms World">Tom's World Only</option>
+                                <option value="Pan Asia">Pan-Asia Only</option>
+                            </select>
+                            <small class="text-muted">Determines which company can see this employee</small>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" name="is_active" id="editIsActiveCheck">
+                            <label class="form-check-label" for="editIsActiveCheck">Active Employee</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Update Employee</button>
                     </div>
                 </form>
             </div>
@@ -598,6 +670,67 @@
         </div>
     </div>
 
+    <!-- Edit Purpose Modal -->
+    <div class="modal fade" id="editPurposeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Purpose</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editPurposeForm">
+                    <input type="hidden" name="purpose_id" id="editPurposeId">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Purpose Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="purpose_code" id="editPurposeCode" readonly>
+                            <small class="text-muted">Purpose code cannot be changed</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Purpose Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="purpose_name" id="editPurposeName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Icon Class</label>
+                            <input type="text" class="form-control" name="icon_class" id="editIconClass" placeholder="e.g., bi-people, bi-briefcase">
+                            <small class="text-muted">Bootstrap Icons class (e.g., bi-people)</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Color Class</label>
+                            <select class="form-select" name="color_class" id="editColorClass">
+                                <option value="text-primary">Primary (Blue)</option>
+                                <option value="text-success">Success (Green)</option>
+                                <option value="text-warning">Warning (Orange)</option>
+                                <option value="text-danger">Danger (Red)</option>
+                                <option value="text-info">Info (Cyan)</option>
+                                <option value="text-secondary">Secondary (Gray)</option>
+                                <option value="text-dark">Dark</option>
+                                <option value="text-purple">Purple</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Company Ownership</label>
+                            <select class="form-select" name="company_owned_by" id="editCompanyOwnedBy">
+                                <option value="Both">Both Companies</option>
+                                <option value="Toms World">Tom's World Only</option>
+                                <option value="Pan Asia">Pan-Asia Only</option>
+                            </select>
+                            <small class="text-muted">Determines which company can see this purpose</small>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" name="is_active" id="editPurposeActiveCheck">
+                            <label class="form-check-label" for="editPurposeActiveCheck">Active Purpose</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Update Purpose</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Visitor History Modal -->
     <div class="modal fade" id="visitorHistoryModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
@@ -673,6 +806,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Department Employees Modal -->
     <div class="modal fade" id="departmentEmployeesModal" tabindex="-1">
@@ -905,32 +1039,164 @@
                 .catch(e => console.error('Error loading visitors:', e));
         }
 
+        // function loadEmployees() {
+        //     loadDepartmentsForSelect();
+        //     fetch(ajaxUrl + '?action=employees')
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             initDataTable('employeeTable', data, (e) => `
+        //                 <td>${e.employee_id}</td>
+        //                 <td><strong>${e.name}</strong></td>
+        //                 <td>${e.email}</td>
+        //                 <td>${e.department_name}</td>
+        //                 <td>
+        //                     <span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                         style="cursor: pointer;" 
+        //                         onclick="toggleEmployeeStatus('${e.employee_id}', ${e.is_active}, '${e.name.replace(/'/g, "\\'")}')" 
+        //                         title="Click to ${e.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                         ${e.is_active == 1 ? 'Active' : 'Inactive'}
+        //                     </span>
+        //                 </td>
+        //                 <td>
+        //                     ${e.total_visits || 0}
+        //                     ${e.total_visits > 0 ? `<button class="btn btn-sm btn-link" onclick="viewEmployeeHistory('${e.employee_id}', '${e.name}')" title="View History"><i class="bi bi-clock-history"></i></button>` : ''}
+        //                 </td>
+        //             `);
+        //         })
+        //         .catch(e => console.error('Error loading employees:', e));
+        // }
+
         function loadEmployees() {
             loadDepartmentsForSelect();
-            fetch(ajaxUrl + '?action=employees')
+            fetch(ajaxUrl + '?action=employees' + filterParam)
                 .then(r => r.json())
                 .then(data => {
-                    initDataTable('employeeTable', data, (e) => `
-                        <td>${e.employee_id}</td>
-                        <td><strong>${e.name}</strong></td>
-                        <td>${e.email}</td>
-                        <td>${e.department_name}</td>
-                        <td>
-                            <span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
-                                style="cursor: pointer;" 
-                                onclick="toggleEmployeeStatus('${e.employee_id}', ${e.is_active}, '${e.name.replace(/'/g, "\\'")}')" 
-                                title="Click to ${e.is_active == 1 ? 'deactivate' : 'activate'}">
-                                ${e.is_active == 1 ? 'Active' : 'Inactive'}
-                            </span>
-                        </td>
-                        <td>
-                            ${e.total_visits || 0}
-                            ${e.total_visits > 0 ? `<button class="btn btn-sm btn-link" onclick="viewEmployeeHistory('${e.employee_id}', '${e.name}')" title="View History"><i class="bi bi-clock-history"></i></button>` : ''}
-                        </td>
-                    `);
+                    initDataTable('employeeTable', data, (e) => {
+                        const canEdit = canEditEmployee(e.company_owned_by);
+                        
+                        return `
+                            <td>${e.employee_id}</td>
+                            <td><strong>${e.name}</strong></td>
+                            <td>${e.email}</td>
+                            <td>${e.department_name}</td>
+                            <td>
+                                <span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+                                    style="cursor: pointer;" 
+                                    onclick="toggleEmployeeStatus('${e.employee_id}', ${e.is_active}, '${e.name.replace(/'/g, "\\'")}')" 
+                                    title="Click to ${e.is_active == 1 ? 'deactivate' : 'activate'}">
+                                    ${e.is_active == 1 ? 'Active' : 'Inactive'}
+                                </span>
+                            </td>
+                            <td>
+                                ${e.total_visits || 0}
+                                ${e.total_visits > 0 ? `<button class="btn btn-sm btn-link" onclick="viewEmployeeHistory('${e.employee_id}', '${e.name}')" title="View History"><i class="bi bi-clock-history"></i></button>` : ''}
+                            </td>
+                            <td>
+                                <span class="badge ${getCompanyOwnershipBadge(e.company_owned_by)}">
+                                    ${e.company_owned_by}
+                                </span>
+                            </td>
+                            <td>
+                                ${canEdit ? `
+                                    <button class="action-btn edit" onclick="editEmployee('${e.employee_id}')" title="Edit Employee">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                ` : ''}
+                            </td>
+                        `;
+                    });
                 })
                 .catch(e => console.error('Error loading employees:', e));
         }
+
+        function canEditEmployee(companyOwnedBy) {
+            // Super admin can edit everything
+            if (companyFilter === null) {
+                return true;
+            }
+            
+            // Both companies can be edited by any admin
+            if (companyOwnedBy === 'Both') {
+                return true;
+            }
+            
+            // Check if the employee belongs to the admin's company
+            return companyOwnedBy === companyFilter;
+        }
+
+        function editEmployee(employeeId) {
+            fetch(ajaxUrl + `?action=get_employee&employee_id=${employeeId}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const employee = data.employee;
+                        
+                        // Populate form fields
+                        document.getElementById('editEmployeeId').value = employee.employee_id;
+                        document.getElementById('editEmployeeIdDisplay').value = employee.employee_id;
+                        document.getElementById('editEmployeeName').value = employee.name;
+                        document.getElementById('editEmployeeEmail').value = employee.email;
+                        document.getElementById('editCompanyOwnedBy').value = employee.company_owned_by;
+                        document.getElementById('editIsActiveCheck').checked = employee.is_active == 1;
+                        
+                        // Load departments and set selected
+                        loadDepartmentsForEditSelect(employee.department_code);
+                        
+                        new bootstrap.Modal(document.getElementById('editEmployeeModal')).show();
+                    } else {
+                        Swal.fire('Error', data.message || 'Failed to load employee details', 'error');
+                    }
+                })
+                .catch(e => {
+                    console.error('Error:', e);
+                    Swal.fire('Error', 'Failed to load employee details', 'error');
+                });
+        }
+
+        function loadDepartmentsForEditSelect(selectedDeptCode) {
+            fetch(ajaxUrl + '?action=departments')
+                .then(r => r.json())
+                .then(data => {
+                    const select = document.getElementById('editEmployeeDepartment');
+                    select.innerHTML = '<option value="">Select Department</option>';
+                    data.forEach(d => {
+                        const selected = d.department_code === selectedDeptCode ? 'selected' : '';
+                        select.innerHTML += `<option value="${d.department_code}" ${selected}>${d.name}</option>`;
+                    });
+                });
+        }
+
+        // Add form submit handler
+        document.getElementById('editEmployeeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch(ajaxUrl + '?action=update_employee', { 
+                method: 'POST', 
+                body: formData 
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal')).hide();
+                    Swal.fire({ 
+                        toast: true, 
+                        position: 'top-end', 
+                        icon: 'success', 
+                        title: 'Employee updated successfully', 
+                        showConfirmButton: false, 
+                        timer: 2000 
+                    });
+                    loadEmployees();
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to update employee', 'error');
+                }
+            })
+            .catch(e => {
+                console.error('Error:', e);
+                Swal.fire('Error', 'Failed to update employee', 'error');
+            });
+        });
 
         function toggleEmployeeStatus(employeeId, currentStatus, employeeName) {
             const newStatus = currentStatus == 1 ? 0 : 1;
@@ -1545,6 +1811,78 @@
             return false;
         }
 
+        // function loadPurposes() {
+        //     fetch(ajaxUrl + '?action=get_all_purposes')
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             if (data.status === 'success') {
+        //                 const tbody = document.getElementById('purposeTableBody');
+        //                 tbody.innerHTML = '';
+                        
+        //                 if (data.purposes.length === 0) {
+        //                     tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No purposes found</td></tr>';
+        //                     return;
+        //                 }
+                        
+        //                 data.purposes.forEach((p, index) => {
+        //                     const isFirst = index === 0;
+        //                     const isLast = index === data.purposes.length - 1;
+                            
+        //                     const tr = document.createElement('tr');
+        //                     tr.innerHTML = `
+        //                         <td>
+        //                             <button class="btn btn-sm btn-outline-secondary" 
+        //                                     onclick="movePurpose(${p.purpose_id}, 'up')" 
+        //                                     ${isFirst ? 'disabled' : ''} 
+        //                                     title="Move Up">
+        //                                 <i class="bi bi-arrow-up"></i>
+        //                             </button>
+        //                             <button class="btn btn-sm btn-outline-secondary" 
+        //                                     onclick="movePurpose(${p.purpose_id}, 'down')" 
+        //                                     ${isLast ? 'disabled' : ''} 
+        //                                     title="Move Down">
+        //                                 <i class="bi bi-arrow-down"></i>
+        //                             </button>
+        //                         </td>
+        //                         <td><span class="badge bg-secondary">${p.purpose_code}</span></td>
+        //                         <td><strong>${p.purpose_name}</strong></td>
+        //                         <td><i class="${p.icon_class}" style="font-size: 1.5em;"></i></td>
+        //                         <td><span class="${p.color_class}">●</span> ${p.color_class}</td>
+        //                         <td>
+        //                             <span class="badge ${p.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                                 style="cursor: pointer;" 
+        //                                 onclick="togglePurposeStatus(${p.purpose_id}, ${p.is_active}, '${p.purpose_name.replace(/'/g, "\\'")}')" 
+        //                                 title="Click to ${p.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                                 ${p.is_active == 1 ? 'Active' : 'Inactive'}
+        //                             </span>
+        //                         </td>
+        //                         <td>
+        //                             <button class="action-btn view" onclick="viewPurposeDetails(${p.purpose_id})" title="View Details">
+        //                                 <i class="bi bi-eye"></i>
+        //                             </button>
+        //                         </td>
+        //                     `;
+        //                     tbody.appendChild(tr);
+        //                 });
+                        
+        //                 if ($.fn.DataTable.isDataTable('#purposeTable')) {
+        //                     $('#purposeTable').DataTable().destroy();
+        //                 }
+        //                 $('#purposeTable').DataTable({
+        //                     pageLength: 10,
+        //                     order: [[0, 'asc']],
+        //                     columnDefs: [
+        //                         { orderable: false, targets: [0, 6] }
+        //                     ]
+        //                 });
+        //             }
+        //         })
+        //         .catch(e => {
+        //             console.error('Error loading purposes:', e);
+        //             Swal.fire('Error', 'Failed to load purposes', 'error');
+        //         });
+        // }
+
         function loadPurposes() {
             fetch(ajaxUrl + '?action=get_all_purposes')
                 .then(r => r.json())
@@ -1554,13 +1892,16 @@
                         tbody.innerHTML = '';
                         
                         if (data.purposes.length === 0) {
-                            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No purposes found</td></tr>';
+                            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No purposes found</td></tr>';
                             return;
                         }
                         
                         data.purposes.forEach((p, index) => {
                             const isFirst = index === 0;
                             const isLast = index === data.purposes.length - 1;
+                            
+                            // Determine if user can edit this purpose
+                            const canEdit = canEditPurpose(p.company_owned_by);
                             
                             const tr = document.createElement('tr');
                             tr.innerHTML = `
@@ -1591,9 +1932,17 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <button class="action-btn view" onclick="viewPurposeDetails(${p.purpose_id})" title="View Details">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
+                                    <span class="badge ${getCompanyOwnershipBadge(p.company_owned_by)}">
+                                        ${p.company_owned_by}
+                                    </span>
+                                </td>
+                                <td>
+                                    ${canEdit ? `
+                                        <button class="action-btn edit" onclick="editPurpose(${p.purpose_id})" title="Edit Purpose">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                    ` : ''}
+                                    
                                 </td>
                             `;
                             tbody.appendChild(tr);
@@ -1606,7 +1955,7 @@
                             pageLength: 10,
                             order: [[0, 'asc']],
                             columnDefs: [
-                                { orderable: false, targets: [0, 6] }
+                                { orderable: false, targets: [0, 7] }
                             ]
                         });
                     }
@@ -1616,6 +1965,90 @@
                     Swal.fire('Error', 'Failed to load purposes', 'error');
                 });
         }
+
+        function canEditPurpose(companyOwnedBy) {
+            // Super admin can edit everything
+            if (companyFilter === null) {
+                return true;
+            }
+            
+            // Both companies can be edited by any admin
+            if (companyOwnedBy === 'Both') {
+                return true;
+            }
+            
+            // Check if the purpose belongs to the admin's company
+            return companyOwnedBy === companyFilter;
+        }
+
+        function getCompanyOwnershipBadge(companyOwnedBy) {
+            if (companyOwnedBy === 'Toms World') {
+                return 'bg-warning text-dark';
+            } else if (companyOwnedBy === 'Pan Asia') {
+                return 'bg-success';
+            } else {
+                return 'bg-info';
+            }
+        }
+
+        function editPurpose(purposeId) {
+            fetch(ajaxUrl + `?action=get_purpose&purpose_id=${purposeId}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const purpose = data.purpose;
+                        
+                        document.getElementById('editPurposeId').value = purpose.purpose_id;
+                        document.getElementById('editPurposeCode').value = purpose.purpose_code;
+                        document.getElementById('editPurposeName').value = purpose.purpose_name;
+                        document.getElementById('editIconClass').value = purpose.icon_class;
+                        document.getElementById('editColorClass').value = purpose.color_class;
+                        document.getElementById('editCompanyOwnedBy').value = purpose.company_owned_by;
+                        document.getElementById('editPurposeActiveCheck').checked = purpose.is_active == 1;
+                        
+                        new bootstrap.Modal(document.getElementById('editPurposeModal')).show();
+                    } else {
+                        Swal.fire('Error', data.message || 'Failed to load purpose details', 'error');
+                    }
+                })
+                .catch(e => {
+                    console.error('Error:', e);
+                    Swal.fire('Error', 'Failed to load purpose details', 'error');
+                });
+        }
+
+        // Add form submit handler in $(document).ready()
+        document.getElementById('editPurposeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch(ajaxUrl + '?action=update_purpose', { 
+                method: 'POST', 
+                body: formData 
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    bootstrap.Modal.getInstance(document.getElementById('editPurposeModal')).hide();
+                    Swal.fire({ 
+                        toast: true, 
+                        position: 'top-end', 
+                        icon: 'success', 
+                        title: 'Purpose updated successfully', 
+                        showConfirmButton: false, 
+                        timer: 2000 
+                    });
+                    loadPurposes();
+                    loadPurposesMap();
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to update purpose', 'error');
+                }
+            })
+            .catch(e => {
+                console.error('Error:', e);
+                Swal.fire('Error', 'Failed to update purpose', 'error');
+            });
+        });
 
         function togglePurposeStatus(purposeId, currentStatus, purposeName) {
             const newStatus = currentStatus == 1 ? 0 : 1;
@@ -1952,5 +2385,7 @@
                 }
             });
     </script>
+
 </body>
+
 </html>

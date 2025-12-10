@@ -146,17 +146,59 @@ class Admin extends CI_Controller {
                         echo json_encode(['success' => false, 'error' => 'Visit ID required']);
                     }
                     break;
+
+                case 'employees':
+                    echo json_encode($this->Admin_model->getEmployees($companyFilter));
+                    break;
+
+                case 'get_employee':
+                    $employee_id = $this->input->get('employee_id');
+                    echo json_encode($this->Admin_model->getEmployeeById($employee_id));
+                    break;
                     
+                case 'update_employee':
+                    $data = [
+                        'employee_id' => trim($this->input->post('employee_id')),
+                        'name' => trim($this->input->post('name')),
+                        'email' => trim($this->input->post('email')),
+                        'department_code' => trim($this->input->post('department_code')),
+                        'company_owned_by' => trim($this->input->post('company_owned_by') ?? 'Both'),
+                        'is_active' => $this->input->post('is_active') ? 1 : 0
+                    ];
+                    
+                    // Check permissions
+                    $canEdit = $this->Admin_model->canEditEmployee($data['employee_id'], $companyFilter);
+                    if (!$canEdit['can_edit']) {
+                        echo json_encode(['status' => 'error', 'message' => 'You do not have permission to edit this employee']);
+                        break;
+                    }
+                    
+                    $result = $this->Admin_model->updateEmployee($data);
+                    echo json_encode($result);
+                    break;
+
                 case 'add_employee':
                     $data = [
                         'name' => $this->input->post('name'),
                         'email' => $this->input->post('email'),
                         'department_code' => $this->input->post('department_code'),
-                        'is_active' => $this->input->post('is_active') ? 1 : 0
+                        'is_active' => $this->input->post('is_active') ? 1 : 0,
+                        'company_owned_by' => $this->input->post('company_owned_by') ?? 'Both'
                     ];
                     $result = $this->Admin_model->addEmployee($data);
                     echo json_encode($result);
                     break;
+                    
+                // case 'add_employee':
+                //     $data = [
+                //         'name' => $this->input->post('name'),
+                //         'email' => $this->input->post('email'),
+                //         'department_code' => $this->input->post('department_code'),
+                //         'is_active' => $this->input->post('is_active') ? 1 : 0
+                //     ];
+                //     $result = $this->Admin_model->addEmployee($data);
+                //     echo json_encode($result);
+                //     break;
                     
                 case 'toggle_employee_status':
                     $employee_id = $this->input->post('employee_id');
@@ -201,6 +243,32 @@ class Admin extends CI_Controller {
                 // case 'auto_checkout_expired':
                 //     echo json_encode($this->Admin_model->autoCheckoutExpiredVisits($companyFilter));
                 //     break;
+
+                case 'get_purpose':
+                    $purpose_id = $this->input->get('purpose_id');
+                    echo json_encode($this->Admin_model->getPurposeById($purpose_id));
+                    break;
+                    
+                case 'update_purpose':
+                    $data = [
+                        'purpose_id' => (int)$this->input->post('purpose_id'),
+                        'purpose_name' => trim($this->input->post('purpose_name')),
+                        'icon_class' => trim($this->input->post('icon_class') ?? 'bi-circle'),
+                        'color_class' => trim($this->input->post('color_class') ?? 'text-primary'),
+                        'company_owned_by' => trim($this->input->post('company_owned_by') ?? 'Both'),
+                        'is_active' => $this->input->post('is_active') ? 1 : 0
+                    ];
+                    
+                    // Check permissions
+                    $canEdit = $this->Admin_model->canEditPurpose($data['purpose_id'], $companyFilter);
+                    if (!$canEdit['can_edit']) {
+                        echo json_encode(['status' => 'error', 'message' => 'You do not have permission to edit this purpose']);
+                        break;
+                    }
+                    
+                    $result = $this->Admin_model->updatePurpose($data);
+                    echo json_encode($result);
+                    break;
                     
                 case 'update_purpose_order':
                     $purpose_id = (int)$this->input->post('purpose_id');

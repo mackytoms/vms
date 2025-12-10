@@ -1476,6 +1476,80 @@
             });
         }
 
+        // // Handle department selection - fetches employees from database
+        // function onDepartmentChange() {
+        //     const select = document.getElementById('departmentSelect');
+        //     const deptCode = select.value;
+        //     const employeeSection = document.getElementById('employeeSection');
+        //     const employeeGrid = document.getElementById('employeeGrid');
+            
+        //     if (!deptCode) {
+        //         employeeSection.style.display = 'none';
+        //         resetHostSelection();
+        //         return;
+        //     }
+            
+        //     // Get the department name from the selected option
+        //     const deptName = select.options[select.selectedIndex].text;
+        //     selectedDepartment = {
+        //         code: deptCode,
+        //         name: deptName
+        //     };
+            
+        //     // Show loading indicator
+        //     employeeGrid.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+        //     employeeSection.style.display = 'block';
+            
+        //     // Fetch employees from database
+        //     fetch(`<?= base_url("kiosk/get_employees/") ?>${deptCode}`, {
+        //         method: 'GET',
+        //         headers: {
+        //             'X-Requested-With': 'XMLHttpRequest'
+        //         }
+        //     })
+        //     .then(response => response.json())
+        //     .then(result => {
+        //         if (result.status === 'success') {
+        //             employeeGrid.innerHTML = '';
+                    
+        //             if (result.employees.length === 0) {
+        //                 employeeGrid.innerHTML = '<p class="text-muted text-center">No employees found in this department</p>';
+        //                 return;
+        //             }
+                    
+        //             result.employees.forEach(employee => {
+        //                 const card = document.createElement('div');
+        //                 card.className = 'employee-card';
+        //                 card.innerHTML = `
+        //                     <i class="bi bi-person-circle"></i>
+        //                     <div class="employee-name">${employee.name}</div>
+        //                     <div class="employee-email">${employee.email}</div>
+        //                 `;
+                        
+        //                 // Store data as data attributes
+        //                 card.dataset.employeeId = employee.employee_id;
+        //                 card.dataset.employeeName = employee.name;
+        //                 card.dataset.employeeEmail = employee.email;
+        //                 card.dataset.deptCode = deptCode;
+        //                 card.dataset.deptName = deptName;
+                        
+        //                 // Add click event listener (NOT onclick)
+        //                 card.addEventListener('click', function(e) {
+        //                     selectEmployeeFromCard(e.currentTarget);
+        //                 });
+                        
+        //                 employeeGrid.appendChild(card);
+        //             });
+        //         } else {
+        //             employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees</p>';
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error('Error loading employees:', error);
+        //         employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees. Please try again.</p>';
+        //     });
+        // }
+
         // Handle department selection - fetches employees from database
         function onDepartmentChange() {
             const select = document.getElementById('departmentSelect');
@@ -1500,8 +1574,8 @@
             employeeGrid.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
             employeeSection.style.display = 'block';
             
-            // Fetch employees from database
-            fetch(`<?= base_url("kiosk/get_employees/") ?>${deptCode}`, {
+            // Fetch employees from database - FILTERED BY COMPANY
+            fetch(`<?= base_url("kiosk/get_employees/") ?>${deptCode}?company_visited=${encodeURIComponent(COMPANY_VISITED)}`, {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -4308,6 +4382,32 @@
             window.location.reload(true); // true forces reload from server, not cache
         
             showScreen(1);
+        }
+
+        // Add this function to load purposes from database
+        function loadPurposesFromDatabase() {
+            // Send company_visited parameter to filter purposes
+            fetch(`<?= base_url("kiosk/get_purposes") ?>?company_visited=${encodeURIComponent(COMPANY_VISITED)}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    availablePurposes = result.purposes;
+                    populatePurposeGrid();
+                } else {
+                    console.error('Failed to load purposes');
+                    // Fallback to default purposes if API fails
+                    loadDefaultPurposes();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading purposes:', error);
+                loadDefaultPurposes();
+            });
         }
 
     </script>

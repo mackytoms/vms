@@ -134,17 +134,106 @@ class Admin_model extends CI_Model {
         return $stats;
     }
     
-    // Employee Management
-    public function getEmployees() {
+    // // Employee Management
+    // public function getEmployees() {
+    //     $this->db->select('e.*, d.name as department_name, COUNT(v.visit_id) as total_visits');
+    //     $this->db->from('employees e');
+    //     $this->db->join('departments d', 'e.department_code = d.department_code');
+    //     $this->db->join('visits v', 'e.employee_id = v.host_employee_id', 'left');
+    //     $this->db->group_by('e.employee_id');
+        
+    //     return $this->db->get()->result_array();
+    // }
+
+    // Modify getEmployees() to filter by company
+    public function getEmployees($companyFilter = null) {
         $this->db->select('e.*, d.name as department_name, COUNT(v.visit_id) as total_visits');
         $this->db->from('employees e');
         $this->db->join('departments d', 'e.department_code = d.department_code');
         $this->db->join('visits v', 'e.employee_id = v.host_employee_id', 'left');
+        
+        if ($companyFilter) {
+            $this->db->group_start();
+            $this->db->where('e.company_owned_by', $companyFilter);
+            $this->db->or_where('e.company_owned_by', 'Both');
+            $this->db->group_end();
+        }
+        
         $this->db->group_by('e.employee_id');
         
         return $this->db->get()->result_array();
     }
+
+    // Add new method to get employee by ID
+    public function getEmployeeById($employee_id) {
+        $this->db->select('e.*, d.name as department_name');
+        $this->db->from('employees e');
+        $this->db->join('departments d', 'e.department_code = d.department_code');
+        $this->db->where('e.employee_id', $employee_id);
+        
+        $result = $this->db->get()->row_array();
+        
+        if ($result) {
+            return ['status' => 'success', 'employee' => $result];
+        }
+          
+        return ['status' => 'error', 'message' => 'Employee not found'];
+    }
+
+    // Add method to check if employee can be edited
+    public function canEditEmployee($employee_id, $companyFilter) {
+        $this->db->where('employee_id', $employee_id);
+        $employee = $this->db->get('employees')->row_array();
+        
+        if (!$employee) {
+            return ['can_edit' => false, 'reason' => 'Employee not found'];
+        }
+        
+        // Super admin can edit everything
+        if ($companyFilter === null) {
+            return ['can_edit' => true];
+        }
+        
+        // Both companies can be edited by any admin
+        if ($employee['company_owned_by'] === 'Both') {
+            return ['can_edit' => true];
+        }
+        
+        // Check if the employee belongs to the admin's company
+        if ($employee['company_owned_by'] === $companyFilter) {
+            return ['can_edit' => true];
+        }
+        
+        return ['can_edit' => false, 'reason' => 'This employee belongs to another company'];
+    }
     
+    
+    // public function addEmployee($data) {
+    //     // Generate employee ID
+    //     $this->db->select('COUNT(*) as cnt');
+    //     $this->db->from('employees');
+    //     $this->db->where('department_code', $data['department_code']);
+    //     $count = $this->db->get()->row()->cnt + 1;
+        
+    //     $employee_id = $data['department_code'] . str_pad($count, 3, '0', STR_PAD_LEFT);
+        
+    //     $insert_data = [
+    //         'employee_id' => $employee_id,
+    //         'name' => $data['name'],
+    //         'email' => $data['email'],
+    //         'department_code' => $data['department_code'],
+    //         'is_active' => $data['is_active'],
+    //         'created_at' => date('Y-m-d H:i:s')
+    //     ];
+        
+    //     if ($this->db->insert('employees', $insert_data)) {
+    //         return ['success' => true, 'employee_id' => $employee_id];
+    //     }
+        
+    //     return ['success' => false, 'error' => $this->db->error()['message']];
+    // }
+
+    // Modify addEmployee to include company ownership
     public function addEmployee($data) {
         // Generate employee ID
         $this->db->select('COUNT(*) as cnt');
@@ -160,6 +249,7 @@ class Admin_model extends CI_Model {
             'email' => $data['email'],
             'department_code' => $data['department_code'],
             'is_active' => $data['is_active'],
+            'company_owned_by' => $data['company_owned_by'] ?? 'Both',
             'created_at' => date('Y-m-d H:i:s')
         ];
         
@@ -169,6 +259,26 @@ class Admin_model extends CI_Model {
         
         return ['success' => false, 'error' => $this->db->error()['message']];
     }
+
+    // Add method to update employee
+    public function updateEmployee($data) {
+        $update_data = [
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'department_code' => $data['department_code'],
+            'company_owned_by' => $data['company_owned_by'],
+            'is_active' => $data['is_active']
+        ];
+        
+        $this->db->where('employee_id', $data['employee_id']);
+        
+        if ($this->db->update('employees', $update_data)) {
+            return ['status' => 'success'];
+        }
+        
+        return ['status' => 'error', 'message' => $this->db->error()['message']];
+    }
+
     
     public function toggleEmployeeStatus($employee_id, $new_status) {
         $this->db->where('employee_id', $employee_id);
@@ -472,4 +582,58 @@ class Admin_model extends CI_Model {
         
     //     return ['status' => 'success', 'checked_out_count' => 0];
     // }
+    public function getPurposeById($purpose_id) {
+        $this->db->where('purpose_id', $purpose_id);
+        $purpose = $this->db->get('purposes')->row_array();
+        
+        if ($purpose) {
+            return ['status' => 'success', 'purpose' => $purpose];
+        }
+        
+        return ['status' => 'error', 'message' => 'Purpose not found'];
+    }
+
+    public function canEditPurpose($purpose_id, $companyFilter) {
+        $this->db->where('purpose_id', $purpose_id);
+        $purpose = $this->db->get('purposes')->row_array();
+        
+        if (!$purpose) {
+            return ['can_edit' => false, 'reason' => 'Purpose not found'];
+        }
+        
+        // Super admin can edit everything
+        if ($companyFilter === null) {
+            return ['can_edit' => true];
+        }
+        
+        // Both companies can be edited by any admin
+        if ($purpose['company_owned_by'] === 'Both') {
+            return ['can_edit' => true];
+        }
+        
+        // Check if the purpose belongs to the admin's company
+        if ($purpose['company_owned_by'] === $companyFilter) {
+            return ['can_edit' => true];
+        }
+        
+        return ['can_edit' => false, 'reason' => 'This purpose belongs to another company'];
+    }
+
+    public function updatePurpose($data) {
+        $update_data = [
+            'purpose_name' => $data['purpose_name'],
+            'icon_class' => $data['icon_class'],
+            'color_class' => $data['color_class'],
+            'company_owned_by' => $data['company_owned_by'],
+            'is_active' => $data['is_active']
+        ];
+        
+        $this->db->where('purpose_id', $data['purpose_id']);
+        
+        if ($this->db->update('purposes', $update_data)) {
+            return ['status' => 'success'];
+        }
+        
+        return ['status' => 'error', 'message' => $this->db->error()['message']];
+    }
 }
