@@ -16,12 +16,25 @@ class Kiosk extends CI_Controller {
     }
     
     // Get departments and employees for the dropdown
+    // public function get_departments() {
+    //     $departments = $this->db->select('department_code, name')
+    //                            ->from('departments')
+    //                            ->order_by('name', 'ASC')
+    //                            ->get()
+    //                            ->result_array();
+        
+    //     echo json_encode(['status' => 'success', 'departments' => $departments]);
+    // }
+    
+    // Get departments and employees for the dropdown - WITH TRANSLATIONS
     public function get_departments() {
-        $departments = $this->db->select('department_code, name')
-                               ->from('departments')
-                               ->order_by('name', 'ASC')
-                               ->get()
-                               ->result_array();
+        // SELECT all translation columns
+        $departments = $this->db->select('department_code, name, 
+                                        name_en, name_zh_tw, name_zh_cn, name_fil, name_ja')
+                            ->from('departments')
+                            ->order_by('name', 'ASC')
+                            ->get()
+                            ->result_array();
         
         echo json_encode(['status' => 'success', 'departments' => $departments]);
     }
@@ -805,6 +818,38 @@ class Kiosk extends CI_Controller {
     /**
      * Get all active purposes for kiosk display - FILTERED BY COMPANY
      */
+    // public function get_purposes() {
+    //     // Get company_visited parameter from query string
+    //     $company_visited = $this->input->get('company_visited');
+        
+    //     // Validate company_visited parameter
+    //     if (empty($company_visited)) {
+    //         echo json_encode([
+    //             'status' => 'error', 
+    //             'message' => 'Company parameter is required'
+    //         ]);
+    //         return;
+    //     }
+        
+    //     // Query purposes that match the company OR are set to "Both"
+    //     // IMPORTANT: The database column is 'company_owned_by', not 'company_visited'
+    //     $this->db->select('purpose_id, purpose_code, purpose_name, icon_class, color_class')
+    //             ->from('purposes')
+    //             ->where('is_active', 1)
+    //             ->group_start()
+    //                 ->where('company_owned_by', $company_visited)
+    //                 ->or_where('company_owned_by', 'Both')
+    //             ->group_end()
+    //             ->order_by('display_order', 'ASC');
+        
+    //     $purposes = $this->db->get()->result_array();
+        
+    //     echo json_encode(['status' => 'success', 'purposes' => $purposes]);
+    // }
+    
+    /**
+     * Get all active purposes for kiosk display - FILTERED BY COMPANY with TRANSLATIONS
+     */
     public function get_purposes() {
         // Get company_visited parameter from query string
         $company_visited = $this->input->get('company_visited');
@@ -819,8 +864,9 @@ class Kiosk extends CI_Controller {
         }
         
         // Query purposes that match the company OR are set to "Both"
-        // IMPORTANT: The database column is 'company_owned_by', not 'company_visited'
-        $this->db->select('purpose_id, purpose_code, purpose_name, icon_class, color_class')
+        // SELECT all translation columns
+        $this->db->select('purpose_id, purpose_code, purpose_name, icon_class, color_class, 
+                        name_en, name_zh_tw, name_zh_cn, name_fil, name_ja')
                 ->from('purposes')
                 ->where('is_active', 1)
                 ->group_start()
@@ -1062,6 +1108,5 @@ class Kiosk extends CI_Controller {
     //         ]);
     //     }
     // }
-
 
 }

@@ -1225,6 +1225,9 @@
         let isProcessingQR = false;
         // Purpose
         let availablePurposes = [];
+        
+        // Global variable to store department data with translations
+        let availableDepartments = [];
 
 
         // Screen flow mapping
@@ -1463,18 +1466,35 @@
             document.getElementById('datetime').textContent = `${dateStr} • ${timeStr}`;
         }
 
-        // Populate departments dropdown
-        function populateDepartments() {
-            const select = document.getElementById('departmentSelect');
-            select.innerHTML = '<option value="">Choose a department...</option>';
+        // Helper function to get translated department name
+        function getTranslatedDepartmentName(department) {
+            // Map JavaScript language codes to database column names
+            const languageMap = {
+                'en': 'name_en',
+                'zh-TW': 'name_zh_tw',
+                'zh-CN': 'name_zh_cn',
+                'fil': 'name_fil',
+                'ja': 'name_ja'
+            };
             
-            Object.keys(departmentData).forEach(deptCode => {
-                const option = document.createElement('option');
-                option.value = deptCode;
-                option.textContent = departmentData[deptCode].name;
-                select.appendChild(option);
-            });
+            const columnName = languageMap[currentLanguage];
+            
+            // Return translated name from database, fallback to English or original name
+            return department[columnName] || department.name_en || department.name;
         }
+
+        // // Populate departments dropdown
+        // function populateDepartments() {
+        //     const select = document.getElementById('departmentSelect');
+        //     select.innerHTML = '<option value="">Choose a department...</option>';
+            
+        //     Object.keys(departmentData).forEach(deptCode => {
+        //         const option = document.createElement('option');
+        //         option.value = deptCode;
+        //         option.textContent = departmentData[deptCode].name;
+        //         select.appendChild(option);
+        //     });
+        // }
 
         // // Handle department selection - fetches employees from database
         // function onDepartmentChange() {
@@ -1550,7 +1570,81 @@
         //     });
         // }
 
-        // Handle department selection - fetches employees from database
+        // // Handle department selection - fetches employees from database
+        // function onDepartmentChange() {
+        //     const select = document.getElementById('departmentSelect');
+        //     const deptCode = select.value;
+        //     const employeeSection = document.getElementById('employeeSection');
+        //     const employeeGrid = document.getElementById('employeeGrid');
+            
+        //     if (!deptCode) {
+        //         employeeSection.style.display = 'none';
+        //         resetHostSelection();
+        //         return;
+        //     }
+            
+        //     // Get the department name from the selected option
+        //     const deptName = select.options[select.selectedIndex].text;
+        //     selectedDepartment = {
+        //         code: deptCode,
+        //         name: deptName
+        //     };
+            
+        //     // Show loading indicator
+        //     employeeGrid.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+        //     employeeSection.style.display = 'block';
+            
+        //     // Fetch employees from database - FILTERED BY COMPANY
+        //     fetch(`<?= base_url("kiosk/get_employees/") ?>${deptCode}?company_visited=${encodeURIComponent(COMPANY_VISITED)}`, {
+        //         method: 'GET',
+        //         headers: {
+        //             'X-Requested-With': 'XMLHttpRequest'
+        //         }
+        //     })
+        //     .then(response => response.json())
+        //     .then(result => {
+        //         if (result.status === 'success') {
+        //             employeeGrid.innerHTML = '';
+                    
+        //             if (result.employees.length === 0) {
+        //                 employeeGrid.innerHTML = '<p class="text-muted text-center">No employees found in this department</p>';
+        //                 return;
+        //             }
+                    
+        //             result.employees.forEach(employee => {
+        //                 const card = document.createElement('div');
+        //                 card.className = 'employee-card';
+        //                 card.innerHTML = `
+        //                     <i class="bi bi-person-circle"></i>
+        //                     <div class="employee-name">${employee.name}</div>
+        //                     <div class="employee-email">${employee.email}</div>
+        //                 `;
+                        
+        //                 // Store data as data attributes
+        //                 card.dataset.employeeId = employee.employee_id;
+        //                 card.dataset.employeeName = employee.name;
+        //                 card.dataset.employeeEmail = employee.email;
+        //                 card.dataset.deptCode = deptCode;
+        //                 card.dataset.deptName = deptName;
+                        
+        //                 // Add click event listener (NOT onclick)
+        //                 card.addEventListener('click', function(e) {
+        //                     selectEmployeeFromCard(e.currentTarget);
+        //                 });
+                        
+        //                 employeeGrid.appendChild(card);
+        //             });
+        //         } else {
+        //             employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees</p>';
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error('Error loading employees:', error);
+        //         employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees. Please try again.</p>';
+        //     });
+        // }
+
+        // Updated: Handle department selection with translated names
         function onDepartmentChange() {
             const select = document.getElementById('departmentSelect');
             const deptCode = select.value;
@@ -1563,11 +1657,14 @@
                 return;
             }
             
-            // Get the department name from the selected option
-            const deptName = select.options[select.selectedIndex].text;
+            // Find the department object to get translated name
+            const deptObj = availableDepartments.find(d => d.department_code === deptCode);
+            const deptName = deptObj ? getTranslatedDepartmentName(deptObj) : select.options[select.selectedIndex].text;
+            
             selectedDepartment = {
                 code: deptCode,
-                name: deptName
+                name: deptName,
+                originalName: deptObj ? deptObj.name : deptName // Keep original for database
             };
             
             // Show loading indicator
@@ -1600,14 +1697,14 @@
                             <div class="employee-email">${employee.email}</div>
                         `;
                         
-                        // Store data as data attributes
+                        // Store data as data attributes (including translated name)
                         card.dataset.employeeId = employee.employee_id;
                         card.dataset.employeeName = employee.name;
                         card.dataset.employeeEmail = employee.email;
                         card.dataset.deptCode = deptCode;
-                        card.dataset.deptName = deptName;
+                        card.dataset.deptName = deptName; // Translated name for display
+                        card.dataset.deptOriginalName = selectedDepartment.originalName; // Original for database
                         
-                        // Add click event listener (NOT onclick)
                         card.addEventListener('click', function(e) {
                             selectEmployeeFromCard(e.currentTarget);
                         });
@@ -1624,43 +1721,90 @@
             });
         }
 
-        // Select employee from card - receives the card DOM element
+        // // Select employee from card - receives the card DOM element
+        // function selectEmployeeFromCard(cardElement) {
+        //     // Safety check
+        //     if (!cardElement || !cardElement.classList) {
+        //         console.error('Invalid card element:', cardElement);
+        //         return;
+        //     }
+            
+        //     // Remove previous selection from all cards
+        //     document.querySelectorAll('.employee-card').forEach(card => {
+        //         card.classList.remove('selected');
+        //     });
+            
+        //     // Add selection to clicked card
+        //     cardElement.classList.add('selected');
+            
+        //     // Get data from card's data attributes
+        //     const employeeId = cardElement.dataset.employeeId;
+        //     const employeeName = cardElement.dataset.employeeName;
+        //     const employeeEmail = cardElement.dataset.employeeEmail;
+        //     const deptCode = cardElement.dataset.deptCode;
+        //     const deptName = cardElement.dataset.deptName;
+            
+        //     // Update selectedHost object
+        //     selectedHost = {
+        //         id: employeeId,
+        //         employeeId: employeeId,
+        //         name: employeeName,
+        //         email: employeeEmail,
+        //         department: deptName,
+        //         departmentCode: deptCode
+        //     };
+            
+        //     // Update visitorData
+        //     visitorData.host = selectedHost;
+            
+        //     // Update the display
+        //     document.getElementById('selectedHost').innerHTML = `
+        //         <div class="d-flex align-items-center gap-3">
+        //             <i class="bi bi-person-circle" style="font-size: 2em;"></i>
+        //             <div>
+        //                 <div style="font-weight: 600;">${employeeName}</div>
+        //                 <div style="font-size: 0.9em; color: #7f8c8d;">${deptName}</div>
+        //             </div>
+        //         </div>
+        //     `;
+            
+        //     // Enable the next button
+        //     document.getElementById('hostNextBtn').disabled = false;
+        // }
+
+        // Updated: Select employee with translated department name
         function selectEmployeeFromCard(cardElement) {
-            // Safety check
             if (!cardElement || !cardElement.classList) {
                 console.error('Invalid card element:', cardElement);
                 return;
             }
             
-            // Remove previous selection from all cards
             document.querySelectorAll('.employee-card').forEach(card => {
                 card.classList.remove('selected');
             });
             
-            // Add selection to clicked card
             cardElement.classList.add('selected');
             
-            // Get data from card's data attributes
             const employeeId = cardElement.dataset.employeeId;
             const employeeName = cardElement.dataset.employeeName;
             const employeeEmail = cardElement.dataset.employeeEmail;
             const deptCode = cardElement.dataset.deptCode;
-            const deptName = cardElement.dataset.deptName;
+            const deptName = cardElement.dataset.deptName; // Translated name
+            const deptOriginalName = cardElement.dataset.deptOriginalName; // Original name
             
-            // Update selectedHost object
             selectedHost = {
                 id: employeeId,
                 employeeId: employeeId,
                 name: employeeName,
                 email: employeeEmail,
-                department: deptName,
+                department: deptName, // Use translated name for display
+                departmentOriginal: deptOriginalName, // Keep original for database
                 departmentCode: deptCode
             };
             
-            // Update visitorData
             visitorData.host = selectedHost;
             
-            // Update the display
+            // Update the display with translated department name
             document.getElementById('selectedHost').innerHTML = `
                 <div class="d-flex align-items-center gap-3">
                     <i class="bi bi-person-circle" style="font-size: 2em;"></i>
@@ -1671,7 +1815,6 @@
                 </div>
             `;
             
-            // Enable the next button
             document.getElementById('hostNextBtn').disabled = false;
         }
 
@@ -2731,7 +2874,28 @@
             });
         }
 
-        // Populate the purpose grid with database purposes
+        // // Populate the purpose grid with database purposes
+        // function populatePurposeGrid() {
+        //     const purposeGrid = document.querySelector('.purpose-grid');
+        //     if (!purposeGrid) return;
+            
+        //     purposeGrid.innerHTML = '';
+            
+        //     availablePurposes.forEach(purpose => {
+        //         const card = document.createElement('div');
+        //         card.className = 'purpose-card';
+        //         card.setAttribute('onclick', `selectPurpose('${purpose.purpose_code}', this)`);
+                
+        //         card.innerHTML = `
+        //             <i class="bi ${purpose.icon_class} ${purpose.color_class}"></i>
+        //             <h5 data-translate="${purpose.purpose_code}">${purpose.purpose_name}</h5>
+        //         `;
+                
+        //         purposeGrid.appendChild(card);
+        //     });
+        // }
+
+        // Updated function to populate purpose grid with database translations
         function populatePurposeGrid() {
             const purposeGrid = document.querySelector('.purpose-grid');
             if (!purposeGrid) return;
@@ -2743,13 +2907,104 @@
                 card.className = 'purpose-card';
                 card.setAttribute('onclick', `selectPurpose('${purpose.purpose_code}', this)`);
                 
+                // Get translated name based on current language
+                const translatedName = getTranslatedPurposeName(purpose);
+                
                 card.innerHTML = `
                     <i class="bi ${purpose.icon_class} ${purpose.color_class}"></i>
-                    <h5 data-translate="${purpose.purpose_code}">${purpose.purpose_name}</h5>
+                    <h5>${translatedName}</h5>
                 `;
                 
                 purposeGrid.appendChild(card);
             });
+        }
+
+        // Helper function to get translated purpose name
+        function getTranslatedPurposeName(purpose) {
+            // Map JavaScript language codes to database column names
+            const languageMap = {
+                'en': 'name_en',
+                'zh-TW': 'name_zh_tw',
+                'zh-CN': 'name_zh_cn',
+                'fil': 'name_fil',
+                'ja': 'name_ja'
+            };
+            
+            const columnName = languageMap[currentLanguage];
+            
+            // Return translated name from database, fallback to English
+            return purpose[columnName] || purpose.name_en || purpose.purpose_name;
+        }
+
+        // Updated translatePage function to also update department names when language changes
+        function translatePage() {
+            // Existing translation code for other elements
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    el.textContent = translations[currentLanguage][key];
+                }
+            });
+
+            const placeholderElements = document.querySelectorAll('[data-translate-placeholder]');
+            placeholderElements.forEach(el => {
+                const key = el.getAttribute('data-translate-placeholder');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    el.placeholder = translations[currentLanguage][key];
+                }
+            });
+
+            if (document.getElementById('agreementText')) {
+                document.getElementById('agreementText').innerHTML = translations[currentLanguage].agreementContent;
+            }
+
+            if (document.getElementById('nextStepsList')) {
+                const steps = translations[currentLanguage].nextStepsContent;
+                document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
+            }
+            
+            // Update purpose cards if loaded
+            if (availablePurposes.length > 0 && document.querySelector('.purpose-grid')) {
+                populatePurposeGrid();
+            }
+            
+            // NEW: Update department dropdown if loaded
+            if (availableDepartments.length > 0) {
+                const select = document.getElementById('departmentSelect');
+                const currentValue = select.value; // Preserve selection
+                
+                select.innerHTML = '<option value="">Choose a department...</option>';
+                
+                availableDepartments.forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept.department_code;
+                    option.textContent = getTranslatedDepartmentName(dept);
+                    if (dept.department_code === currentValue) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                
+                // Update selected host display if there's a selection
+                if (selectedHost && selectedHost.departmentCode === currentValue) {
+                    const deptObj = availableDepartments.find(d => d.department_code === currentValue);
+                    if (deptObj) {
+                        const translatedDeptName = getTranslatedDepartmentName(deptObj);
+                        selectedHost.department = translatedDeptName;
+                        
+                        document.getElementById('selectedHost').innerHTML = `
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="bi bi-person-circle" style="font-size: 2em;"></i>
+                                <div>
+                                    <div style="font-weight: 600;">${selectedHost.name}</div>
+                                    <div style="font-size: 0.9em; color: #7f8c8d;">${translatedDeptName}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            }
         }
 
         // Fallback function for default purposes (in case API fails)
@@ -3765,7 +4020,36 @@
             generateVisitorQRCode();
         }
 
-        // Updated department loading function to fetch from database
+        // // Updated department loading function to fetch from database
+        // function populateDepartments() {
+        //     fetch('<?= base_url("kiosk/get_departments") ?>', {
+        //         method: 'GET',
+        //         headers: {
+        //             'X-Requested-With': 'XMLHttpRequest'
+        //         }
+        //     })
+        //     .then(response => response.json())
+        //     .then(result => {
+        //         if (result.status === 'success') {
+        //             const select = document.getElementById('departmentSelect');
+        //             select.innerHTML = '<option value="">Choose a department...</option>';
+                    
+        //             result.departments.forEach(dept => {
+        //                 const option = document.createElement('option');
+        //                 option.value = dept.department_code;
+        //                 option.textContent = dept.name;
+        //                 select.appendChild(option);
+        //             });
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error('Error loading departments:', error);
+        //         // Fallback to hardcoded departments if API fails
+        //         populateDepartmentsStatic();
+        //     });
+        // }
+
+        // Updated: Populate departments with translations
         function populateDepartments() {
             fetch('<?= base_url("kiosk/get_departments") ?>', {
                 method: 'GET',
@@ -3776,13 +4060,17 @@
             .then(response => response.json())
             .then(result => {
                 if (result.status === 'success') {
+                    // Store departments globally for translation
+                    availableDepartments = result.departments;
+                    
                     const select = document.getElementById('departmentSelect');
                     select.innerHTML = '<option value="">Choose a department...</option>';
                     
                     result.departments.forEach(dept => {
                         const option = document.createElement('option');
                         option.value = dept.department_code;
-                        option.textContent = dept.name;
+                        // Use translated name
+                        option.textContent = getTranslatedDepartmentName(dept);
                         select.appendChild(option);
                     });
                 }

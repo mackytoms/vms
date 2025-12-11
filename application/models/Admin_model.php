@@ -310,11 +310,31 @@ class Admin_model extends CI_Model {
         return $this->db->get()->result_array();
     }
     
+    // public function addDepartment($data) {
+    //     $insert_data = [
+    //         'department_code' => $data['department_code'],
+    //         'name' => $data['name'],
+    //         'description' => $data['description'],
+    //         'created_at' => date('Y-m-d H:i:s')
+    //     ];
+        
+    //     if ($this->db->insert('departments', $insert_data)) {
+    //         return ['success' => true];
+    //     }
+        
+    //     return ['success' => false, 'error' => $this->db->error()['message']];
+    // }
+
     public function addDepartment($data) {
         $insert_data = [
             'department_code' => $data['department_code'],
             'name' => $data['name'],
-            'description' => $data['description'],
+            'name_en' => $data['name_en'] ?? null,
+            'name_zh_tw' => $data['name_zh_tw'] ?? null,
+            'name_zh_cn' => $data['name_zh_cn'] ?? null,
+            'name_fil' => $data['name_fil'] ?? null,
+            'name_ja' => $data['name_ja'] ?? null,
+            'description' => $data['description'] ?? '',
             'created_at' => date('Y-m-d H:i:s')
         ];
         
@@ -323,6 +343,37 @@ class Admin_model extends CI_Model {
         }
         
         return ['success' => false, 'error' => $this->db->error()['message']];
+    }
+
+    public function getDepartmentById($department_code) {
+        $this->db->where('department_code', $department_code);
+        $department = $this->db->get('departments')->row_array();
+        
+        if ($department) {
+            return ['status' => 'success', 'department' => $department];
+        }
+        
+        return ['status' => 'error', 'message' => 'Department not found'];
+    }
+
+    public function updateDepartment($data) {
+        $update_data = [
+            'name' => $data['name'],
+            'name_en' => $data['name_en'] ?? null,
+            'name_zh_tw' => $data['name_zh_tw'] ?? null,
+            'name_zh_cn' => $data['name_zh_cn'] ?? null,
+            'name_fil' => $data['name_fil'] ?? null,
+            'name_ja' => $data['name_ja'] ?? null,
+            'description' => $data['description'] ?? ''
+        ];
+        
+        $this->db->where('department_code', $data['department_code']);
+        
+        if ($this->db->update('departments', $update_data)) {
+            return ['status' => 'success'];
+        }
+        
+        return ['status' => 'error', 'message' => $this->db->error()['message']];
     }
     
     public function getEmployeesByDepartment($department_code) {
@@ -432,6 +483,37 @@ class Admin_model extends CI_Model {
         return ['status' => 'success', 'purposes' => $purposes];
     }
     
+    // public function addPurpose($data) {
+    //     // Check if purpose code exists
+    //     $this->db->where('purpose_code', $data['purpose_code']);
+    //     $existing = $this->db->get('purposes')->num_rows();
+        
+    //     if ($existing > 0) {
+    //         return ['status' => 'error', 'message' => 'Purpose code already exists'];
+    //     }
+        
+    //     // Get max display order
+    //     $this->db->select_max('display_order');
+    //     $max_order = $this->db->get('purposes')->row()->display_order;
+    //     $display_order = ($max_order ?? 0) + 1;
+        
+    //     $insert_data = [
+    //         'purpose_code' => $data['purpose_code'],
+    //         'purpose_name' => $data['purpose_name'],
+    //         'icon_class' => $data['icon_class'],
+    //         'color_class' => $data['color_class'],
+    //         'display_order' => $display_order,
+    //         'is_active' => $data['is_active'],
+    //         'created_at' => date('Y-m-d H:i:s')
+    //     ];
+        
+    //     if ($this->db->insert('purposes', $insert_data)) {
+    //         return ['status' => 'success'];
+    //     }
+        
+    //     return ['status' => 'error', 'message' => $this->db->error()['message']];
+    // }
+
     public function addPurpose($data) {
         // Check if purpose code exists
         $this->db->where('purpose_code', $data['purpose_code']);
@@ -449,9 +531,15 @@ class Admin_model extends CI_Model {
         $insert_data = [
             'purpose_code' => $data['purpose_code'],
             'purpose_name' => $data['purpose_name'],
+            'name_en' => $data['name_en'] ?? null,
+            'name_zh_tw' => $data['name_zh_tw'] ?? null,
+            'name_zh_cn' => $data['name_zh_cn'] ?? null,
+            'name_fil' => $data['name_fil'] ?? null,
+            'name_ja' => $data['name_ja'] ?? null,
             'icon_class' => $data['icon_class'],
             'color_class' => $data['color_class'],
             'display_order' => $display_order,
+            'company_owned_by' => $data['company_owned_by'] ?? 'Both',
             'is_active' => $data['is_active'],
             'created_at' => date('Y-m-d H:i:s')
         ];
@@ -619,9 +707,32 @@ class Admin_model extends CI_Model {
         return ['can_edit' => false, 'reason' => 'This purpose belongs to another company'];
     }
 
+    // public function updatePurpose($data) {
+    //     $update_data = [
+    //         'purpose_name' => $data['purpose_name'],
+    //         'icon_class' => $data['icon_class'],
+    //         'color_class' => $data['color_class'],
+    //         'company_owned_by' => $data['company_owned_by'],
+    //         'is_active' => $data['is_active']
+    //     ];
+        
+    //     $this->db->where('purpose_id', $data['purpose_id']);
+        
+    //     if ($this->db->update('purposes', $update_data)) {
+    //         return ['status' => 'success'];
+    //     }
+        
+    //     return ['status' => 'error', 'message' => $this->db->error()['message']];
+    // }
+
     public function updatePurpose($data) {
         $update_data = [
             'purpose_name' => $data['purpose_name'],
+            'name_en' => $data['name_en'] ?? null,
+            'name_zh_tw' => $data['name_zh_tw'] ?? null,
+            'name_zh_cn' => $data['name_zh_cn'] ?? null,
+            'name_fil' => $data['name_fil'] ?? null,
+            'name_ja' => $data['name_ja'] ?? null,
             'icon_class' => $data['icon_class'],
             'color_class' => $data['color_class'],
             'company_owned_by' => $data['company_owned_by'],

@@ -101,6 +101,20 @@
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; }
         }
+
+        /* Add this to your existing styles */
+        .modal-lg {
+            max-width: 900px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        hr.my-3 {
+            border-top: 2px solid #e0e0e0;
+        }
     </style>
 </head>
 
@@ -324,6 +338,32 @@
         </div>
 
         <!-- Departments Section -->
+        <!-- <div class="dashboard-content" id="departmentsSection" style="display: none;">
+            <h1 class="page-title">Department Management</h1>
+            <p class="page-subtitle">Manage organizational departments</p>
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="chart-title">All Departments</h3>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">
+                        <i class="bi bi-plus-circle"></i> Add Department
+                    </button>
+                </div>
+                <table class="table table-hover" id="departmentTable">
+                    <thead>
+                        <tr>
+                            <th>Department Code</th>
+                            <th>Department Name</th>
+                            <th>Total Employees</th>
+                            <th>Total Visits</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody id="departmentTableBody"></tbody>
+                </table>
+            </div>
+        </div> -->
+
+        <!-- Departments Section - UPDATE THIS IN YOUR MAIN VIEW -->
         <div class="dashboard-content" id="departmentsSection" style="display: none;">
             <h1 class="page-title">Department Management</h1>
             <p class="page-subtitle">Manage organizational departments</p>
@@ -337,7 +377,12 @@
                 <table class="table table-hover" id="departmentTable">
                     <thead>
                         <tr>
-                            <th>Department Code</th><th>Department Name</th><th>Total Employees</th><th>Total Visits</th><th>Created</th>
+                            <th>Department Code</th>
+                            <th>Department Name</th>
+                            <th>Total Employees</th>
+                            <th>Total Visits</th>
+                            <th>Created</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="departmentTableBody"></tbody>
@@ -586,9 +631,9 @@
         </div>
     </div>
 
-    <!-- Add Department Modal -->
+    <!-- Add Department Modal - UPDATED WITH TRANSLATIONS -->
     <div class="modal fade" id="addDepartmentModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header <?php echo $modalHeaderClass; ?>">
                     <h5 class="modal-title"><i class="bi bi-building-add"></i> Add New Department</h5>
@@ -596,18 +641,47 @@
                 </div>
                 <form id="addDepartmentForm">
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Department Code <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="department_code" placeholder="e.g., IT, HR, SALES" required maxlength="20">
-                            <small class="text-muted">Unique identifier for the department</small>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Department Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="department_code" placeholder="e.g., IT, HR, SALES" required maxlength="20">
+                                <small class="text-muted">Unique identifier for the department</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Department Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" placeholder="e.g., Information Technology" required>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Department Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="name" placeholder="e.g., Information Technology" required>
-                        </div>
+                        
                         <div class="mb-3">
                             <label class="form-label">Description</label>
-                            <textarea class="form-control" name="description" rows="3" placeholder="Brief description of the department"></textarea>
+                            <textarea class="form-control" name="description" rows="2" placeholder="Brief description of the department"></textarea>
+                        </div>
+                        
+                        <hr class="my-3">
+                        <h6 class="mb-3"><i class="bi bi-translate"></i> Translations (Optional)</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇬🇧 English</label>
+                                <input type="text" class="form-control" name="name_en" placeholder="English translation">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇹🇼 Traditional Chinese</label>
+                                <input type="text" class="form-control" name="name_zh_tw" placeholder="繁體中文">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇨🇳 Simplified Chinese</label>
+                                <input type="text" class="form-control" name="name_zh_cn" placeholder="简体中文">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇵🇭 Filipino</label>
+                                <input type="text" class="form-control" name="name_fil" placeholder="Filipino translation">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇯🇵 Japanese</label>
+                                <input type="text" class="form-control" name="name_ja" placeholder="日本語">
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -619,8 +693,71 @@
         </div>
     </div>
 
+    <!-- Edit Department Modal - NEW -->
+    <div class="modal fade" id="editDepartmentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Department</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editDepartmentForm">
+                    <input type="hidden" name="department_code" id="editDepartmentCode">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Department Code</label>
+                                <input type="text" class="form-control" id="editDepartmentCodeDisplay" readonly>
+                                <small class="text-muted">Department code cannot be changed</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Department Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" id="editDepartmentName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" id="editDepartmentDescription" rows="2"></textarea>
+                        </div>
+                        
+                        <hr class="my-3">
+                        <h6 class="mb-3"><i class="bi bi-translate"></i> Translations (Optional)</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇬🇧 English</label>
+                                <input type="text" class="form-control" name="name_en" id="editDepartmentNameEn">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇹🇼 Traditional Chinese</label>
+                                <input type="text" class="form-control" name="name_zh_tw" id="editDepartmentNameZhTw">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇨🇳 Simplified Chinese</label>
+                                <input type="text" class="form-control" name="name_zh_cn" id="editDepartmentNameZhCn">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇵🇭 Filipino</label>
+                                <input type="text" class="form-control" name="name_fil" id="editDepartmentNameFil">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇯🇵 Japanese</label>
+                                <input type="text" class="form-control" name="name_ja" id="editDepartmentNameJa">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Update Department</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Add Purpose Modal -->
-    <div class="modal fade" id="addPurposeModal" tabindex="-1">
+    <!-- <div class="modal fade" id="addPurposeModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header <?php echo $modalHeaderClass; ?>">
@@ -668,10 +805,105 @@
                 </form>
             </div>
         </div>
+    </div> -->
+
+    <!-- Add Purpose Modal - UPDATED WITH TRANSLATIONS -->
+    <div class="modal fade" id="addPurposeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
+                    <h5 class="modal-title"><i class="bi bi-flag-fill"></i> Add New Purpose</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addPurposeForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Purpose Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="purpose_code" placeholder="e.g., meeting, interview" required maxlength="20">
+                                <small class="text-muted">Unique identifier (lowercase, no spaces)</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Purpose Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="purpose_name" placeholder="e.g., Meeting, Interview" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Icon Class</label>
+                                <input type="text" class="form-control" name="icon_class" placeholder="e.g., bi-people, bi-briefcase" value="bi-circle">
+                                <small class="text-muted">Bootstrap Icons class</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Color Class</label>
+                                <select class="form-select" name="color_class">
+                                    <option value="text-primary">Primary (Blue)</option>
+                                    <option value="text-success">Success (Green)</option>
+                                    <option value="text-warning">Warning (Orange)</option>
+                                    <option value="text-danger">Danger (Red)</option>
+                                    <option value="text-info">Info (Cyan)</option>
+                                    <option value="text-secondary">Secondary (Gray)</option>
+                                    <option value="text-dark">Dark</option>
+                                    <option value="text-purple">Purple</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Company Ownership</label>
+                                <select class="form-select" name="company_owned_by">
+                                    <option value="Both">Both Companies</option>
+                                    <option value="Toms World">Tom's World Only</option>
+                                    <option value="Pan Asia">Pan-Asia Only</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="is_active" id="purposeActiveCheck" checked>
+                                    <label class="form-check-label" for="purposeActiveCheck">Active Purpose</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-3">
+                        <h6 class="mb-3"><i class="bi bi-translate"></i> Translations (Optional)</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇬🇧 English</label>
+                                <input type="text" class="form-control" name="name_en" placeholder="English translation">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇹🇼 Traditional Chinese</label>
+                                <input type="text" class="form-control" name="name_zh_tw" placeholder="繁體中文">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇨🇳 Simplified Chinese</label>
+                                <input type="text" class="form-control" name="name_zh_cn" placeholder="简体中文">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇵🇭 Filipino</label>
+                                <input type="text" class="form-control" name="name_fil" placeholder="Filipino translation">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇯🇵 Japanese</label>
+                                <input type="text" class="form-control" name="name_ja" placeholder="日本語">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save Purpose</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- Edit Purpose Modal -->
-    <div class="modal fade" id="editPurposeModal" tabindex="-1">
+    <!-- <div class="modal fade" id="editPurposeModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header <?php echo $modalHeaderClass; ?>">
@@ -720,6 +952,102 @@
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" name="is_active" id="editPurposeActiveCheck">
                             <label class="form-check-label" for="editPurposeActiveCheck">Active Purpose</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Update Purpose</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Edit Purpose Modal - UPDATED WITH TRANSLATIONS -->
+    <div class="modal fade" id="editPurposeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Purpose</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editPurposeForm">
+                    <input type="hidden" name="purpose_id" id="editPurposeId">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Purpose Code</label>
+                                <input type="text" class="form-control" name="purpose_code" id="editPurposeCode" readonly>
+                                <small class="text-muted">Purpose code cannot be changed</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Purpose Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="purpose_name" id="editPurposeName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Icon Class</label>
+                                <input type="text" class="form-control" name="icon_class" id="editIconClass">
+                                <small class="text-muted">Bootstrap Icons class</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Color Class</label>
+                                <select class="form-select" name="color_class" id="editColorClass">
+                                    <option value="text-primary">Primary (Blue)</option>
+                                    <option value="text-success">Success (Green)</option>
+                                    <option value="text-warning">Warning (Orange)</option>
+                                    <option value="text-danger">Danger (Red)</option>
+                                    <option value="text-info">Info (Cyan)</option>
+                                    <option value="text-secondary">Secondary (Gray)</option>
+                                    <option value="text-dark">Dark</option>
+                                    <option value="text-purple">Purple</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Company Ownership</label>
+                                <select class="form-select" name="company_owned_by" id="editPurposeCompanyOwnedBy">
+                                    <option value="Both">Both Companies</option>
+                                    <option value="Toms World">Tom's World Only</option>
+                                    <option value="Pan Asia">Pan-Asia Only</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="is_active" id="editPurposeActiveCheck">
+                                    <label class="form-check-label" for="editPurposeActiveCheck">Active Purpose</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-3">
+                        <h6 class="mb-3"><i class="bi bi-translate"></i> Translations (Optional)</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇬🇧 English</label>
+                                <input type="text" class="form-control" name="name_en" id="editPurposeNameEn">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇹🇼 Traditional Chinese</label>
+                                <input type="text" class="form-control" name="name_zh_tw" id="editPurposeNameZhTw">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇨🇳 Simplified Chinese</label>
+                                <input type="text" class="form-control" name="name_zh_cn" id="editPurposeNameZhCn">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇵🇭 Filipino</label>
+                                <input type="text" class="form-control" name="name_fil" id="editPurposeNameFil">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇯🇵 Japanese</label>
+                                <input type="text" class="form-control" name="name_ja" id="editPurposeNameJa">
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -1246,6 +1574,25 @@
             });
         }
 
+        // function loadDepartments() {
+        //     fetch(ajaxUrl + '?action=departments')
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             initDataTable('departmentTable', data, (d) => `
+        //                 <td><span class="badge bg-secondary">${d.department_code}</span></td>
+        //                 <td><strong>${d.name}</strong></td>
+        //                 <td>
+        //                     ${d.employee_count || 0}
+        //                     ${d.employee_count > 0 ? `<button class="btn btn-sm btn-link" onclick="viewDepartmentEmployees('${d.department_code}', '${d.name}')" title="View Employees"><i class="bi bi-people-fill"></i></button>` : ''}
+        //                 </td>
+        //                 <td>${d.visit_count || 0}</td>
+        //                 <td>${d.created_at || 'N/A'}</td>
+        //             `);
+        //         })
+        //         .catch(e => console.error('Error loading departments:', e));
+        // }
+
+        // Update loadDepartments to include edit button
         function loadDepartments() {
             fetch(ajaxUrl + '?action=departments')
                 .then(r => r.json())
@@ -1259,9 +1606,46 @@
                         </td>
                         <td>${d.visit_count || 0}</td>
                         <td>${d.created_at || 'N/A'}</td>
+                        <td>
+                            <button class="action-btn edit" onclick="editDepartment('${d.department_code}')" title="Edit Department">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                        </td>
                     `);
                 })
                 .catch(e => console.error('Error loading departments:', e));
+        }
+
+        // Edit Department function
+        function editDepartment(departmentCode) {
+            fetch(ajaxUrl + `?action=get_department&department_code=${departmentCode}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const dept = data.department;
+                        
+                        // Populate form fields
+                        document.getElementById('editDepartmentCode').value = dept.department_code;
+                        document.getElementById('editDepartmentCodeDisplay').value = dept.department_code;
+                        document.getElementById('editDepartmentName').value = dept.name;
+                        document.getElementById('editDepartmentDescription').value = dept.description || '';
+                        
+                        // Populate translation fields
+                        document.getElementById('editDepartmentNameEn').value = dept.name_en || '';
+                        document.getElementById('editDepartmentNameZhTw').value = dept.name_zh_tw || '';
+                        document.getElementById('editDepartmentNameZhCn').value = dept.name_zh_cn || '';
+                        document.getElementById('editDepartmentNameFil').value = dept.name_fil || '';
+                        document.getElementById('editDepartmentNameJa').value = dept.name_ja || '';
+                        
+                        new bootstrap.Modal(document.getElementById('editDepartmentModal')).show();
+                    } else {
+                        Swal.fire('Error', data.message || 'Failed to load department details', 'error');
+                    }
+                })
+                .catch(e => {
+                    console.error('Error:', e);
+                    Swal.fire('Error', 'Failed to load department details', 'error');
+                });
         }
 
         function loadDepartmentsForSelect() {
@@ -1991,6 +2375,33 @@
             }
         }
 
+        // function editPurpose(purposeId) {
+        //     fetch(ajaxUrl + `?action=get_purpose&purpose_id=${purposeId}`)
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             if (data.status === 'success') {
+        //                 const purpose = data.purpose;
+                        
+        //                 document.getElementById('editPurposeId').value = purpose.purpose_id;
+        //                 document.getElementById('editPurposeCode').value = purpose.purpose_code;
+        //                 document.getElementById('editPurposeName').value = purpose.purpose_name;
+        //                 document.getElementById('editIconClass').value = purpose.icon_class;
+        //                 document.getElementById('editColorClass').value = purpose.color_class;
+        //                 document.getElementById('editCompanyOwnedBy').value = purpose.company_owned_by;
+        //                 document.getElementById('editPurposeActiveCheck').checked = purpose.is_active == 1;
+                        
+        //                 new bootstrap.Modal(document.getElementById('editPurposeModal')).show();
+        //             } else {
+        //                 Swal.fire('Error', data.message || 'Failed to load purpose details', 'error');
+        //             }
+        //         })
+        //         .catch(e => {
+        //             console.error('Error:', e);
+        //             Swal.fire('Error', 'Failed to load purpose details', 'error');
+        //         });
+        // }
+
+        // Update editPurpose to populate translation fields
         function editPurpose(purposeId) {
             fetch(ajaxUrl + `?action=get_purpose&purpose_id=${purposeId}`)
                 .then(r => r.json())
@@ -1998,13 +2409,21 @@
                     if (data.status === 'success') {
                         const purpose = data.purpose;
                         
+                        // Populate main fields
                         document.getElementById('editPurposeId').value = purpose.purpose_id;
                         document.getElementById('editPurposeCode').value = purpose.purpose_code;
                         document.getElementById('editPurposeName').value = purpose.purpose_name;
                         document.getElementById('editIconClass').value = purpose.icon_class;
                         document.getElementById('editColorClass').value = purpose.color_class;
-                        document.getElementById('editCompanyOwnedBy').value = purpose.company_owned_by;
+                        document.getElementById('editPurposeCompanyOwnedBy').value = purpose.company_owned_by;
                         document.getElementById('editPurposeActiveCheck').checked = purpose.is_active == 1;
+                        
+                        // Populate translation fields
+                        document.getElementById('editPurposeNameEn').value = purpose.name_en || '';
+                        document.getElementById('editPurposeNameZhTw').value = purpose.name_zh_tw || '';
+                        document.getElementById('editPurposeNameZhCn').value = purpose.name_zh_cn || '';
+                        document.getElementById('editPurposeNameFil').value = purpose.name_fil || '';
+                        document.getElementById('editPurposeNameJa').value = purpose.name_ja || '';
                         
                         new bootstrap.Modal(document.getElementById('editPurposeModal')).show();
                     } else {
@@ -2223,6 +2642,129 @@
                 if ($.fn.DataTable.isDataTable('#departmentEmployeesTable')) {
                     $('#departmentEmployeesTable').DataTable().clear().destroy();
                 }
+            });
+
+            // Add Department Form with translations
+            document.getElementById('addDepartmentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                
+                fetch(ajaxUrl + '?action=add_department', { method: 'POST', body: formData })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            bootstrap.Modal.getInstance(document.getElementById('addDepartmentModal')).hide();
+                            this.reset();
+                            Swal.fire({ 
+                                toast: true, 
+                                position: 'top-end', 
+                                icon: 'success', 
+                                title: 'Department added successfully', 
+                                showConfirmButton: false, 
+                                timer: 2000 
+                            });
+                            loadDepartments();
+                        } else {
+                            Swal.fire('Error', data.error || 'Failed to add department', 'error');
+                        }
+                    })
+                    .catch(e => Swal.fire('Error', 'Failed to add department', 'error'));
+            });
+            
+            // Edit Department Form
+            document.getElementById('editDepartmentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                
+                fetch(ajaxUrl + '?action=update_department', { method: 'POST', body: formData })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            bootstrap.Modal.getInstance(document.getElementById('editDepartmentModal')).hide();
+                            Swal.fire({ 
+                                toast: true, 
+                                position: 'top-end', 
+                                icon: 'success', 
+                                title: 'Department updated successfully', 
+                                showConfirmButton: false, 
+                                timer: 2000 
+                            });
+                            loadDepartments();
+                        } else {
+                            Swal.fire('Error', data.message || 'Failed to update department', 'error');
+                        }
+                    })
+                    .catch(e => {
+                        console.error('Error:', e);
+                        Swal.fire('Error', 'Failed to update department', 'error');
+                    });
+            });
+            
+            // Add Purpose Form with translations (update existing handler)
+            document.getElementById('addPurposeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                
+                fetch(ajaxUrl + '?action=add_purpose', { 
+                    method: 'POST', 
+                    body: formData 
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        bootstrap.Modal.getInstance(document.getElementById('addPurposeModal')).hide();
+                        this.reset();
+                        Swal.fire({ 
+                            toast: true, 
+                            position: 'top-end', 
+                            icon: 'success', 
+                            title: 'Purpose added successfully', 
+                            showConfirmButton: false, 
+                            timer: 2000 
+                        });
+                        loadPurposes();
+                        loadPurposesMap();
+                    } else {
+                        Swal.fire('Error', data.message || 'Failed to add purpose', 'error');
+                    }
+                })
+                .catch(e => {
+                    console.error('Error:', e);
+                    Swal.fire('Error', 'Failed to add purpose', 'error');
+                });
+            });
+            
+            // Edit Purpose Form with translations (update existing handler)
+            document.getElementById('editPurposeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                
+                fetch(ajaxUrl + '?action=update_purpose', { 
+                    method: 'POST', 
+                    body: formData 
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        bootstrap.Modal.getInstance(document.getElementById('editPurposeModal')).hide();
+                        Swal.fire({ 
+                            toast: true, 
+                            position: 'top-end', 
+                            icon: 'success', 
+                            title: 'Purpose updated successfully', 
+                            showConfirmButton: false, 
+                            timer: 2000 
+                        });
+                        loadPurposes();
+                        loadPurposesMap();
+                    } else {
+                        Swal.fire('Error', data.message || 'Failed to update purpose', 'error');
+                    }
+                })
+                .catch(e => {
+                    console.error('Error:', e);
+                    Swal.fire('Error', 'Failed to update purpose', 'error');
+                });
             });
             
         });

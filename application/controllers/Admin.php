@@ -207,31 +207,31 @@ class Admin extends CI_Controller {
                     echo json_encode($result);
                     break;
                     
-                case 'add_department':
-                    $data = [
-                        'department_code' => $this->input->post('department_code'),
-                        'name' => $this->input->post('name'),
-                        'description' => $this->input->post('description') ?? ''
-                    ];
-                    $result = $this->Admin_model->addDepartment($data);
-                    echo json_encode($result);
-                    break;
+                // case 'add_department':
+                //     $data = [
+                //         'department_code' => $this->input->post('department_code'),
+                //         'name' => $this->input->post('name'),
+                //         'description' => $this->input->post('description') ?? ''
+                //     ];
+                //     $result = $this->Admin_model->addDepartment($data);
+                //     echo json_encode($result);
+                //     break;
                     
                 case 'get_all_purposes':
                     echo json_encode($this->Admin_model->getAllPurposes());
                     break;
                     
-                case 'add_purpose':
-                    $data = [
-                        'purpose_code' => strtolower(trim($this->input->post('purpose_code'))),
-                        'purpose_name' => trim($this->input->post('purpose_name')),
-                        'icon_class' => trim($this->input->post('icon_class') ?? 'bi-circle'),
-                        'color_class' => trim($this->input->post('color_class') ?? 'text-primary'),
-                        'is_active' => $this->input->post('is_active') ? 1 : 0
-                    ];
-                    $result = $this->Admin_model->addPurpose($data);
-                    echo json_encode($result);
-                    break;
+                // case 'add_purpose':
+                //     $data = [
+                //         'purpose_code' => strtolower(trim($this->input->post('purpose_code'))),
+                //         'purpose_name' => trim($this->input->post('purpose_name')),
+                //         'icon_class' => trim($this->input->post('icon_class') ?? 'bi-circle'),
+                //         'color_class' => trim($this->input->post('color_class') ?? 'text-primary'),
+                //         'is_active' => $this->input->post('is_active') ? 1 : 0
+                //     ];
+                //     $result = $this->Admin_model->addPurpose($data);
+                //     echo json_encode($result);
+                //     break;
                     
                 case 'toggle_purpose_status':
                     $purpose_id = (int)$this->input->post('purpose_id');
@@ -249,15 +249,15 @@ class Admin extends CI_Controller {
                     echo json_encode($this->Admin_model->getPurposeById($purpose_id));
                     break;
                     
-                case 'update_purpose':
-                    $data = [
-                        'purpose_id' => (int)$this->input->post('purpose_id'),
-                        'purpose_name' => trim($this->input->post('purpose_name')),
-                        'icon_class' => trim($this->input->post('icon_class') ?? 'bi-circle'),
-                        'color_class' => trim($this->input->post('color_class') ?? 'text-primary'),
-                        'company_owned_by' => trim($this->input->post('company_owned_by') ?? 'Both'),
-                        'is_active' => $this->input->post('is_active') ? 1 : 0
-                    ];
+                // case 'update_purpose':
+                //     $data = [
+                //         'purpose_id' => (int)$this->input->post('purpose_id'),
+                //         'purpose_name' => trim($this->input->post('purpose_name')),
+                //         'icon_class' => trim($this->input->post('icon_class') ?? 'bi-circle'),
+                //         'color_class' => trim($this->input->post('color_class') ?? 'text-primary'),
+                //         'company_owned_by' => trim($this->input->post('company_owned_by') ?? 'Both'),
+                //         'is_active' => $this->input->post('is_active') ? 1 : 0
+                //     ];
                     
                     // Check permissions
                     $canEdit = $this->Admin_model->canEditPurpose($data['purpose_id'], $companyFilter);
@@ -288,6 +288,85 @@ class Admin extends CI_Controller {
                 case 'acknowledge_emergency_alert':
                     $alert_id = (int)$this->input->post('alert_id');
                     $result = $this->Admin_model->acknowledgeEmergencyAlert($alert_id);
+                    echo json_encode($result);
+                    break;
+
+                case 'add_department':
+                    $data = [
+                        'department_code' => $this->input->post('department_code'),
+                        'name' => $this->input->post('name'),
+                        'name_en' => $this->input->post('name_en') ?: null,
+                        'name_zh_tw' => $this->input->post('name_zh_tw') ?: null,
+                        'name_zh_cn' => $this->input->post('name_zh_cn') ?: null,
+                        'name_fil' => $this->input->post('name_fil') ?: null,
+                        'name_ja' => $this->input->post('name_ja') ?: null,
+                        'description' => $this->input->post('description') ?? ''
+                    ];
+                    $result = $this->Admin_model->addDepartment($data);
+                    echo json_encode($result);
+                    break;
+                    
+                case 'get_department':
+                    $department_code = $this->input->get('department_code');
+                    echo json_encode($this->Admin_model->getDepartmentById($department_code));
+                    break;
+                    
+                case 'update_department':
+                    $data = [
+                        'department_code' => $this->input->post('department_code'),
+                        'name' => $this->input->post('name'),
+                        'name_en' => $this->input->post('name_en') ?: null,
+                        'name_zh_tw' => $this->input->post('name_zh_tw') ?: null,
+                        'name_zh_cn' => $this->input->post('name_zh_cn') ?: null,
+                        'name_fil' => $this->input->post('name_fil') ?: null,
+                        'name_ja' => $this->input->post('name_ja') ?: null,
+                        'description' => $this->input->post('description') ?? ''
+                    ];
+                    $result = $this->Admin_model->updateDepartment($data);
+                    echo json_encode($result);
+                    break;
+                    
+                case 'add_purpose':
+                    $data = [
+                        'purpose_code' => strtolower(trim($this->input->post('purpose_code'))),
+                        'purpose_name' => trim($this->input->post('purpose_name')),
+                        'name_en' => trim($this->input->post('name_en')) ?: null,
+                        'name_zh_tw' => trim($this->input->post('name_zh_tw')) ?: null,
+                        'name_zh_cn' => trim($this->input->post('name_zh_cn')) ?: null,
+                        'name_fil' => trim($this->input->post('name_fil')) ?: null,
+                        'name_ja' => trim($this->input->post('name_ja')) ?: null,
+                        'icon_class' => trim($this->input->post('icon_class') ?? 'bi-circle'),
+                        'color_class' => trim($this->input->post('color_class') ?? 'text-primary'),
+                        'company_owned_by' => trim($this->input->post('company_owned_by') ?? 'Both'),
+                        'is_active' => $this->input->post('is_active') ? 1 : 0
+                    ];
+                    $result = $this->Admin_model->addPurpose($data);
+                    echo json_encode($result);
+                    break;
+                    
+                case 'update_purpose':
+                    $data = [
+                        'purpose_id' => (int)$this->input->post('purpose_id'),
+                        'purpose_name' => trim($this->input->post('purpose_name')),
+                        'name_en' => trim($this->input->post('name_en')) ?: null,
+                        'name_zh_tw' => trim($this->input->post('name_zh_tw')) ?: null,
+                        'name_zh_cn' => trim($this->input->post('name_zh_cn')) ?: null,
+                        'name_fil' => trim($this->input->post('name_fil')) ?: null,
+                        'name_ja' => trim($this->input->post('name_ja')) ?: null,
+                        'icon_class' => trim($this->input->post('icon_class') ?? 'bi-circle'),
+                        'color_class' => trim($this->input->post('color_class') ?? 'text-primary'),
+                        'company_owned_by' => trim($this->input->post('company_owned_by') ?? 'Both'),
+                        'is_active' => $this->input->post('is_active') ? 1 : 0
+                    ];
+                    
+                    // Check permissions
+                    $canEdit = $this->Admin_model->canEditPurpose($data['purpose_id'], $companyFilter);
+                    if (!$canEdit['can_edit']) {
+                        echo json_encode(['status' => 'error', 'message' => 'You do not have permission to edit this purpose']);
+                        break;
+                    }
+                    
+                    $result = $this->Admin_model->updatePurpose($data);
                     echo json_encode($result);
                     break;
                     
