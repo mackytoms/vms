@@ -26,12 +26,25 @@ class Kiosk extends CI_Controller {
     //     echo json_encode(['status' => 'success', 'departments' => $departments]);
     // }
     
+    // // Get departments and employees for the dropdown - WITH TRANSLATIONS
+    // public function get_departments() {
+    //     // SELECT all translation columns
+    //     $departments = $this->db->select('department_code, name, 
+    //                                     name_en, name_zh_tw, name_zh_cn, name_fil, name_ja')
+    //                         ->from('departments')
+    //                         ->order_by('name', 'ASC')
+    //                         ->get()
+    //                         ->result_array();
+        
+    //     echo json_encode(['status' => 'success', 'departments' => $departments]);
+    // }
     // Get departments and employees for the dropdown - WITH TRANSLATIONS
     public function get_departments() {
-        // SELECT all translation columns
+        // SELECT all translation columns - ONLY ACTIVE DEPARTMENTS
         $departments = $this->db->select('department_code, name, 
                                         name_en, name_zh_tw, name_zh_cn, name_fil, name_ja')
                             ->from('departments')
+                            ->where('is_active', 1)  // ADD THIS LINE
                             ->order_by('name', 'ASC')
                             ->get()
                             ->result_array();

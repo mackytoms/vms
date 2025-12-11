@@ -410,9 +410,9 @@
 
         .employee-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
             gap: 15px;
-            max-height: 300px;
+            max-height: 500px;
             overflow-y: auto;
             padding: 15px;
             background: #f8f9fa;
