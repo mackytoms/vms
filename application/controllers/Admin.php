@@ -300,7 +300,8 @@ class Admin extends CI_Controller {
                         'name_zh_cn' => $this->input->post('name_zh_cn') ?: null,
                         'name_fil' => $this->input->post('name_fil') ?: null,
                         'name_ja' => $this->input->post('name_ja') ?: null,
-                        'description' => $this->input->post('description') ?? ''
+                        'description' => $this->input->post('description') ?? '',
+                        'is_active' => $this->input->post('is_active') ? 1 : 0
                     ];
                     $result = $this->Admin_model->addDepartment($data);
                     echo json_encode($result);
@@ -320,9 +321,19 @@ class Admin extends CI_Controller {
                         'name_zh_cn' => $this->input->post('name_zh_cn') ?: null,
                         'name_fil' => $this->input->post('name_fil') ?: null,
                         'name_ja' => $this->input->post('name_ja') ?: null,
-                        'description' => $this->input->post('description') ?? ''
+                        'description' => $this->input->post('description') ?? '',
+                        'is_active' => $this->input->post('is_active') ? 1 : 0
+
                     ];
                     $result = $this->Admin_model->updateDepartment($data);
+                    echo json_encode($result);
+                    break;
+
+                // Add this new case after 'update_department':
+                case 'toggle_department_status':
+                    $department_code = $this->input->post('department_code');
+                    $new_status = (int)$this->input->post('new_status');
+                    $result = $this->Admin_model->toggleDepartmentStatus($department_code, $new_status);
                     echo json_encode($result);
                     break;
                     
@@ -367,6 +378,16 @@ class Admin extends CI_Controller {
                     }
                     
                     $result = $this->Admin_model->updatePurpose($data);
+                    echo json_encode($result);
+                    break;
+
+                // Add this case inside the switch statement in ajax_handler() method
+                // Place it after the 'update_department' case
+
+                case 'toggle_department_status':
+                    $department_code = $this->input->post('department_code');
+                    $new_status = (int)$this->input->post('new_status');
+                    $result = $this->Admin_model->toggleDepartmentStatus($department_code, $new_status);
                     echo json_encode($result);
                     break;
                     

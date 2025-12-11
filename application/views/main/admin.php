@@ -364,6 +364,33 @@
         </div> -->
 
         <!-- Departments Section - UPDATE THIS IN YOUR MAIN VIEW -->
+        <!-- <div class="dashboard-content" id="departmentsSection" style="display: none;">
+            <h1 class="page-title">Department Management</h1>
+            <p class="page-subtitle">Manage organizational departments</p>
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="chart-title">All Departments</h3>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">
+                        <i class="bi bi-plus-circle"></i> Add Department
+                    </button>
+                </div>
+                <table class="table table-hover" id="departmentTable">
+                    <thead>
+                        <tr>
+                            <th>Department Code</th>
+                            <th>Department Name</th>
+                            <th>Total Employees</th>
+                            <th>Total Visits</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="departmentTableBody"></tbody>
+                </table>
+            </div>
+        </div> -->
+
+        <!-- Departments Section -->
         <div class="dashboard-content" id="departmentsSection" style="display: none;">
             <h1 class="page-title">Department Management</h1>
             <p class="page-subtitle">Manage organizational departments</p>
@@ -381,6 +408,7 @@
                             <th>Department Name</th>
                             <th>Total Employees</th>
                             <th>Total Visits</th>
+                            <th>Status</th>
                             <th>Created</th>
                             <th>Actions</th>
                         </tr>
@@ -631,7 +659,7 @@
         </div>
     </div>
 
-    <!-- Add Department Modal - UPDATED WITH TRANSLATIONS -->
+    <!-- Replace the Add Department Modal with this: -->
     <div class="modal fade" id="addDepartmentModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -656,6 +684,11 @@
                         <div class="mb-3">
                             <label class="form-label">Description</label>
                             <textarea class="form-control" name="description" rows="2" placeholder="Brief description of the department"></textarea>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" name="is_active" id="departmentActiveCheck" checked>
+                            <label class="form-check-label" for="departmentActiveCheck">Active Department</label>
                         </div>
                         
                         <hr class="my-3">
@@ -693,7 +726,7 @@
         </div>
     </div>
 
-    <!-- Edit Department Modal - NEW -->
+    <!-- Replace the Edit Department Modal with this: -->
     <div class="modal fade" id="editDepartmentModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -719,6 +752,11 @@
                         <div class="mb-3">
                             <label class="form-label">Description</label>
                             <textarea class="form-control" name="description" id="editDepartmentDescription" rows="2"></textarea>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" name="is_active" id="editDepartmentActiveCheck">
+                            <label class="form-check-label" for="editDepartmentActiveCheck">Active Department</label>
                         </div>
                         
                         <hr class="my-3">
@@ -1592,7 +1630,30 @@
         //         .catch(e => console.error('Error loading departments:', e));
         // }
 
-        // Update loadDepartments to include edit button
+        // // Update loadDepartments to include edit button
+        // function loadDepartments() {
+        //     fetch(ajaxUrl + '?action=departments')
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             initDataTable('departmentTable', data, (d) => `
+        //                 <td><span class="badge bg-secondary">${d.department_code}</span></td>
+        //                 <td><strong>${d.name}</strong></td>
+        //                 <td>
+        //                     ${d.employee_count || 0}
+        //                     ${d.employee_count > 0 ? `<button class="btn btn-sm btn-link" onclick="viewDepartmentEmployees('${d.department_code}', '${d.name}')" title="View Employees"><i class="bi bi-people-fill"></i></button>` : ''}
+        //                 </td>
+        //                 <td>${d.visit_count || 0}</td>
+        //                 <td>${d.created_at || 'N/A'}</td>
+        //                 <td>
+        //                     <button class="action-btn edit" onclick="editDepartment('${d.department_code}')" title="Edit Department">
+        //                         <i class="bi bi-pencil-square"></i>
+        //                     </button>
+        //                 </td>
+        //             `);
+        //         })
+        //         .catch(e => console.error('Error loading departments:', e));
+        // }
+
         function loadDepartments() {
             fetch(ajaxUrl + '?action=departments')
                 .then(r => r.json())
@@ -1605,6 +1666,14 @@
                             ${d.employee_count > 0 ? `<button class="btn btn-sm btn-link" onclick="viewDepartmentEmployees('${d.department_code}', '${d.name}')" title="View Employees"><i class="bi bi-people-fill"></i></button>` : ''}
                         </td>
                         <td>${d.visit_count || 0}</td>
+                        <td>
+                            <span class="badge ${d.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+                                style="cursor: pointer;" 
+                                onclick="toggleDepartmentStatus('${d.department_code}', ${d.is_active}, '${d.name.replace(/'/g, "\\'")}')" 
+                                title="Click to ${d.is_active == 1 ? 'deactivate' : 'activate'}">
+                                ${d.is_active == 1 ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
                         <td>${d.created_at || 'N/A'}</td>
                         <td>
                             <button class="action-btn edit" onclick="editDepartment('${d.department_code}')" title="Edit Department">
@@ -1614,6 +1683,54 @@
                     `);
                 })
                 .catch(e => console.error('Error loading departments:', e));
+        }
+
+        function toggleDepartmentStatus(departmentCode, currentStatus, departmentName) {
+            const newStatus = currentStatus == 1 ? 0 : 1;
+            const actionText = newStatus == 1 ? 'activate' : 'deactivate';
+            const statusText = newStatus == 1 ? 'Active' : 'Inactive';
+            
+            Swal.fire({
+                title: `${actionText.charAt(0).toUpperCase() + actionText.slice(1)} Department?`,
+                html: `Are you sure you want to ${actionText} <strong>${departmentName}</strong>?<br><small class="text-muted">Status will be changed to: ${statusText}</small>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: newStatus == 1 ? '#27ae60' : '#95a5a6',
+                cancelButtonColor: '#95a5a6',
+                confirmButtonText: `Yes, ${actionText.charAt(0).toUpperCase() + actionText.slice(1)}`,
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('department_code', departmentCode);
+                    formData.append('new_status', newStatus);
+                    
+                    fetch(ajaxUrl + '?action=toggle_department_status', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: `Department ${actionText}d successfully`,
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                            loadDepartments();
+                        } else {
+                            Swal.fire('Error', data.message || 'Failed to update department status', 'error');
+                        }
+                    })
+                    .catch(e => {
+                        console.error('Error:', e);
+                        Swal.fire('Error', 'Failed to update department status', 'error');
+                    });
+                }
+            });
         }
 
         // Edit Department function
@@ -1636,6 +1753,9 @@
                         document.getElementById('editDepartmentNameZhCn').value = dept.name_zh_cn || '';
                         document.getElementById('editDepartmentNameFil').value = dept.name_fil || '';
                         document.getElementById('editDepartmentNameJa').value = dept.name_ja || '';
+                        
+                        // Populate is_active checkbox
+                        document.getElementById('editDepartmentActiveCheck').checked = dept.is_active == 1;
                         
                         new bootstrap.Modal(document.getElementById('editDepartmentModal')).show();
                     } else {

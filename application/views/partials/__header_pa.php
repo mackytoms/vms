@@ -46,15 +46,15 @@
         }
 
         /* Header - CHANGED COLOR */
-        .kiosk-header {
+        /* .kiosk-header {
             background: linear-gradient(135deg, #1e9338a8 0%, #1e9338 100%);
             color: white;
             padding: 15px;
             text-align: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
+        } */
 
-        .company-logo {
+        /* .company-logo {
             width: 50px;
             height: 50px;
             background: white;
@@ -63,19 +63,19 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 8px;
-        }
+        } */
 
-        .kiosk-header h1 {
+        /* .kiosk-header h1 {
             font-size: 2em;
             font-weight: 800;
             margin: 8px 0;
             letter-spacing: 1px;
-        }
+        } */
 
-        .datetime-display {
+        /* .datetime-display {
             font-size: 1em;
             opacity: 0.9;
-        }
+        } */
 
         /* Main Content Area */
         .kiosk-content {
@@ -893,6 +893,292 @@
             }
             50% {
                 box-shadow: 0 4px 30px rgba(231, 76, 60, 0.8);
+            }
+        }
+
+        /* Header with Off-canvas Trigger */
+        .kiosk-header {
+            background: linear-gradient(135deg, #1e9338a8 0%, #1e9338 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .header-center {
+            flex: 1;
+            text-align: center;
+        }
+
+        .company-logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .kiosk-header h1 {
+            font-size: 2em;
+            font-weight: 800;
+            margin: 8px 0;
+            letter-spacing: 1px;
+        }
+
+        .datetime-display {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        /* Off-canvas Trigger Button */
+        .offcanvas-trigger {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .offcanvas-trigger:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .offcanvas-trigger:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        /* Off-canvas Overlay */
+        .offcanvas-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        .offcanvas-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Off-canvas Panel */
+        .offcanvas-panel {
+            position: fixed;
+            top: 0;
+            left: -400px;
+            width: 400px;
+            max-width: 90vw;
+            height: 100vh;
+            background: white;
+            z-index: 9999;
+            transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .offcanvas-panel.active {
+            left: 0;
+        }
+
+        /* Off-canvas Header */
+        .offcanvas-header {
+            background: linear-gradient(135deg, #1e9338a8 0%, #1e9338 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .offcanvas-header h3 {
+            margin: 0;
+            font-size: 1.5em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .offcanvas-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            transition: all 0.3s ease;
+        }
+
+        .offcanvas-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        /* Off-canvas Content */
+        .offcanvas-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+        }
+
+        .offcanvas-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .offcanvas-section:last-child {
+            border-bottom: none;
+        }
+
+        .offcanvas-section h4 {            
+            color: #1e9338a8;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .offcanvas-section p {
+            color: #1e9338;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* QR Code Container */
+        .offcanvas-qr-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .offcanvas-qr-code {
+            width: 200px;
+            height: 200px;
+            display: block;
+            margin: 0 auto;
+            border: 4px solid white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-description {
+            margin-top: 15px;
+            color: #1e9338;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        /* Guidelines List */
+        .guidelines-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0 0;
+        }
+
+        .guidelines-list li {
+            padding: 8px 0 8px 30px;
+            position: relative;
+            color: #495057;
+        }
+
+        .guidelines-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* Swipe Indicator (optional visual cue) */
+        .swipe-indicator {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8em;
+            pointer-events: none;
+            animation: swipeHint 2s infinite;
+        }
+
+        @keyframes swipeHint {
+            0%, 100% { opacity: 0.3; transform: translateY(-50%) translateX(0); }
+            50% { opacity: 0.7; transform: translateY(-50%) translateX(10px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .offcanvas-panel {
+                width: 320px;
+            }
+            
+            .kiosk-header h1 {
+                font-size: 1.5em;
+            }
+            
+            .datetime-display {
+                font-size: 0.9em;
+            }
+            
+            .offcanvas-trigger {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .offcanvas-panel {
+                width: 100vw;
+                max-width: 100vw;
+            }
+            
+            .kiosk-header h1 {
+                font-size: 1.2em;
+            }
+            
+            .company-logo {
+                width: 40px;
+                height: 40px;
             }
         }
     </style>

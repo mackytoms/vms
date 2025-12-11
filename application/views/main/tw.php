@@ -3,7 +3,7 @@
     <!-- Main Kiosk Container -->
     <div class="kiosk-container">
         <!-- Header -->
-        <div class="kiosk-header">
+        <!-- <div class="kiosk-header">
             <div class="company-logo">
                 <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" 
                     alt="Toms World" 
@@ -11,6 +11,70 @@
             </div>
             <h1 data-translate="companyName">Welcome to TOMS WORLD</h1>
             <div class="datetime-display" id="datetime"></div>
+        </div> -->
+
+        <div class="kiosk-header">
+            <button class="offcanvas-trigger" onclick="toggleOffcanvas()" aria-label="Open info panel">
+                <i class="bi bi-info-circle"></i>
+            </button>
+            
+            <div class="header-center">
+                <div class="company-logo">
+                    <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" 
+                        alt="Toms World" 
+                        style="width: 40px; height: 40px; object-fit: contain; border-radius: 50%;">
+                </div>
+                <h1 data-translate="companyName">Welcome to TOMS WORLD</h1>
+                <div class="datetime-display" id="datetime"></div>
+            </div>
+        </div>
+        
+        <!-- Off-canvas Info Panel -->
+        <div class="offcanvas-overlay" id="offcanvasOverlay" onclick="closeOffcanvas()"></div>
+        <div class="offcanvas-panel" id="offcanvasPanel">
+            <div class="offcanvas-header">
+                <h3><i class="bi bi-info-circle"></i> Information</h3>
+                <button class="offcanvas-close" onclick="closeOffcanvas()" aria-label="Close panel">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            
+            <div class="offcanvas-content">
+                <div class="offcanvas-section">
+                    <h4>Visitor Check-In System</h4>
+                    <p>Scan the QR code below to access our visitor portal from your mobile device.</p>
+                </div>
+                
+                <div class="offcanvas-qr-container">
+                    <img src="<?= base_url('assets/images/qr/qr_tw.png') ?>" 
+                        alt="QR Code" 
+                        class="offcanvas-qr-code">
+                    <p class="qr-description">Scan for quick access</p>
+                </div>
+                
+                <div class="offcanvas-section">
+                    <h4><i class="bi bi-clock"></i> Operating Hours</h4>
+                    <p>Monday - Wednesday: 8:00 AM - 7:00 PM<br>
+                    Thursday - Friday: 8:00 AM - 6:00 PM<br>
+                    Saturday - Sunday: Closed</p>
+                </div>
+                
+                <!-- <div class="offcanvas-section">
+                    <h4><i class="bi bi-telephone"></i> Need Help?</h4>
+                    <p>Reception: (02) 1234-5678<br>
+                    Security: (02) 8765-4321</p>
+                </div> -->
+                
+                <div class="offcanvas-section">
+                    <h4><i class="bi bi-shield-check"></i> Visitor Guidelines</h4>
+                    <ul class="guidelines-list">
+                        <li>Valid ID required for check-in</li>
+                        <li>Please wear your visitor badge at all times</li>
+                        <li>Follow all safety protocols</li>
+                        <li>Photography requires prior approval</li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <!-- Content Area -->
@@ -730,14 +794,14 @@
                 selectedHost: "Selected Host",
                 noSelection: "No one selected yet",
                 purposeTitle: "What brings you here today?",
-                meeting: "Meeting",
-                interview: "Interview",
-                delivery: "Delivery",
-                service: "Service/Repair",
-                training: "Training",
-                tour: "Tour",
-                event: "Event",
-                other: "Other",
+                // meeting: "Meeting",
+                // interview: "Interview",
+                // delivery: "Delivery",
+                // service: "Service/Repair",
+                // training: "Training",
+                // tour: "Tour",
+                // event: "Event",
+                // other: "Other",
                 additionalNotes: "Additional notes (optional)",
                 notesPlaceholder: "Any additional information...",
                 termsTitle: "Terms & Agreements",
@@ -833,14 +897,14 @@
                 selectedHost: "已選擇的接待人",
                 noSelection: "尚未選擇任何人",
                 purposeTitle: "今天來訪的目的是什麼？",
-                meeting: "會議",
-                interview: "面試",
-                delivery: "送貨",
-                service: "服務/維修",
-                training: "培訓",
-                tour: "參觀",
-                event: "活動",
-                other: "其他",
+                // meeting: "會議",
+                // interview: "面試",
+                // delivery: "送貨",
+                // service: "服務/維修",
+                // training: "培訓",
+                // tour: "參觀",
+                // event: "活動",
+                // other: "其他",
                 additionalNotes: "附加說明（可選）",
                 notesPlaceholder: "任何額外信息...",
                 termsTitle: "條款和協議",
@@ -936,14 +1000,14 @@
                 selectedHost: "已选择的接待人",
                 noSelection: "尚未选择任何人",
                 purposeTitle: "今天来访的目的是什么？",
-                meeting: "会议",
-                interview: "面试",
-                delivery: "送货",
-                service: "服务/维修",
-                training: "培训",
-                tour: "参观",
-                event: "活动",
-                other: "其他",
+                // meeting: "会议",
+                // interview: "面试",
+                // delivery: "送货",
+                // service: "服务/维修",
+                // training: "培训",
+                // tour: "参观",
+                // event: "活动",
+                // other: "其他",
                 additionalNotes: "附加说明（可选）",
                 notesPlaceholder: "任何额外信息...",
                 termsTitle: "条款和协议",
@@ -1039,14 +1103,14 @@
                 selectedHost: "Napiling Tauhan",
                 noSelection: "Wala pang napili",
                 purposeTitle: "Ano ang dahilan ng iyong pagbisita ngayon?",
-                meeting: "Pulong",
-                interview: "Interbyu",
-                delivery: "Paghahatid",
-                service: "Serbisyo/ Pagkukumpuni",
-                training: "Pagsasanay",
-                tour: "Paglilibot",
-                event: "Kaganapan",
-                other: "Iba pa",
+                // meeting: "Pulong",
+                // interview: "Interbyu",
+                // delivery: "Paghahatid",
+                // service: "Serbisyo/ Pagkukumpuni",
+                // training: "Pagsasanay",
+                // tour: "Paglilibot",
+                // event: "Kaganapan",
+                // other: "Iba pa",
                 additionalNotes: "Karagdagang tala (opsyonal)",
                 notesPlaceholder: "Anumang karagdagang impormasyon...",
                 termsTitle: "Mga Tuntunin at Kasunduan",
@@ -1142,14 +1206,14 @@
                 selectedHost: "選択されたホスト",
                 noSelection: "まだ選択されていません",
                 purposeTitle: "本日のご訪問の目的は何ですか？",
-                meeting: "会議",
-                interview: "面接",
-                delivery: "配達",
-                service: "サービス/修理",
-                training: "トレーニング",
-                tour: "見学",
-                event: "イベント",
-                other: "その他",
+                // meeting: "会議",
+                // interview: "面接",
+                // delivery: "配達",
+                // service: "サービス/修理",
+                // training: "トレーニング",
+                // tour: "見学",
+                // event: "イベント",
+                // other: "その他",
                 additionalNotes: "追加メモ（オプション）",
                 notesPlaceholder: "追加情報...",
                 termsTitle: "規約と同意事項",
@@ -4697,5 +4761,79 @@
                 loadDefaultPurposes();
             });
         }
+
+        // Off-canvas Panel Functions
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let isOffcanvasOpen = false;
+
+        function toggleOffcanvas() {
+            const panel = document.getElementById('offcanvasPanel');
+            const overlay = document.getElementById('offcanvasOverlay');
+            
+            isOffcanvasOpen = !isOffcanvasOpen;
+            
+            if (isOffcanvasOpen) {
+                panel.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                closeOffcanvas();
+            }
+        }
+
+        function closeOffcanvas() {
+            const panel = document.getElementById('offcanvasPanel');
+            const overlay = document.getElementById('offcanvasOverlay');
+            
+            panel.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+            isOffcanvasOpen = false;
+        }
+
+        // Touch Swipe Support
+        document.addEventListener('DOMContentLoaded', function() {
+            const panel = document.getElementById('offcanvasPanel');
+            
+            // Swipe to open from left edge
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            
+            document.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+            
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const swipeDistance = touchEndX - touchStartX;
+                
+                // Swipe right to open (from left edge)
+                if (!isOffcanvasOpen && touchStartX < 50 && swipeDistance > swipeThreshold) {
+                    toggleOffcanvas();
+                }
+                
+                // Swipe left to close
+                if (isOffcanvasOpen && swipeDistance < -swipeThreshold) {
+                    closeOffcanvas();
+                }
+            }
+            
+            // Close on ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isOffcanvasOpen) {
+                    closeOffcanvas();
+                }
+            });
+            
+            // Prevent body scroll when offcanvas is open
+            panel.addEventListener('touchmove', (e) => {
+                if (isOffcanvasOpen) {
+                    e.stopPropagation();
+                }
+            });
+        });
 
     </script>

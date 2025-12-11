@@ -325,6 +325,26 @@ class Admin_model extends CI_Model {
     //     return ['success' => false, 'error' => $this->db->error()['message']];
     // }
 
+    // public function addDepartment($data) {
+    //     $insert_data = [
+    //         'department_code' => $data['department_code'],
+    //         'name' => $data['name'],
+    //         'name_en' => $data['name_en'] ?? null,
+    //         'name_zh_tw' => $data['name_zh_tw'] ?? null,
+    //         'name_zh_cn' => $data['name_zh_cn'] ?? null,
+    //         'name_fil' => $data['name_fil'] ?? null,
+    //         'name_ja' => $data['name_ja'] ?? null,
+    //         'description' => $data['description'] ?? '',
+    //         'created_at' => date('Y-m-d H:i:s')
+    //     ];
+        
+    //     if ($this->db->insert('departments', $insert_data)) {
+    //         return ['success' => true];
+    //     }
+        
+    //     return ['success' => false, 'error' => $this->db->error()['message']];
+    // }
+
     public function addDepartment($data) {
         $insert_data = [
             'department_code' => $data['department_code'],
@@ -335,6 +355,7 @@ class Admin_model extends CI_Model {
             'name_fil' => $data['name_fil'] ?? null,
             'name_ja' => $data['name_ja'] ?? null,
             'description' => $data['description'] ?? '',
+            'is_active' => $data['is_active'] ?? 1,
             'created_at' => date('Y-m-d H:i:s')
         ];
         
@@ -356,6 +377,26 @@ class Admin_model extends CI_Model {
         return ['status' => 'error', 'message' => 'Department not found'];
     }
 
+    // public function updateDepartment($data) {
+    //     $update_data = [
+    //         'name' => $data['name'],
+    //         'name_en' => $data['name_en'] ?? null,
+    //         'name_zh_tw' => $data['name_zh_tw'] ?? null,
+    //         'name_zh_cn' => $data['name_zh_cn'] ?? null,
+    //         'name_fil' => $data['name_fil'] ?? null,
+    //         'name_ja' => $data['name_ja'] ?? null,
+    //         'description' => $data['description'] ?? ''
+    //     ];
+        
+    //     $this->db->where('department_code', $data['department_code']);
+        
+    //     if ($this->db->update('departments', $update_data)) {
+    //         return ['status' => 'success'];
+    //     }
+        
+    //     return ['status' => 'error', 'message' => $this->db->error()['message']];
+    // }
+
     public function updateDepartment($data) {
         $update_data = [
             'name' => $data['name'],
@@ -364,13 +405,25 @@ class Admin_model extends CI_Model {
             'name_zh_cn' => $data['name_zh_cn'] ?? null,
             'name_fil' => $data['name_fil'] ?? null,
             'name_ja' => $data['name_ja'] ?? null,
-            'description' => $data['description'] ?? ''
+            'description' => $data['description'] ?? '',
+            'is_active' => $data['is_active'] ?? 1
         ];
         
         $this->db->where('department_code', $data['department_code']);
         
         if ($this->db->update('departments', $update_data)) {
             return ['status' => 'success'];
+        }
+        
+        return ['status' => 'error', 'message' => $this->db->error()['message']];
+    }
+
+    // Add this method to Admin_model.php after the updateDepartment method
+
+    public function toggleDepartmentStatus($department_code, $new_status) {
+        $this->db->where('department_code', $department_code);
+        if ($this->db->update('departments', ['is_active' => $new_status])) {
+            return ['status' => 'success', 'new_status' => $new_status];
         }
         
         return ['status' => 'error', 'message' => $this->db->error()['message']];
@@ -747,4 +800,5 @@ class Admin_model extends CI_Model {
         
         return ['status' => 'error', 'message' => $this->db->error()['message']];
     }
+    
 }
