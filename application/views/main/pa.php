@@ -276,6 +276,62 @@
             </div>
 
             <!-- Screen 5: Host Selection (Enhanced) -->
+            <!-- <div class="screen" id="hostScreen">
+                <div class="form-screen">
+                    <h2 class="form-title" data-translate="hostTitle">Who are you here to see?</h2>
+
+                    <div class="department-selection">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="selectDepartment">Select Department</label>
+                            <select class="form-select form-select-lg" id="departmentSelect" onchange="onDepartmentChange()">
+                                <option value="" data-translate="chooseDepartment">Choose a department...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!- ADD THIS SEARCH INPUT ->
+                    <div class="employee-search-container mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" 
+                                class="form-control form-control-lg" 
+                                id="employeeSearch" 
+                                placeholder="Search employee by name..."
+                                data-translate-placeholder="searchEmployeePlaceholder"
+                                oninput="filterEmployees(this.value)">
+                            <button class="btn btn-outline-secondary" type="button" onclick="clearEmployeeSearch()">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!- END SEARCH INPUT ->
+
+                    <div id="employeeSection" style="display: none;">
+                        <label class="form-label" data-translate="selectEmployee">Select Employee</label>
+                        <div class="employee-grid" id="employeeGrid">
+                            <!- Employees will be populated here ->
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label class="form-label" data-translate="selectedHost">Selected Host</label>
+                        <div class="form-control form-control-lg" id="selectedHost" style="background: #f8f9fa;">
+                            <span class="text-muted" data-translate="noSelection">No one selected yet</span>
+                        </div>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <button class="btn-large btn-back" onclick="previousScreen()">
+                            <i class="bi bi-arrow-left"></i> <span data-translate="back">Back</span>
+                        </button>
+                        <button class="btn-large btn-next" onclick="nextScreen()" disabled id="hostNextBtn">
+                            <span data-translate="continue">Continue</span> <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- Screen 5: Host Selection (Enhanced with Search) -->
             <div class="screen" id="hostScreen">
                 <div class="form-screen">
                     <h2 class="form-title" data-translate="hostTitle">Who are you here to see?</h2>
@@ -291,6 +347,26 @@
 
                     <div id="employeeSection" style="display: none;">
                         <label class="form-label" data-translate="selectEmployee">Select Employee</label>
+                        
+                        <!-- EMPLOYEE SEARCH INPUT -->
+                        <div class="employee-search-container mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" 
+                                    class="form-control form-control-lg" 
+                                    id="employeeSearch" 
+                                    placeholder="Search employee by name..."
+                                    data-translate-placeholder="searchEmployeePlaceholder"
+                                    oninput="filterEmployees(this.value)"
+                                    autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" onclick="clearEmployeeSearch()" title="Clear search">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted mt-1 d-block" id="employeeCount"></small>
+                        </div>
+                        <!-- END EMPLOYEE SEARCH INPUT -->
+                        
                         <div class="employee-grid" id="employeeGrid">
                             <!-- Employees will be populated here -->
                         </div>
@@ -777,6 +853,10 @@
                 skipNow: "Skip for Now",
                 hostTitle: "Who are you here to see?",
                 searchHost: "Search by name or department",
+                
+                searchEmployeePlaceholder: "Search employee by name...",
+                noEmployeesFound: "No employees found matching your search",
+
                 hostSearchPlaceholder: "Start typing name...",
                 popularDepts: "Popular departments:",
                 sales: "Sales",
@@ -880,6 +960,10 @@
                 skipNow: "暫時跳過",
                 hostTitle: "您要見誰？",
                 searchHost: "按姓名或部門搜索",
+                                
+                searchEmployeePlaceholder: "按姓名搜尋員工...",
+                noEmployeesFound: "找不到符合搜尋條件的員工",
+
                 hostSearchPlaceholder: "開始輸入姓名...",
                 popularDepts: "熱門部門：",
                 sales: "銷售",
@@ -983,6 +1067,10 @@
                 skipNow: "暂时跳过",
                 hostTitle: "您要见谁？",
                 searchHost: "按姓名或部门搜索",
+                                
+                searchEmployeePlaceholder: "按姓名搜索员工...",
+                noEmployeesFound: "找不到符合搜索条件的员工",
+
                 hostSearchPlaceholder: "开始输入姓名...",
                 popularDepts: "热门部门：",
                 sales: "销售",
@@ -1086,6 +1174,10 @@
                 skipNow: "Laktawan Muna",
                 hostTitle: "Sino ang iyong gustong makita?",
                 searchHost: "Maghanap ayon sa pangalan o departamento",
+                
+                searchEmployeePlaceholder: "Maghanap ng empleyado ayon sa pangalan...",
+                noEmployeesFound: "Walang nakitang empleyado na tumutugma sa iyong paghahanap",
+
                 hostSearchPlaceholder: "Simulang mag-type ng pangalan...",
                 popularDepts: "Mga popular na departamento:",
                 sales: "Benta",
@@ -1189,6 +1281,10 @@
                 skipNow: "今はスキップ",
                 hostTitle: "どなたにお会いになりますか？",
                 searchHost: "名前または部署で検索",
+                
+                searchEmployeePlaceholder: "名前で従業員を検索...",
+                noEmployeesFound: "検索条件に一致する従業員が見つかりません",
+
                 hostSearchPlaceholder: "名前を入力開始...",
                 popularDepts: "人気の部署：",
                 sales: "営業",
@@ -1286,6 +1382,9 @@
 
         // Global variable to store department data with translations
         let availableDepartments = [];
+
+        // Add this variable near the top with other state variables
+        let currentDepartmentEmployees = []; // Store fetched employees for filtering
 
         // FIXED: Safe stop function that checks scanner state first
         async function stopQRScanner() {
@@ -1680,11 +1779,101 @@
         // }
 
         // Updated: Handle department selection with translated names
+        // function onDepartmentChange() {
+        //     const select = document.getElementById('departmentSelect');
+        //     const deptCode = select.value;
+        //     const employeeSection = document.getElementById('employeeSection');
+        //     const employeeGrid = document.getElementById('employeeGrid');
+            
+        //     if (!deptCode) {
+        //         employeeSection.style.display = 'none';
+        //         resetHostSelection();
+        //         return;
+        //     }
+            
+        //     // Find the department object to get translated name
+        //     const deptObj = availableDepartments.find(d => d.department_code === deptCode);
+        //     const deptName = deptObj ? getTranslatedDepartmentName(deptObj) : select.options[select.selectedIndex].text;
+            
+        //     selectedDepartment = {
+        //         code: deptCode,
+        //         name: deptName,
+        //         originalName: deptObj ? deptObj.name : deptName // Keep original for database
+        //     };
+            
+        //     // Show loading indicator
+        //     employeeGrid.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+        //     employeeSection.style.display = 'block';
+            
+        //     // Fetch employees from database - FILTERED BY COMPANY
+        //     fetch(`<?= base_url("kiosk/get_employees/") ?>${deptCode}?company_visited=${encodeURIComponent(COMPANY_VISITED)}`, {
+        //         method: 'GET',
+        //         headers: {
+        //             'X-Requested-With': 'XMLHttpRequest'
+        //         }
+        //     })
+        //     .then(response => response.json())
+        //     .then(result => {
+        //         if (result.status === 'success') {
+        //             employeeGrid.innerHTML = '';
+                    
+        //             if (result.employees.length === 0) {
+        //                 employeeGrid.innerHTML = '<p class="text-muted text-center">No employees found in this department</p>';
+        //                 return;
+        //             }
+                    
+        //             result.employees.forEach(employee => {
+        //                 const card = document.createElement('div');
+        //                 card.className = 'employee-card';
+        //                 card.innerHTML = `
+        //                     <i class="bi bi-person-circle"></i>
+        //                     <div class="employee-name">${employee.name}</div>
+        //                     <div class="employee-email">${employee.email}</div>
+        //                 `;
+                        
+        //                 // Store data as data attributes (including translated name)
+        //                 card.dataset.employeeId = employee.employee_id;
+        //                 card.dataset.employeeName = employee.name;
+        //                 card.dataset.employeeEmail = employee.email;
+        //                 card.dataset.deptCode = deptCode;
+        //                 card.dataset.deptName = deptName; // Translated name for display
+        //                 card.dataset.deptOriginalName = selectedDepartment.originalName; // Original for database
+                        
+        //                 card.addEventListener('click', function(e) {
+        //                     selectEmployeeFromCard(e.currentTarget);
+        //                 });
+                        
+        //                 employeeGrid.appendChild(card);
+        //             });
+        //         } else {
+        //             employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees</p>';
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error('Error loading employees:', error);
+        //         employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees. Please try again.</p>';
+        //     });
+        // }
+
+        // Updated: Handle department selection with translated names and employee storage
         function onDepartmentChange() {
             const select = document.getElementById('departmentSelect');
             const deptCode = select.value;
             const employeeSection = document.getElementById('employeeSection');
             const employeeGrid = document.getElementById('employeeGrid');
+            const employeeSearch = document.getElementById('employeeSearch');
+            const employeeCount = document.getElementById('employeeCount');
+            
+            // Reset search input and count
+            if (employeeSearch) {
+                employeeSearch.value = '';
+            }
+            if (employeeCount) {
+                employeeCount.textContent = '';
+            }
+            
+            // Clear stored employees
+            currentDepartmentEmployees = [];
             
             if (!deptCode) {
                 employeeSection.style.display = 'none';
@@ -1699,11 +1888,11 @@
             selectedDepartment = {
                 code: deptCode,
                 name: deptName,
-                originalName: deptObj ? deptObj.name : deptName // Keep original for database
+                originalName: deptObj ? deptObj.name : deptName
             };
             
             // Show loading indicator
-            employeeGrid.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+            employeeGrid.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted">Loading employees...</p></div>';
             employeeSection.style.display = 'block';
             
             // Fetch employees from database - FILTERED BY COMPANY
@@ -1716,36 +1905,19 @@
             .then(response => response.json())
             .then(result => {
                 if (result.status === 'success') {
-                    employeeGrid.innerHTML = '';
+                    // Store employees for filtering
+                    currentDepartmentEmployees = result.employees.map(emp => ({
+                        ...emp,
+                        deptCode: deptCode,
+                        deptName: deptName,
+                        deptOriginalName: selectedDepartment.originalName
+                    }));
                     
-                    if (result.employees.length === 0) {
-                        employeeGrid.innerHTML = '<p class="text-muted text-center">No employees found in this department</p>';
-                        return;
-                    }
+                    // Display all employees
+                    displayEmployees(currentDepartmentEmployees);
                     
-                    result.employees.forEach(employee => {
-                        const card = document.createElement('div');
-                        card.className = 'employee-card';
-                        card.innerHTML = `
-                            <i class="bi bi-person-circle"></i>
-                            <div class="employee-name">${employee.name}</div>
-                            <div class="employee-email">${employee.email}</div>
-                        `;
-                        
-                        // Store data as data attributes (including translated name)
-                        card.dataset.employeeId = employee.employee_id;
-                        card.dataset.employeeName = employee.name;
-                        card.dataset.employeeEmail = employee.email;
-                        card.dataset.deptCode = deptCode;
-                        card.dataset.deptName = deptName; // Translated name for display
-                        card.dataset.deptOriginalName = selectedDepartment.originalName; // Original for database
-                        
-                        card.addEventListener('click', function(e) {
-                            selectEmployeeFromCard(e.currentTarget);
-                        });
-                        
-                        employeeGrid.appendChild(card);
-                    });
+                    // Update employee count
+                    updateEmployeeCount(currentDepartmentEmployees.length, currentDepartmentEmployees.length);
                 } else {
                     employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees</p>';
                 }
@@ -1754,6 +1926,107 @@
                 console.error('Error loading employees:', error);
                 employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees. Please try again.</p>';
             });
+        }
+
+        // Function to display employees in the grid
+        function displayEmployees(employees) {
+            const employeeGrid = document.getElementById('employeeGrid');
+            employeeGrid.innerHTML = '';
+            
+            if (employees.length === 0) {
+                const noResultsText = translations[currentLanguage]?.noEmployeesFound || 'No employees found matching your search';
+                employeeGrid.innerHTML = `
+                    <div class="no-results-message">
+                        <i class="bi bi-search"></i>
+                        <p>${noResultsText}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            employees.forEach(employee => {
+                const card = document.createElement('div');
+                card.className = 'employee-card';
+                
+                // Check if this employee is currently selected
+                if (selectedHost && selectedHost.id === employee.employee_id) {
+                    card.classList.add('selected');
+                }
+                
+                card.innerHTML = `
+                    <i class="bi bi-person-circle"></i>
+                    <div class="employee-name">${employee.name}</div>
+                    <div class="employee-email">${employee.email}</div>
+                `;
+                
+                // Store data as data attributes
+                card.dataset.employeeId = employee.employee_id;
+                card.dataset.employeeName = employee.name;
+                card.dataset.employeeEmail = employee.email;
+                card.dataset.deptCode = employee.deptCode;
+                card.dataset.deptName = employee.deptName;
+                card.dataset.deptOriginalName = employee.deptOriginalName;
+                
+                card.addEventListener('click', function(e) {
+                    selectEmployeeFromCard(e.currentTarget);
+                });
+                
+                employeeGrid.appendChild(card);
+            });
+        }
+
+        // Function to filter employees based on search query
+        function filterEmployees(query) {
+            const searchTerm = query.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                // If search is empty, show all employees
+                displayEmployees(currentDepartmentEmployees);
+                updateEmployeeCount(currentDepartmentEmployees.length, currentDepartmentEmployees.length);
+                return;
+            }
+            
+            // Filter employees by name and email (case-insensitive)
+            const filteredEmployees = currentDepartmentEmployees.filter(employee => {
+                const name = employee.name.toLowerCase();
+                const email = employee.email.toLowerCase();
+                
+                // Search in both name and email
+                return name.includes(searchTerm) || email.includes(searchTerm);
+            });
+            
+            displayEmployees(filteredEmployees);
+            updateEmployeeCount(filteredEmployees.length, currentDepartmentEmployees.length);
+        }
+
+        function updateEmployeeCount(shown, total) {
+            const employeeCount = document.getElementById('employeeCount');
+            if (employeeCount) {
+                if (shown === total) {
+                    employeeCount.textContent = `${total} employee${total !== 1 ? 's' : ''} available`;
+                } else {
+                    employeeCount.textContent = `Showing ${shown} of ${total} employee${total !== 1 ? 's' : ''}`;
+                }
+            }
+        }
+
+        // Function to clear employee search
+        // function clearEmployeeSearch() {
+        //     const searchInput = document.getElementById('employeeSearch');
+        //     if (searchInput) {
+        //         searchInput.value = '';
+        //         filterEmployees('');
+        //         searchInput.focus();
+        //     }
+        // }
+
+        function clearEmployeeSearch() {
+            const searchInput = document.getElementById('employeeSearch');
+            if (searchInput) {
+                searchInput.value = '';
+                filterEmployees('');
+                searchInput.focus();
+            }
         }
 
         // // Select employee from card - receives the card DOM element
@@ -1808,6 +2081,100 @@
         // }
 
         // Updated: Select employee with translated department name
+        // function selectEmployeeFromCard(cardElement) {
+        //     if (!cardElement || !cardElement.classList) {
+        //         console.error('Invalid card element:', cardElement);
+        //         return;
+        //     }
+            
+        //     document.querySelectorAll('.employee-card').forEach(card => {
+        //         card.classList.remove('selected');
+        //     });
+            
+        //     cardElement.classList.add('selected');
+            
+        //     const employeeId = cardElement.dataset.employeeId;
+        //     const employeeName = cardElement.dataset.employeeName;
+        //     const employeeEmail = cardElement.dataset.employeeEmail;
+        //     const deptCode = cardElement.dataset.deptCode;
+        //     const deptName = cardElement.dataset.deptName; // Translated name
+        //     const deptOriginalName = cardElement.dataset.deptOriginalName; // Original name
+            
+        //     selectedHost = {
+        //         id: employeeId,
+        //         employeeId: employeeId,
+        //         name: employeeName,
+        //         email: employeeEmail,
+        //         department: deptName, // Use translated name for display
+        //         departmentOriginal: deptOriginalName, // Keep original for database
+        //         departmentCode: deptCode
+        //     };
+            
+        //     visitorData.host = selectedHost;
+            
+        //     // Update the display with translated department name
+        //     document.getElementById('selectedHost').innerHTML = `
+        //         <div class="d-flex align-items-center gap-3">
+        //             <i class="bi bi-person-circle" style="font-size: 2em;"></i>
+        //             <div>
+        //                 <div style="font-weight: 600;">${employeeName}</div>
+        //                 <div style="font-size: 0.9em; color: #7f8c8d;">${deptName}</div>
+        //             </div>
+        //         </div>
+        //     `;
+            
+        //     document.getElementById('hostNextBtn').disabled = false;
+        // }
+
+        // Updated: Select employee with translated department name (keep selection visible after filtering)
+        // function selectEmployeeFromCard(cardElement) {
+        //     if (!cardElement || !cardElement.classList) {
+        //         console.error('Invalid card element:', cardElement);
+        //         return;
+        //     }
+            
+        //     document.querySelectorAll('.employee-card').forEach(card => {
+        //         card.classList.remove('selected');
+        //     });
+            
+        //     cardElement.classList.add('selected');
+            
+        //     const employeeId = cardElement.dataset.employeeId;
+        //     const employeeName = cardElement.dataset.employeeName;
+        //     const employeeEmail = cardElement.dataset.employeeEmail;
+        //     const deptCode = cardElement.dataset.deptCode;
+        //     const deptName = cardElement.dataset.deptName;
+        //     const deptOriginalName = cardElement.dataset.deptOriginalName;
+            
+        //     selectedHost = {
+        //         id: employeeId,
+        //         employeeId: employeeId,
+        //         name: employeeName,
+        //         email: employeeEmail,
+        //         department: deptName,
+        //         departmentOriginal: deptOriginalName,
+        //         departmentCode: deptCode
+        //     };
+            
+        //     visitorData.host = selectedHost;
+            
+        //     // Update the display with translated department name
+        //     document.getElementById('selectedHost').innerHTML = `
+        //         <div class="d-flex align-items-center gap-3">
+        //             <i class="bi bi-person-circle" style="font-size: 2em;"></i>
+        //             <div>
+        //                 <div style="font-weight: 600;">${employeeName}</div>
+        //                 <div style="font-size: 0.9em; color: #7f8c8d;">${deptName}</div>
+        //             </div>
+        //         </div>
+        //     `;
+            
+        //     document.getElementById('hostNextBtn').disabled = false;
+            
+        //     // Clear search after selection (optional - comment out if you want to keep the search)
+        //     // clearEmployeeSearch();
+        // }
+
         function selectEmployeeFromCard(cardElement) {
             if (!cardElement || !cardElement.classList) {
                 console.error('Invalid card element:', cardElement);
@@ -1824,16 +2191,16 @@
             const employeeName = cardElement.dataset.employeeName;
             const employeeEmail = cardElement.dataset.employeeEmail;
             const deptCode = cardElement.dataset.deptCode;
-            const deptName = cardElement.dataset.deptName; // Translated name
-            const deptOriginalName = cardElement.dataset.deptOriginalName; // Original name
+            const deptName = cardElement.dataset.deptName;
+            const deptOriginalName = cardElement.dataset.deptOriginalName;
             
             selectedHost = {
                 id: employeeId,
                 employeeId: employeeId,
                 name: employeeName,
                 email: employeeEmail,
-                department: deptName, // Use translated name for display
-                departmentOriginal: deptOriginalName, // Keep original for database
+                department: deptName,
+                departmentOriginal: deptOriginalName,
                 departmentCode: deptCode
             };
             
@@ -1842,11 +2209,12 @@
             // Update the display with translated department name
             document.getElementById('selectedHost').innerHTML = `
                 <div class="d-flex align-items-center gap-3">
-                    <i class="bi bi-person-circle" style="font-size: 2em;"></i>
+                    <i class="bi bi-person-circle" style="font-size: 2em; color: #27ae60;"></i>
                     <div>
                         <div style="font-weight: 600;">${employeeName}</div>
                         <div style="font-size: 0.9em; color: #7f8c8d;">${deptName}</div>
                     </div>
+                    <i class="bi bi-check-circle-fill text-success ms-auto" style="font-size: 1.5em;"></i>
                 </div>
             `;
             
@@ -1854,10 +2222,34 @@
         }
 
         // Reset host selection
+        // function resetHostSelection() {
+        //     selectedHost = null;
+        //     document.getElementById('selectedHost').innerHTML = `
+        //         <span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>
+        //     `;
+        //     document.getElementById('hostNextBtn').disabled = true;
+        //     document.querySelectorAll('.employee-card').forEach(card => {
+        //         card.classList.remove('selected');
+        //     });
+        // }
+        
+        // Updated resetHostSelection to also clear search
         function resetHostSelection() {
             selectedHost = null;
+            currentDepartmentEmployees = [];
+            
+            const searchInput = document.getElementById('employeeSearch');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            
+            const employeeCount = document.getElementById('employeeCount');
+            if (employeeCount) {
+                employeeCount.textContent = '';
+            }
+            
             document.getElementById('selectedHost').innerHTML = `
-                <span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>
+                <span class="text-muted">${translations[currentLanguage]?.noSelection || 'No one selected yet'}</span>
             `;
             document.getElementById('hostNextBtn').disabled = true;
             document.querySelectorAll('.employee-card').forEach(card => {

@@ -1179,6 +1179,151 @@
                 height: 40px;
             }
         }
+
+        .employee-search-container {
+            position: relative;
+        }
+
+        .employee-search-container .input-group-text {
+            background: #f8f9fa;
+            border-right: none;
+        }
+
+        .employee-search-container .form-control {
+            border-left: none;
+        }
+
+        .employee-search-container .form-control:focus {
+            border-color: #ced4da;
+            box-shadow: none;
+        }
+
+        .employee-search-container .btn-outline-secondary {
+            border-left: none;
+            background: #fff;
+        }
+
+        .employee-search-container .btn-outline-secondary:hover {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .no-results-message {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Employee Search Styles */
+        .employee-search-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .employee-search-container .input-group {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .employee-search-container .input-group-text {
+            background: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-right: none;
+            color: #6c757d;
+            padding: 12px 15px;
+        }
+
+        .employee-search-container .form-control {
+            border: 1px solid #ced4da;
+            border-left: none;
+            border-right: none;
+            padding: 12px 15px;
+            font-size: 1rem;
+        }
+
+        .employee-search-container .form-control:focus {
+            border-color: #ced4da;
+            box-shadow: none;
+            outline: none;
+        }
+
+        .employee-search-container .form-control::placeholder {
+            color: #adb5bd;
+        }
+
+        .employee-search-container .btn-outline-secondary {
+            border: 1px solid #ced4da;
+            border-left: none;
+            background: #fff;
+            color: #6c757d;
+            padding: 12px 15px;
+            transition: all 0.2s ease;
+        }
+
+        .employee-search-container .btn-outline-secondary:hover {
+            background: #f8f9fa;
+            color: #495057;
+            border-color: #ced4da;
+        }
+
+        .employee-search-container .btn-outline-secondary:focus {
+            box-shadow: none;
+        }
+
+        /* No results message */
+        .no-results-message {
+            text-align: center;
+            padding: 30px 20px;
+            color: #6c757d;
+            font-style: italic;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .no-results-message i {
+            font-size: 2em;
+            display: block;
+            margin-bottom: 10px;
+            color: #adb5bd;
+        }
+
+        /* Employee count text */
+        #employeeCount {
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+
+        /* Highlight matching text in search results (optional enhancement) */
+        .employee-card .highlight {
+            background-color: #fff3cd;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        /* Animation for filtered results */
+        .employee-grid {
+            transition: opacity 0.2s ease;
+        }
+
+        .employee-grid.filtering {
+            opacity: 0.5;
+        }
+
+        /* Mobile responsiveness for search */
+        @media (max-width: 768px) {
+            .employee-search-container .input-group-text,
+            .employee-search-container .form-control,
+            .employee-search-container .btn-outline-secondary {
+                padding: 10px 12px;
+            }
+            
+            .employee-search-container .form-control {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
     </style>
 </head>
 <body>

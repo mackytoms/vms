@@ -115,6 +115,233 @@
         hr.my-3 {
             border-top: 2px solid #e0e0e0;
         }
+
+        /* ============================================
+        ADD THESE STYLES TO YOUR EXISTING <style> SECTION
+        ============================================ */
+
+        /* Filter Container Styles */
+        .filter-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .filter-container .form-label {
+            font-size: 0.85em;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .filter-container .form-label i {
+            margin-right: 5px;
+            color: var(--primary-color);
+        }
+
+        .filter-container .form-select {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .filter-container .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
+        }
+
+        .filter-container .btn {
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .filter-container .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+        }
+
+        .filter-container .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+        }
+
+        .filter-container .btn-secondary {
+            background: #6c757d;
+            border: none;
+        }
+
+        .filter-container .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        /* Filter Badge Counter */
+        .filter-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-color);
+            color: white;
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+
+        /* Active Filter Indicator */
+        .filter-active {
+            position: relative;
+        }
+
+        .filter-active::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 10px;
+            height: 10px;
+            background: var(--danger-color);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .filter-container .row {
+                gap: 10px;
+            }
+            
+            .filter-container .col-md-2,
+            .filter-container .col-md-3 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            .filter-container .btn {
+                margin-top: 5px;
+            }
+        }
+
+        /* Animation for filter results */
+        @keyframes filterFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #employeeTableBody tr,
+        #departmentTableBody tr,
+        #purposeTableBody tr {
+            animation: filterFadeIn 0.3s ease;
+        }
+
+        /* Filter Dropdown Hover Effects */
+        .filter-container .form-select option:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Quick Filter Pills (Optional Enhancement) */
+        .quick-filter-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #dee2e6;
+        }
+
+        .quick-filter-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-filter-pill:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .quick-filter-pill.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .quick-filter-pill i {
+            margin-right: 5px;
+        }
+
+        /* Icon Selector Styles */
+        .icon-select-wrapper {
+            position: relative;
+        }
+
+        .icon-select-wrapper .form-select {
+            padding-left: 40px;
+        }
+
+        .icon-select-preview {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .icon-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Custom dropdown for icons */
+        .icon-dropdown {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .icon-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .icon-dropdown-item:hover {
+            background: #f0f0f0;
+        }
+
+        .icon-dropdown-item i {
+            font-size: 1.3em;
+            width: 25px;
+            text-align: center;
+        }
+
+        .icon-dropdown-item.selected {
+            background: #e3f2fd;
+            font-weight: 500;
+        }
     </style>
 </head>
 
@@ -309,7 +536,7 @@
         </div>
 
         <!-- Employees Section -->
-        <div class="dashboard-content" id="employeesSection" style="display: none;">
+        <!-- <div class="dashboard-content" id="employeesSection" style="display: none;">
             <h1 class="page-title">Employee Directory</h1>
             <p class="page-subtitle">Manage employee records and host assignments</p>
             <div class="table-container">
@@ -335,7 +562,79 @@
                     <tbody id="employeeTableBody"></tbody>
                 </table>
             </div>
+        </div> -->
+
+        <!-- ============================================== -->
+        <!-- EMPLOYEES SECTION - Replace your existing one -->
+        <!-- ============================================== -->
+        <div class="dashboard-content" id="employeesSection" style="display: none;">
+            <h1 class="page-title">Employee Directory</h1>
+            <p class="page-subtitle">Manage employee records and host assignments</p>
+            <div class="table-container">
+                <div class="table-header">
+                    <h4>Employee List</h4>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                        <i class="bi bi-plus-circle"></i> Add Employee
+                    </button>
+                </div>
+                
+                <!-- Employee Filters -->
+                <div class="filter-container mb-3 p-3 bg-light rounded">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold"><i class="bi bi-building"></i> Department</label>
+                            <select class="form-select" id="employeeDeptFilter">
+                                <option value="">All Departments</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold"><i class="bi bi-toggle-on"></i> Status</label>
+                            <select class="form-select" id="employeeStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold"><i class="bi bi-briefcase"></i> Company</label>
+                            <select class="form-select" id="employeeCompanyFilter">
+                                <option value="">All Companies</option>
+                                <option value="Toms World">Tom's World</option>
+                                <option value="Pan Asia">Pan-Asia</option>
+                                <option value="Both">Both</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-secondary w-100" onclick="clearEmployeeFilters()">
+                                <i class="bi bi-x-circle"></i> Clear
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100" onclick="applyEmployeeFilters()">
+                                <i class="bi bi-funnel"></i> Apply
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <table class="table table-hover" id="employeeTable">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Total Visits Hosted</th>
+                            <th>Company</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeeTableBody"></tbody>
+                </table>
+            </div>
         </div>
+
 
         <!-- Departments Section -->
         <!-- <div class="dashboard-content" id="departmentsSection" style="display: none;">
@@ -391,7 +690,7 @@
         </div> -->
 
         <!-- Departments Section -->
-        <div class="dashboard-content" id="departmentsSection" style="display: none;">
+        <!-- <div class="dashboard-content" id="departmentsSection" style="display: none;">
             <h1 class="page-title">Department Management</h1>
             <p class="page-subtitle">Manage organizational departments</p>
             <div class="table-container">
@@ -416,9 +715,103 @@
                     <tbody id="departmentTableBody"></tbody>
                 </table>
             </div>
+        </div> -->
+
+        <!-- ============================================== -->
+        <!-- DEPARTMENTS SECTION - Replace your existing one -->
+        <!-- ============================================== -->
+        <div class="dashboard-content" id="departmentsSection" style="display: none;">
+            <h1 class="page-title">Department Management</h1>
+            <p class="page-subtitle">Manage organizational departments</p>
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="chart-title">All Departments</h3>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">
+                        <i class="bi bi-plus-circle"></i> Add Department
+                    </button>
+                </div>
+                
+                <!-- Department Filters -->
+                <div class="filter-container mb-3 p-3 bg-light rounded">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold"><i class="bi bi-toggle-on"></i> Status</label>
+                            <select class="form-select" id="departmentStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold"><i class="bi bi-people"></i> Has Employees</label>
+                            <select class="form-select" id="departmentEmployeeFilter">
+                                <option value="">All</option>
+                                <option value="yes">With Employees</option>
+                                <option value="no">No Employees</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-secondary w-100" onclick="clearDepartmentFilters()">
+                                <i class="bi bi-x-circle"></i> Clear Filters
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100" onclick="applyDepartmentFilters()">
+                                <i class="bi bi-funnel"></i> Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <table class="table table-hover" id="departmentTable">
+                    <thead>
+                        <tr>
+                            <th>Department Code</th>
+                            <th>Department Name</th>
+                            <th>Total Employees</th>
+                            <th>Total Visits</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="departmentTableBody"></tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Purposes Section -->
+        <!-- <div class="dashboard-content" id="purposesSection" style="display: none;">
+            <h1 class="page-title">Purpose Management</h1>
+            <p class="page-subtitle">Manage visit purpose types</p>
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="chart-title">All Visit Purposes</h3>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPurposeModal">
+                        <i class="bi bi-plus-circle"></i> Add Purpose
+                    </button>
+                </div>
+                <table class="table table-hover" id="purposeTable">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Purpose Code</th>
+                            <th>Purpose Name</th>
+                            <th>Icon</th>
+                            <th>Color</th>
+                            <th>Status</th>
+                            <th>Company</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purposeTableBody"></tbody>
+                </table>
+            </div>
+        </div> -->
+
+        <!-- ============================================== -->
+        <!-- PURPOSES SECTION - Replace your existing one -->
+        <!-- ============================================== -->
         <div class="dashboard-content" id="purposesSection" style="display: none;">
             <h1 class="page-title">Purpose Management</h1>
             <p class="page-subtitle">Manage visit purpose types</p>
@@ -429,6 +822,54 @@
                         <i class="bi bi-plus-circle"></i> Add Purpose
                     </button>
                 </div>
+                
+                <!-- Purpose Filters -->
+                <div class="filter-container mb-3 p-3 bg-light rounded">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold"><i class="bi bi-toggle-on"></i> Status</label>
+                            <select class="form-select" id="purposeStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold"><i class="bi bi-briefcase"></i> Company</label>
+                            <select class="form-select" id="purposeCompanyFilter">
+                                <option value="">All Companies</option>
+                                <option value="Toms World">Tom's World</option>
+                                <option value="Pan Asia">Pan-Asia</option>
+                                <option value="Both">Both</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold"><i class="bi bi-palette"></i> Color</label>
+                            <select class="form-select" id="purposeColorFilter">
+                                <option value="">All Colors</option>
+                                <option value="text-primary">Primary (Blue)</option>
+                                <option value="text-success">Success (Green)</option>
+                                <option value="text-warning">Warning (Orange)</option>
+                                <option value="text-danger">Danger (Red)</option>
+                                <option value="text-info">Info (Cyan)</option>
+                                <option value="text-secondary">Secondary (Gray)</option>
+                                <option value="text-dark">Dark</option>
+                                <option value="text-purple">Purple</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-secondary w-100" onclick="clearPurposeFilters()">
+                                <i class="bi bi-x-circle"></i> Clear
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100" onclick="applyPurposeFilters()">
+                                <i class="bi bi-funnel"></i> Apply
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
                 <table class="table table-hover" id="purposeTable">
                     <thead>
                         <tr>
@@ -846,7 +1287,7 @@
     </div> -->
 
     <!-- Add Purpose Modal - UPDATED WITH TRANSLATIONS -->
-    <div class="modal fade" id="addPurposeModal" tabindex="-1">
+    <!-- <div class="modal fade" id="addPurposeModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header <?php echo $modalHeaderClass; ?>">
@@ -885,6 +1326,117 @@
                                     <option value="text-dark">Dark</option>
                                     <option value="text-purple">Purple</option>
                                 </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Company Ownership</label>
+                                <select class="form-select" name="company_owned_by">
+                                    <option value="Both">Both Companies</option>
+                                    <option value="Toms World">Tom's World Only</option>
+                                    <option value="Pan Asia">Pan-Asia Only</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="is_active" id="purposeActiveCheck" checked>
+                                    <label class="form-check-label" for="purposeActiveCheck">Active Purpose</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-3">
+                        <h6 class="mb-3"><i class="bi bi-translate"></i> Translations (Optional)</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇬🇧 English</label>
+                                <input type="text" class="form-control" name="name_en" placeholder="English translation">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇹🇼 Traditional Chinese</label>
+                                <input type="text" class="form-control" name="name_zh_tw" placeholder="繁體中文">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇨🇳 Simplified Chinese</label>
+                                <input type="text" class="form-control" name="name_zh_cn" placeholder="简体中文">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇵🇭 Filipino</label>
+                                <input type="text" class="form-control" name="name_fil" placeholder="Filipino translation">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇯🇵 Japanese</label>
+                                <input type="text" class="form-control" name="name_ja" placeholder="日本語">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save Purpose</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Add Purpose Modal - WITH ICON DROPDOWN -->
+    <div class="modal fade" id="addPurposeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
+                    <h5 class="modal-title"><i class="bi bi-flag-fill"></i> Add New Purpose</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addPurposeForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Purpose Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="purpose_code" placeholder="e.g., meeting, interview" required maxlength="20">
+                                <small class="text-muted">Unique identifier (lowercase, no spaces)</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Purpose Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="purpose_name" placeholder="e.g., Meeting, Interview" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><i class="bi bi-icons"></i> Icon</label>
+                                <div class="icon-select-wrapper">
+                                    <i class="icon-select-preview bi bi-circle" id="addIconPreview"></i>
+                                    <select class="form-select" name="icon_class" id="addIconSelect" onchange="updateIconPreview('add')">
+                                        <!-- Options will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <small class="text-muted">Select an icon for this purpose</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Color Class</label>
+                                <select class="form-select" name="color_class" id="addColorSelect" onchange="updateColorPreview('add')">
+                                    <option value="text-primary">Primary (Blue)</option>
+                                    <option value="text-success">Success (Green)</option>
+                                    <option value="text-warning">Warning (Orange)</option>
+                                    <option value="text-danger">Danger (Red)</option>
+                                    <option value="text-info">Info (Cyan)</option>
+                                    <option value="text-secondary">Secondary (Gray)</option>
+                                    <option value="text-dark">Dark</option>
+                                    <option value="text-purple">Purple</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Icon Preview -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Preview</label>
+                                <div class="p-3 bg-light rounded text-center">
+                                    <i id="addPurposeIconPreviewLarge" class="bi bi-circle text-primary" style="font-size: 3em;"></i>
+                                    <p class="mt-2 mb-0" id="addPurposePreviewText">Purpose Preview</p>
+                                </div>
                             </div>
                         </div>
                         
@@ -1002,7 +1554,7 @@
     </div> -->
 
     <!-- Edit Purpose Modal - UPDATED WITH TRANSLATIONS -->
-    <div class="modal fade" id="editPurposeModal" tabindex="-1">
+    <!-- <div class="modal fade" id="editPurposeModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header <?php echo $modalHeaderClass; ?>">
@@ -1042,6 +1594,118 @@
                                     <option value="text-dark">Dark</option>
                                     <option value="text-purple">Purple</option>
                                 </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Company Ownership</label>
+                                <select class="form-select" name="company_owned_by" id="editPurposeCompanyOwnedBy">
+                                    <option value="Both">Both Companies</option>
+                                    <option value="Toms World">Tom's World Only</option>
+                                    <option value="Pan Asia">Pan-Asia Only</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="is_active" id="editPurposeActiveCheck">
+                                    <label class="form-check-label" for="editPurposeActiveCheck">Active Purpose</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-3">
+                        <h6 class="mb-3"><i class="bi bi-translate"></i> Translations (Optional)</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇬🇧 English</label>
+                                <input type="text" class="form-control" name="name_en" id="editPurposeNameEn">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇹🇼 Traditional Chinese</label>
+                                <input type="text" class="form-control" name="name_zh_tw" id="editPurposeNameZhTw">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇨🇳 Simplified Chinese</label>
+                                <input type="text" class="form-control" name="name_zh_cn" id="editPurposeNameZhCn">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇵🇭 Filipino</label>
+                                <input type="text" class="form-control" name="name_fil" id="editPurposeNameFil">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🇯🇵 Japanese</label>
+                                <input type="text" class="form-control" name="name_ja" id="editPurposeNameJa">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Update Purpose</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Edit Purpose Modal - WITH ICON DROPDOWN -->
+    <div class="modal fade" id="editPurposeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Purpose</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editPurposeForm">
+                    <input type="hidden" name="purpose_id" id="editPurposeId">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Purpose Code</label>
+                                <input type="text" class="form-control" name="purpose_code" id="editPurposeCode" readonly>
+                                <small class="text-muted">Purpose code cannot be changed</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Purpose Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="purpose_name" id="editPurposeName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><i class="bi bi-icons"></i> Icon</label>
+                                <div class="icon-select-wrapper">
+                                    <i class="icon-select-preview bi bi-circle" id="editIconPreview"></i>
+                                    <select class="form-select" name="icon_class" id="editIconSelect" onchange="updateIconPreview('edit')">
+                                        <!-- Options will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <small class="text-muted">Select an icon for this purpose</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Color Class</label>
+                                <select class="form-select" name="color_class" id="editColorSelect" onchange="updateColorPreview('edit')">
+                                    <option value="text-primary">Primary (Blue)</option>
+                                    <option value="text-success">Success (Green)</option>
+                                    <option value="text-warning">Warning (Orange)</option>
+                                    <option value="text-danger">Danger (Red)</option>
+                                    <option value="text-info">Info (Cyan)</option>
+                                    <option value="text-secondary">Secondary (Gray)</option>
+                                    <option value="text-dark">Dark</option>
+                                    <option value="text-purple">Purple</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Icon Preview -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Preview</label>
+                                <div class="p-3 bg-light rounded text-center">
+                                    <i id="editPurposeIconPreviewLarge" class="bi bi-circle text-primary" style="font-size: 3em;"></i>
+                                    <p class="mt-2 mb-0" id="editPurposePreviewText">Purpose Preview</p>
+                                </div>
                             </div>
                         </div>
                         
@@ -1226,6 +1890,205 @@
         let dataTableInstances = {};
         let purposesMap = {};
         let lastAlertId = 0;
+
+        // ============================================
+        // ADD THESE VARIABLES AT THE TOP WITH YOUR OTHER VARIABLES
+        // ============================================
+        let allEmployeesData = [];
+        let allDepartmentsData = [];
+        let allPurposesData = [];        
+
+
+        // Bootstrap Icons List for Purpose Selection
+        const bootstrapIconsList = [
+            // General Purpose Icons
+            { value: 'bi-circle', label: 'Circle (Default)', category: 'General' },
+            { value: 'bi-check-circle', label: 'Check Circle', category: 'General' },
+            { value: 'bi-x-circle', label: 'X Circle', category: 'General' },
+            { value: 'bi-info-circle', label: 'Info Circle', category: 'General' },
+            { value: 'bi-question-circle', label: 'Question Circle', category: 'General' },
+            { value: 'bi-exclamation-circle', label: 'Exclamation Circle', category: 'General' },
+            
+            // People & Business
+            { value: 'bi-people', label: 'People / Group', category: 'People' },
+            { value: 'bi-people-fill', label: 'People Filled', category: 'People' },
+            { value: 'bi-person', label: 'Person', category: 'People' },
+            { value: 'bi-person-fill', label: 'Person Filled', category: 'People' },
+            { value: 'bi-person-check', label: 'Person Check', category: 'People' },
+            { value: 'bi-person-badge', label: 'Person Badge', category: 'People' },
+            { value: 'bi-person-workspace', label: 'Person Workspace', category: 'People' },
+            { value: 'bi-person-video', label: 'Person Video', category: 'People' },
+            { value: 'bi-person-lines-fill', label: 'Person Lines', category: 'People' },
+            
+            // Business & Work
+            { value: 'bi-briefcase', label: 'Briefcase', category: 'Business' },
+            { value: 'bi-briefcase-fill', label: 'Briefcase Filled', category: 'Business' },
+            { value: 'bi-building', label: 'Building', category: 'Business' },
+            { value: 'bi-building-fill', label: 'Building Filled', category: 'Business' },
+            { value: 'bi-shop', label: 'Shop', category: 'Business' },
+            { value: 'bi-shop-window', label: 'Shop Window', category: 'Business' },
+            { value: 'bi-cart', label: 'Cart', category: 'Business' },
+            { value: 'bi-cart-fill', label: 'Cart Filled', category: 'Business' },
+            { value: 'bi-cash', label: 'Cash', category: 'Business' },
+            { value: 'bi-cash-stack', label: 'Cash Stack', category: 'Business' },
+            { value: 'bi-credit-card', label: 'Credit Card', category: 'Business' },
+            { value: 'bi-wallet', label: 'Wallet', category: 'Business' },
+            { value: 'bi-bank', label: 'Bank', category: 'Business' },
+            
+            // Communication
+            { value: 'bi-chat', label: 'Chat', category: 'Communication' },
+            { value: 'bi-chat-dots', label: 'Chat Dots', category: 'Communication' },
+            { value: 'bi-chat-left-text', label: 'Chat Text', category: 'Communication' },
+            { value: 'bi-telephone', label: 'Telephone', category: 'Communication' },
+            { value: 'bi-telephone-fill', label: 'Telephone Filled', category: 'Communication' },
+            { value: 'bi-envelope', label: 'Envelope', category: 'Communication' },
+            { value: 'bi-envelope-fill', label: 'Envelope Filled', category: 'Communication' },
+            { value: 'bi-megaphone', label: 'Megaphone', category: 'Communication' },
+            { value: 'bi-broadcast', label: 'Broadcast', category: 'Communication' },
+            
+            // Meeting & Events
+            { value: 'bi-calendar', label: 'Calendar', category: 'Events' },
+            { value: 'bi-calendar-check', label: 'Calendar Check', category: 'Events' },
+            { value: 'bi-calendar-event', label: 'Calendar Event', category: 'Events' },
+            { value: 'bi-calendar-date', label: 'Calendar Date', category: 'Events' },
+            { value: 'bi-clock', label: 'Clock', category: 'Events' },
+            { value: 'bi-clock-fill', label: 'Clock Filled', category: 'Events' },
+            { value: 'bi-alarm', label: 'Alarm', category: 'Events' },
+            { value: 'bi-hourglass', label: 'Hourglass', category: 'Events' },
+            { value: 'bi-hourglass-split', label: 'Hourglass Split', category: 'Events' },
+            
+            // Documents & Files
+            { value: 'bi-file-text', label: 'File Text', category: 'Documents' },
+            { value: 'bi-file-earmark', label: 'File Earmark', category: 'Documents' },
+            { value: 'bi-file-earmark-text', label: 'File Earmark Text', category: 'Documents' },
+            { value: 'bi-clipboard', label: 'Clipboard', category: 'Documents' },
+            { value: 'bi-clipboard-check', label: 'Clipboard Check', category: 'Documents' },
+            { value: 'bi-clipboard-data', label: 'Clipboard Data', category: 'Documents' },
+            { value: 'bi-journal', label: 'Journal', category: 'Documents' },
+            { value: 'bi-book', label: 'Book', category: 'Documents' },
+            { value: 'bi-folder', label: 'Folder', category: 'Documents' },
+            { value: 'bi-folder-fill', label: 'Folder Filled', category: 'Documents' },
+            
+            // Technical & Tools
+            { value: 'bi-gear', label: 'Gear / Settings', category: 'Technical' },
+            { value: 'bi-gear-fill', label: 'Gear Filled', category: 'Technical' },
+            { value: 'bi-tools', label: 'Tools', category: 'Technical' },
+            { value: 'bi-wrench', label: 'Wrench', category: 'Technical' },
+            { value: 'bi-hammer', label: 'Hammer', category: 'Technical' },
+            { value: 'bi-screwdriver', label: 'Screwdriver', category: 'Technical' },
+            { value: 'bi-pc-display', label: 'PC Display', category: 'Technical' },
+            { value: 'bi-laptop', label: 'Laptop', category: 'Technical' },
+            { value: 'bi-printer', label: 'Printer', category: 'Technical' },
+            { value: 'bi-cpu', label: 'CPU', category: 'Technical' },
+            { value: 'bi-server', label: 'Server', category: 'Technical' },
+            
+            // Delivery & Logistics
+            { value: 'bi-truck', label: 'Truck / Delivery', category: 'Delivery' },
+            { value: 'bi-box', label: 'Box / Package', category: 'Delivery' },
+            { value: 'bi-box-seam', label: 'Box Seam', category: 'Delivery' },
+            { value: 'bi-boxes', label: 'Boxes', category: 'Delivery' },
+            { value: 'bi-archive', label: 'Archive', category: 'Delivery' },
+            { value: 'bi-send', label: 'Send', category: 'Delivery' },
+            
+            // Security & Safety
+            { value: 'bi-shield', label: 'Shield', category: 'Security' },
+            { value: 'bi-shield-check', label: 'Shield Check', category: 'Security' },
+            { value: 'bi-shield-lock', label: 'Shield Lock', category: 'Security' },
+            { value: 'bi-lock', label: 'Lock', category: 'Security' },
+            { value: 'bi-unlock', label: 'Unlock', category: 'Security' },
+            { value: 'bi-key', label: 'Key', category: 'Security' },
+            { value: 'bi-eye', label: 'Eye', category: 'Security' },
+            { value: 'bi-eye-slash', label: 'Eye Slash', category: 'Security' },
+            
+            // Education & Training
+            { value: 'bi-mortarboard', label: 'Graduation Cap', category: 'Education' },
+            { value: 'bi-award', label: 'Award', category: 'Education' },
+            { value: 'bi-trophy', label: 'Trophy', category: 'Education' },
+            { value: 'bi-lightbulb', label: 'Lightbulb / Idea', category: 'Education' },
+            { value: 'bi-lightbulb-fill', label: 'Lightbulb Filled', category: 'Education' },
+            { value: 'bi-puzzle', label: 'Puzzle', category: 'Education' },
+            
+            // Medical & Health
+            { value: 'bi-heart', label: 'Heart', category: 'Medical' },
+            { value: 'bi-heart-fill', label: 'Heart Filled', category: 'Medical' },
+            { value: 'bi-heart-pulse', label: 'Heart Pulse', category: 'Medical' },
+            { value: 'bi-hospital', label: 'Hospital', category: 'Medical' },
+            { value: 'bi-bandaid', label: 'Bandaid', category: 'Medical' },
+            { value: 'bi-capsule', label: 'Capsule', category: 'Medical' },
+            { value: 'bi-thermometer', label: 'Thermometer', category: 'Medical' },
+            
+            // Food & Dining
+            { value: 'bi-cup-hot', label: 'Coffee / Hot Cup', category: 'Food' },
+            { value: 'bi-cup-straw', label: 'Cup with Straw', category: 'Food' },
+            { value: 'bi-egg-fried', label: 'Food / Meal', category: 'Food' },
+            
+            // Flags & Status
+            { value: 'bi-flag', label: 'Flag', category: 'Flags' },
+            { value: 'bi-flag-fill', label: 'Flag Filled', category: 'Flags' },
+            { value: 'bi-bookmark', label: 'Bookmark', category: 'Flags' },
+            { value: 'bi-bookmark-fill', label: 'Bookmark Filled', category: 'Flags' },
+            { value: 'bi-star', label: 'Star', category: 'Flags' },
+            { value: 'bi-star-fill', label: 'Star Filled', category: 'Flags' },
+            { value: 'bi-pin', label: 'Pin', category: 'Flags' },
+            { value: 'bi-pin-fill', label: 'Pin Filled', category: 'Flags' },
+            
+            // Actions
+            { value: 'bi-check', label: 'Check', category: 'Actions' },
+            { value: 'bi-check2', label: 'Check 2', category: 'Actions' },
+            { value: 'bi-check-lg', label: 'Check Large', category: 'Actions' },
+            { value: 'bi-plus', label: 'Plus', category: 'Actions' },
+            { value: 'bi-plus-circle', label: 'Plus Circle', category: 'Actions' },
+            { value: 'bi-dash', label: 'Dash', category: 'Actions' },
+            { value: 'bi-x', label: 'X', category: 'Actions' },
+            { value: 'bi-arrow-right', label: 'Arrow Right', category: 'Actions' },
+            { value: 'bi-arrow-left', label: 'Arrow Left', category: 'Actions' },
+            { value: 'bi-box-arrow-in-right', label: 'Box Arrow In', category: 'Actions' },
+            { value: 'bi-box-arrow-right', label: 'Box Arrow Out', category: 'Actions' },
+            
+            // Misc
+            { value: 'bi-house', label: 'House / Home', category: 'Misc' },
+            { value: 'bi-house-fill', label: 'House Filled', category: 'Misc' },
+            { value: 'bi-geo-alt', label: 'Location Pin', category: 'Misc' },
+            { value: 'bi-geo-alt-fill', label: 'Location Pin Filled', category: 'Misc' },
+            { value: 'bi-map', label: 'Map', category: 'Misc' },
+            { value: 'bi-compass', label: 'Compass', category: 'Misc' },
+            { value: 'bi-bell', label: 'Bell', category: 'Misc' },
+            { value: 'bi-bell-fill', label: 'Bell Filled', category: 'Misc' },
+            { value: 'bi-camera', label: 'Camera', category: 'Misc' },
+            { value: 'bi-camera-video', label: 'Video Camera', category: 'Misc' },
+            { value: 'bi-image', label: 'Image', category: 'Misc' },
+            { value: 'bi-mic', label: 'Microphone', category: 'Misc' },
+            { value: 'bi-music-note', label: 'Music Note', category: 'Misc' },
+            { value: 'bi-film', label: 'Film', category: 'Misc' },
+            { value: 'bi-gift', label: 'Gift', category: 'Misc' },
+            { value: 'bi-balloon', label: 'Balloon', category: 'Misc' },
+            { value: 'bi-emoji-smile', label: 'Smile', category: 'Misc' },
+            { value: 'bi-hand-thumbs-up', label: 'Thumbs Up', category: 'Misc' },
+            { value: 'bi-hand-thumbs-down', label: 'Thumbs Down', category: 'Misc' },
+            { value: 'bi-handshake', label: 'Handshake', category: 'Misc' },
+        ];
+
+
+        // Initialize Icon Dropdowns
+        function initIconDropdowns() {
+            populateIconSelect('addIconSelect');
+            populateIconSelect('editIconSelect');
+        }
+
+        // ============================================
+        // HELPER FUNCTION FOR FILTER RESULT TOAST
+        // (Add this BEFORE the filter functions so it's available)
+        // ============================================
+        function showFilterResultToast(module, filtered, total) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: `Showing ${filtered} of ${total} ${module.toLowerCase()}s`,
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('collapsed');
@@ -1432,47 +2295,181 @@
         //         .catch(e => console.error('Error loading employees:', e));
         // }
 
+        // function loadEmployees() {
+        //     loadDepartmentsForSelect();
+        //     fetch(ajaxUrl + '?action=employees' + filterParam)
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             initDataTable('employeeTable', data, (e) => {
+        //                 const canEdit = canEditEmployee(e.company_owned_by);
+                        
+        //                 return `
+        //                     <td>${e.employee_id}</td>
+        //                     <td><strong>${e.name}</strong></td>
+        //                     <td>${e.email}</td>
+        //                     <td>${e.department_name}</td>
+        //                     <td>
+        //                         <span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                             style="cursor: pointer;" 
+        //                             onclick="toggleEmployeeStatus('${e.employee_id}', ${e.is_active}, '${e.name.replace(/'/g, "\\'")}')" 
+        //                             title="Click to ${e.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                             ${e.is_active == 1 ? 'Active' : 'Inactive'}
+        //                         </span>
+        //                     </td>
+        //                     <td>
+        //                         ${e.total_visits || 0}
+        //                         ${e.total_visits > 0 ? `<button class="btn btn-sm btn-link" onclick="viewEmployeeHistory('${e.employee_id}', '${e.name}')" title="View History"><i class="bi bi-clock-history"></i></button>` : ''}
+        //                     </td>
+        //                     <td>
+        //                         <span class="badge ${getCompanyOwnershipBadge(e.company_owned_by)}">
+        //                             ${e.company_owned_by}
+        //                         </span>
+        //                     </td>
+        //                     <td>
+        //                         ${canEdit ? `
+        //                             <button class="action-btn edit" onclick="editEmployee('${e.employee_id}')" title="Edit Employee">
+        //                                 <i class="bi bi-pencil-square"></i>
+        //                             </button>
+        //                         ` : ''}
+        //                     </td>
+        //                 `;
+        //             });
+        //         })
+        //         .catch(e => console.error('Error loading employees:', e));
+        // }
+
+        // ============================================
+        // EMPLOYEE FILTER FUNCTIONS
+        // ============================================
+
         function loadEmployees() {
             loadDepartmentsForSelect();
+            loadDepartmentsForEmployeeFilter(); // Load departments for filter dropdown
+            
             fetch(ajaxUrl + '?action=employees' + filterParam)
                 .then(r => r.json())
                 .then(data => {
-                    initDataTable('employeeTable', data, (e) => {
-                        const canEdit = canEditEmployee(e.company_owned_by);
-                        
-                        return `
-                            <td>${e.employee_id}</td>
-                            <td><strong>${e.name}</strong></td>
-                            <td>${e.email}</td>
-                            <td>${e.department_name}</td>
-                            <td>
-                                <span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
-                                    style="cursor: pointer;" 
-                                    onclick="toggleEmployeeStatus('${e.employee_id}', ${e.is_active}, '${e.name.replace(/'/g, "\\'")}')" 
-                                    title="Click to ${e.is_active == 1 ? 'deactivate' : 'activate'}">
-                                    ${e.is_active == 1 ? 'Active' : 'Inactive'}
-                                </span>
-                            </td>
-                            <td>
-                                ${e.total_visits || 0}
-                                ${e.total_visits > 0 ? `<button class="btn btn-sm btn-link" onclick="viewEmployeeHistory('${e.employee_id}', '${e.name}')" title="View History"><i class="bi bi-clock-history"></i></button>` : ''}
-                            </td>
-                            <td>
-                                <span class="badge ${getCompanyOwnershipBadge(e.company_owned_by)}">
-                                    ${e.company_owned_by}
-                                </span>
-                            </td>
-                            <td>
-                                ${canEdit ? `
-                                    <button class="action-btn edit" onclick="editEmployee('${e.employee_id}')" title="Edit Employee">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                ` : ''}
-                            </td>
-                        `;
-                    });
+                    allEmployeesData = data; // Store all data
+                    renderEmployeeTable(data);
                 })
                 .catch(e => console.error('Error loading employees:', e));
+        }
+
+        function loadDepartmentsForEmployeeFilter() {
+            fetch(ajaxUrl + '?action=departments')
+                .then(r => r.json())
+                .then(data => {
+                    const select = document.getElementById('employeeDeptFilter');
+                    select.innerHTML = '<option value="">All Departments</option>';
+                    // Filter to only show active departments
+                    data.filter(d => d.is_active == 1).forEach(d => {
+                        select.innerHTML += `<option value="${d.department_code}">${d.name}</option>`;
+                    });
+                });
+        }
+
+        // function renderEmployeeTable(data) {
+        //     initDataTable('employeeTable', data, (e) => {
+        //         const canEdit = canEditEmployee(e.company_owned_by);
+                
+        //         return `
+        //             <td>${e.employee_id}</td>
+        //             <td><strong>${e.name}</strong></td>
+        //             <td>${e.email}</td>
+        //             <td>${e.department_name}</td>
+        //             <td>
+        //                 <span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                     style="cursor: pointer;" 
+        //                     onclick="toggleEmployeeStatus('${e.employee_id}', ${e.is_active}, '${e.name.replace(/'/g, "\\'")}')" 
+        //                     title="Click to ${e.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                     ${e.is_active == 1 ? 'Active' : 'Inactive'}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 ${e.total_visits || 0}
+        //                 ${e.total_visits > 0 ? `<button class="btn btn-sm btn-link" onclick="viewEmployeeHistory('${e.employee_id}', '${e.name}')" title="View History"><i class="bi bi-clock-history"></i></button>` : ''}
+        //             </td>
+        //             <td>
+        //                 <span class="badge ${getCompanyOwnershipBadge(e.company_owned_by)}">
+        //                     ${e.company_owned_by}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 ${canEdit ? `
+        //                     <button class="action-btn edit" onclick="editEmployee('${e.employee_id}')" title="Edit Employee">
+        //                         <i class="bi bi-pencil-square"></i>
+        //                     </button>
+        //                 ` : ''}
+        //             </td>
+        //         `;
+        //     });
+        // }
+
+        // function applyEmployeeFilters() {
+        //     const deptFilter = document.getElementById('employeeDeptFilter').value;
+        //     const statusFilter = document.getElementById('employeeStatusFilter').value;
+        //     const companyFilterValue = document.getElementById('employeeCompanyFilter').value;
+            
+        //     if (!allEmployeesData || allEmployeesData.length === 0) {
+        //         Swal.fire({
+        //             toast: true,
+        //             position: 'top-end',
+        //             icon: 'warning',
+        //             title: 'No data to filter. Please wait for data to load.',
+        //             showConfirmButton: false,
+        //             timer: 2000
+        //         });
+        //         return;
+        //     }
+            
+        //     let filteredData = allEmployeesData.filter(e => {
+        //         let matchDept = deptFilter === '' || e.department_code === deptFilter;
+        //         let matchStatus = statusFilter === '' || String(e.is_active) === statusFilter;
+        //         let matchCompany = companyFilterValue === '' || e.company_owned_by === companyFilterValue;
+                
+        //         return matchDept && matchStatus && matchCompany;
+        //     });
+            
+        //     renderEmployeeTable(filteredData);
+        //     showFilterResultToast('Employee', filteredData.length, allEmployeesData.length);
+        // }
+
+        function applyEmployeeFilters() {
+            const deptFilter = document.getElementById('employeeDeptFilter').value;
+            const statusFilter = document.getElementById('employeeStatusFilter').value;
+            const companyFilterValue = document.getElementById('employeeCompanyFilter').value;
+            
+            console.log('Applying employee filters:', { deptFilter, statusFilter, companyFilterValue });
+            
+            if (!allEmployeesData || allEmployeesData.length === 0) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'No data to filter. Please wait for data to load.',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                return;
+            }
+            
+            let filteredData = allEmployeesData.filter(e => {
+                // Department filter
+                let matchDept = deptFilter === '' || e.department_code === deptFilter;
+                
+                // Status filter - compare as strings since select values are strings
+                let matchStatus = statusFilter === '' || String(e.is_active) === statusFilter;
+                
+                // Company filter
+                let matchCompany = companyFilterValue === '' || e.company_owned_by === companyFilterValue;
+                
+                return matchDept && matchStatus && matchCompany;
+            });
+            
+            console.log('Filtered employees:', filteredData.length, 'of', allEmployeesData.length);
+            
+            renderEmployeeTable(filteredData);
+            showFilterResultToast('Employee', filteredData.length, allEmployeesData.length);
         }
 
         function canEditEmployee(companyOwnedBy) {
@@ -1519,15 +2516,32 @@
                 });
         }
 
+        // function loadDepartmentsForEditSelect(selectedDeptCode) {
+        //     fetch(ajaxUrl + '?action=departments')
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             const select = document.getElementById('editEmployeeDepartment');
+        //             select.innerHTML = '<option value="">Select Department</option>';
+        //             data.forEach(d => {
+        //                 const selected = d.department_code === selectedDeptCode ? 'selected' : '';
+        //                 select.innerHTML += `<option value="${d.department_code}" ${selected}>${d.name}</option>`;
+        //             });
+        //         });
+        // }
+
         function loadDepartmentsForEditSelect(selectedDeptCode) {
             fetch(ajaxUrl + '?action=departments')
                 .then(r => r.json())
                 .then(data => {
                     const select = document.getElementById('editEmployeeDepartment');
                     select.innerHTML = '<option value="">Select Department</option>';
+                    // Filter to only show active departments (but keep selected if it's inactive)
                     data.forEach(d => {
-                        const selected = d.department_code === selectedDeptCode ? 'selected' : '';
-                        select.innerHTML += `<option value="${d.department_code}" ${selected}>${d.name}</option>`;
+                        if (d.is_active == 1 || d.department_code === selectedDeptCode) {
+                            const selected = d.department_code === selectedDeptCode ? 'selected' : '';
+                            const inactiveLabel = d.is_active != 1 ? ' (Inactive)' : '';
+                            select.innerHTML += `<option value="${d.department_code}" ${selected}>${d.name}${inactiveLabel}</option>`;
+                        }
                     });
                 });
         }
@@ -1654,36 +2668,491 @@
         //         .catch(e => console.error('Error loading departments:', e));
         // }
 
+        // function loadDepartments() {
+        //     fetch(ajaxUrl + '?action=departments')
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             initDataTable('departmentTable', data, (d) => `
+        //                 <td><span class="badge bg-secondary">${d.department_code}</span></td>
+        //                 <td><strong>${d.name}</strong></td>
+        //                 <td>
+        //                     ${d.employee_count || 0}
+        //                     ${d.employee_count > 0 ? `<button class="btn btn-sm btn-link" onclick="viewDepartmentEmployees('${d.department_code}', '${d.name}')" title="View Employees"><i class="bi bi-people-fill"></i></button>` : ''}
+        //                 </td>
+        //                 <td>${d.visit_count || 0}</td>
+        //                 <td>
+        //                     <span class="badge ${d.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                         style="cursor: pointer;" 
+        //                         onclick="toggleDepartmentStatus('${d.department_code}', ${d.is_active}, '${d.name.replace(/'/g, "\\'")}')" 
+        //                         title="Click to ${d.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                         ${d.is_active == 1 ? 'Active' : 'Inactive'}
+        //                     </span>
+        //                 </td>
+        //                 <td>${d.created_at || 'N/A'}</td>
+        //                 <td>
+        //                     <button class="action-btn edit" onclick="editDepartment('${d.department_code}')" title="Edit Department">
+        //                         <i class="bi bi-pencil-square"></i>
+        //                     </button>
+        //                 </td>
+        //             `);
+        //         })
+        //         .catch(e => console.error('Error loading departments:', e));
+        // }
+
+        // ============================================
+        // DEPARTMENT FILTER FUNCTIONS
+        // ============================================
+
         function loadDepartments() {
             fetch(ajaxUrl + '?action=departments')
                 .then(r => r.json())
                 .then(data => {
-                    initDataTable('departmentTable', data, (d) => `
-                        <td><span class="badge bg-secondary">${d.department_code}</span></td>
-                        <td><strong>${d.name}</strong></td>
-                        <td>
-                            ${d.employee_count || 0}
-                            ${d.employee_count > 0 ? `<button class="btn btn-sm btn-link" onclick="viewDepartmentEmployees('${d.department_code}', '${d.name}')" title="View Employees"><i class="bi bi-people-fill"></i></button>` : ''}
-                        </td>
-                        <td>${d.visit_count || 0}</td>
-                        <td>
-                            <span class="badge ${d.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
-                                style="cursor: pointer;" 
-                                onclick="toggleDepartmentStatus('${d.department_code}', ${d.is_active}, '${d.name.replace(/'/g, "\\'")}')" 
-                                title="Click to ${d.is_active == 1 ? 'deactivate' : 'activate'}">
-                                ${d.is_active == 1 ? 'Active' : 'Inactive'}
-                            </span>
-                        </td>
-                        <td>${d.created_at || 'N/A'}</td>
-                        <td>
-                            <button class="action-btn edit" onclick="editDepartment('${d.department_code}')" title="Edit Department">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-                        </td>
-                    `);
+                    allDepartmentsData = data; // Store all data
+                    renderDepartmentTable(data);
                 })
                 .catch(e => console.error('Error loading departments:', e));
         }
+
+        // function renderDepartmentTable(data) {
+        //     initDataTable('departmentTable', data, (d) => `
+        //         <td><span class="badge bg-secondary">${d.department_code}</span></td>
+        //         <td><strong>${d.name}</strong></td>
+        //         <td>
+        //             ${d.employee_count || 0}
+        //             ${d.employee_count > 0 ? `<button class="btn btn-sm btn-link" onclick="viewDepartmentEmployees('${d.department_code}', '${d.name}')" title="View Employees"><i class="bi bi-people-fill"></i></button>` : ''}
+        //         </td>
+        //         <td>${d.visit_count || 0}</td>
+        //         <td>
+        //             <span class="badge ${d.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                 style="cursor: pointer;" 
+        //                 onclick="toggleDepartmentStatus('${d.department_code}', ${d.is_active}, '${d.name.replace(/'/g, "\\'")}')" 
+        //                 title="Click to ${d.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                 ${d.is_active == 1 ? 'Active' : 'Inactive'}
+        //             </span>
+        //         </td>
+        //         <td>${d.created_at || 'N/A'}</td>
+        //         <td>
+        //             <button class="action-btn edit" onclick="editDepartment('${d.department_code}')" title="Edit Department">
+        //                 <i class="bi bi-pencil-square"></i>
+        //             </button>
+        //         </td>
+        //     `);
+        // }
+
+        // function renderEmployeeTable(data) {
+        //     // ALWAYS destroy existing DataTable first
+        //     if ($.fn.DataTable.isDataTable('#employeeTable')) {
+        //         $('#employeeTable').DataTable().clear().destroy();
+        //     }
+            
+        //     const tbody = document.getElementById('employeeTableBody');
+        //     tbody.innerHTML = '';
+            
+        //     if (!data || data.length === 0) {
+        //         tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No employees found matching your filters</td></tr>';
+        //         $('#employeeTable').DataTable({
+        //             pageLength: 10,
+        //             order: [],
+        //             language: {
+        //                 emptyTable: "No employees found matching your filters",
+        //                 zeroRecords: "No matching records found"
+        //             }
+        //         });
+        //         return;
+        //     }
+            
+        //     data.forEach(e => {
+        //         const canEdit = canEditEmployee(e.company_owned_by);
+                
+        //         const tr = document.createElement('tr');
+        //         tr.innerHTML = `
+        //             <td>${e.employee_id}</td>
+        //             <td><strong>${e.name}</strong></td>
+        //             <td>${e.email}</td>
+        //             <td>${e.department_name}</td>
+        //             <td>
+        //                 <span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                     style="cursor: pointer;" 
+        //                     onclick="toggleEmployeeStatus('${e.employee_id}', ${e.is_active}, '${e.name.replace(/'/g, "\\'")}')" 
+        //                     title="Click to ${e.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                     ${e.is_active == 1 ? 'Active' : 'Inactive'}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 ${e.total_visits || 0}
+        //                 ${e.total_visits > 0 ? `<button class="btn btn-sm btn-link" onclick="viewEmployeeHistory('${e.employee_id}', '${e.name.replace(/'/g, "\\'")}')" title="View History"><i class="bi bi-clock-history"></i></button>` : ''}
+        //             </td>
+        //             <td>
+        //                 <span class="badge ${getCompanyOwnershipBadge(e.company_owned_by)}">
+        //                     ${e.company_owned_by}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 ${canEdit ? `
+        //                     <button class="action-btn edit" onclick="editEmployee('${e.employee_id}')" title="Edit Employee">
+        //                         <i class="bi bi-pencil-square"></i>
+        //                     </button>
+        //                 ` : ''}
+        //             </td>
+        //         `;
+        //         tbody.appendChild(tr);
+        //     });
+            
+        //     $('#employeeTable').DataTable({
+        //         pageLength: 10,
+        //         order: [[0, 'asc']],
+        //         language: {
+        //             emptyTable: "No employees found",
+        //             zeroRecords: "No matching records found"
+        //         }
+        //     });
+        // }
+
+        function renderEmployeeTable(data) {
+            // ALWAYS destroy existing DataTable first - with extra safety checks
+            if ($.fn.DataTable.isDataTable('#employeeTable')) {
+                try {
+                    $('#employeeTable').DataTable().clear().destroy();
+                } catch (e) {
+                    console.warn('Error destroying DataTable:', e);
+                }
+            }
+            
+            // Also remove any DataTable classes/attributes that might persist
+            $('#employeeTable').removeClass('dataTable no-footer');
+            $('#employeeTable').removeAttr('aria-describedby');
+            
+            const tbody = document.getElementById('employeeTableBody');
+            tbody.innerHTML = '';
+            
+            // Handle empty data - create proper empty rows with correct column count
+            if (!data || data.length === 0) {
+                // Create 8 empty cells to match header column count
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td colspan="8" class="text-center text-muted">No employees found matching your filters</td>
+                `;
+                tbody.appendChild(tr);
+                
+                // DON'T initialize DataTable when empty - just show the message
+                // This avoids the column count mismatch error
+                return;
+            }
+            
+            data.forEach(e => {
+                const canEdit = canEditEmployee(e.company_owned_by);
+                
+                const tr = document.createElement('tr');
+                // Ensure exactly 8 <td> elements to match 8 <th> in header
+                tr.innerHTML = `
+                    <td>${e.employee_id || ''}</td>
+                    <td><strong>${e.name || ''}</strong></td>
+                    <td>${e.email || ''}</td>
+                    <td>${e.department_name || ''}</td>
+                    <td>
+                        <span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+                            style="cursor: pointer;" 
+                            onclick="toggleEmployeeStatus('${e.employee_id}', ${e.is_active}, '${(e.name || '').replace(/'/g, "\\'")}')" 
+                            title="Click to ${e.is_active == 1 ? 'deactivate' : 'activate'}">
+                            ${e.is_active == 1 ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        ${e.total_visits || 0}
+                        ${(e.total_visits || 0) > 0 ? `<button class="btn btn-sm btn-link" onclick="viewEmployeeHistory('${e.employee_id}', '${(e.name || '').replace(/'/g, "\\'")}')" title="View History"><i class="bi bi-clock-history"></i></button>` : ''}
+                    </td>
+                    <td>
+                        <span class="badge ${getCompanyOwnershipBadge(e.company_owned_by)}">
+                            ${e.company_owned_by || 'N/A'}
+                        </span>
+                    </td>
+                    <td>
+                        ${canEdit ? `
+                            <button class="action-btn edit" onclick="editEmployee('${e.employee_id}')" title="Edit Employee">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                        ` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            // Only initialize DataTable when we have data
+            try {
+                $('#employeeTable').DataTable({
+                    pageLength: 10,
+                    order: [[0, 'asc']],
+                    destroy: true, // Add this for safety
+                    language: {
+                        emptyTable: "No employees found",
+                        zeroRecords: "No matching records found"
+                    }
+                });
+            } catch (e) {
+                console.error('Error initializing DataTable:', e);
+            }
+        }
+
+        // function renderDepartmentTable(data) {
+        //     // ALWAYS destroy existing DataTable first
+        //     if ($.fn.DataTable.isDataTable('#departmentTable')) {
+        //         $('#departmentTable').DataTable().clear().destroy();
+        //     }
+            
+        //     const tbody = document.getElementById('departmentTableBody');
+        //     tbody.innerHTML = '';
+            
+        //     if (!data || data.length === 0) {
+        //         tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No departments found matching your filters</td></tr>';
+        //         $('#departmentTable').DataTable({
+        //             pageLength: 10,
+        //             order: [],
+        //             language: {
+        //                 emptyTable: "No departments found matching your filters",
+        //                 zeroRecords: "No matching records found"
+        //             }
+        //         });
+        //         return;
+        //     }
+            
+        //     data.forEach(d => {
+        //         const tr = document.createElement('tr');
+        //         tr.innerHTML = `
+        //             <td><span class="badge bg-secondary">${d.department_code}</span></td>
+        //             <td><strong>${d.name}</strong></td>
+        //             <td>
+        //                 ${d.employee_count || 0}
+        //                 ${d.employee_count > 0 ? `<button class="btn btn-sm btn-link" onclick="viewDepartmentEmployees('${d.department_code}', '${d.name.replace(/'/g, "\\'")}')" title="View Employees"><i class="bi bi-people-fill"></i></button>` : ''}
+        //             </td>
+        //             <td>${d.visit_count || 0}</td>
+        //             <td>
+        //                 <span class="badge ${d.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                     style="cursor: pointer;" 
+        //                     onclick="toggleDepartmentStatus('${d.department_code}', ${d.is_active}, '${d.name.replace(/'/g, "\\'")}')" 
+        //                     title="Click to ${d.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                     ${d.is_active == 1 ? 'Active' : 'Inactive'}
+        //                 </span>
+        //             </td>
+        //             <td>${d.created_at || 'N/A'}</td>
+        //             <td>
+        //                 <button class="action-btn edit" onclick="editDepartment('${d.department_code}')" title="Edit Department">
+        //                     <i class="bi bi-pencil-square"></i>
+        //                 </button>
+        //             </td>
+        //         `;
+        //         tbody.appendChild(tr);
+        //     });
+            
+        //     $('#departmentTable').DataTable({
+        //         pageLength: 10,
+        //         order: [[0, 'asc']],
+        //         language: {
+        //             emptyTable: "No departments found",
+        //             zeroRecords: "No matching records found"
+        //         }
+        //     });
+        // }
+
+        function renderDepartmentTable(data) {
+            // Destroy existing DataTable with safety checks
+            if ($.fn.DataTable.isDataTable('#departmentTable')) {
+                try {
+                    $('#departmentTable').DataTable().clear().destroy();
+                } catch (e) {
+                    console.warn('Error destroying departmentTable:', e);
+                }
+            }
+            $('#departmentTable').removeClass('dataTable no-footer');
+            
+            const tbody = document.getElementById('departmentTableBody');
+            tbody.innerHTML = '';
+            
+            if (!data || data.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="7" class="text-center text-muted">No departments found matching your filters</td>`;
+                tbody.appendChild(tr);
+                return; // Don't initialize DataTable for empty results
+            }
+            
+            data.forEach(d => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge bg-secondary">${d.department_code}</span></td>
+                    <td><strong>${d.name}</strong></td>
+                    <td>
+                        ${d.employee_count || 0}
+                        ${(d.employee_count || 0) > 0 ? `<button class="btn btn-sm btn-link" onclick="viewDepartmentEmployees('${d.department_code}', '${(d.name || '').replace(/'/g, "\\'")}')" title="View Employees"><i class="bi bi-people-fill"></i></button>` : ''}
+                    </td>
+                    <td>${d.visit_count || 0}</td>
+                    <td>
+                        <span class="badge ${d.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+                            style="cursor: pointer;" 
+                            onclick="toggleDepartmentStatus('${d.department_code}', ${d.is_active}, '${(d.name || '').replace(/'/g, "\\'")}')" 
+                            title="Click to ${d.is_active == 1 ? 'deactivate' : 'activate'}">
+                            ${d.is_active == 1 ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>${d.created_at || 'N/A'}</td>
+                    <td>
+                        <button class="action-btn edit" onclick="editDepartment('${d.department_code}')" title="Edit Department">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            try {
+                $('#departmentTable').DataTable({
+                    pageLength: 10,
+                    order: [[0, 'asc']],
+                    destroy: true
+                });
+            } catch (e) {
+                console.error('Error initializing departmentTable:', e);
+            }
+        }
+
+        // function applyDepartmentFilters() {
+        //     const statusFilter = document.getElementById('departmentStatusFilter').value;
+        //     const employeeFilter = document.getElementById('departmentEmployeeFilter').value;
+            
+        //     let filteredData = allDepartmentsData.filter(d => {
+        //         let matchStatus = statusFilter === '' || d.is_active == statusFilter;
+        //         let matchEmployee = true;
+                
+        //         if (employeeFilter === 'yes') {
+        //             matchEmployee = (d.employee_count || 0) > 0;
+        //         } else if (employeeFilter === 'no') {
+        //             matchEmployee = (d.employee_count || 0) === 0;
+        //         }
+                
+        //         return matchStatus && matchEmployee;
+        //     });
+            
+        //     renderDepartmentTable(filteredData);
+        //     showFilterResultToast('Department', filteredData.length, allDepartmentsData.length);
+        // }
+
+        function applyDepartmentFilters() {
+            const statusFilter = document.getElementById('departmentStatusFilter').value;
+            const employeeFilter = document.getElementById('departmentEmployeeFilter').value;
+            
+            if (!allDepartmentsData || allDepartmentsData.length === 0) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'No data to filter. Please wait for data to load.',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                return;
+            }
+            
+            let filteredData = allDepartmentsData.filter(d => {
+                let matchStatus = statusFilter === '' || String(d.is_active) === statusFilter;
+                let matchEmployee = true;
+                
+                if (employeeFilter === 'yes') {
+                    matchEmployee = (parseInt(d.employee_count) || 0) > 0;
+                } else if (employeeFilter === 'no') {
+                    matchEmployee = (parseInt(d.employee_count) || 0) === 0;
+                }
+                
+                return matchStatus && matchEmployee;
+            });
+            
+            renderDepartmentTable(filteredData);
+            showFilterResultToast('Department', filteredData.length, allDepartmentsData.length);
+        }
+
+        function clearDepartmentFilters() {
+            document.getElementById('departmentStatusFilter').value = '';
+            document.getElementById('departmentEmployeeFilter').value = '';
+            renderDepartmentTable(allDepartmentsData);
+            
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'info',
+                title: 'Department filters cleared',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
+        // function loadDepartments() {
+        //     fetch(ajaxUrl + '?action=departments')
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             allDepartmentsData = data; // Store all data
+        //             renderDepartmentTable(data);
+        //         })
+        //         .catch(e => console.error('Error loading departments:', e));
+        // }
+
+        // function renderDepartmentTable(data) {
+        //     initDataTable('departmentTable', data, (d) => `
+        //         <td><span class="badge bg-secondary">${d.department_code}</span></td>
+        //         <td><strong>${d.name}</strong></td>
+        //         <td>
+        //             ${d.employee_count || 0}
+        //             ${d.employee_count > 0 ? `<button class="btn btn-sm btn-link" onclick="viewDepartmentEmployees('${d.department_code}', '${d.name}')" title="View Employees"><i class="bi bi-people-fill"></i></button>` : ''}
+        //         </td>
+        //         <td>${d.visit_count || 0}</td>
+        //         <td>
+        //             <span class="badge ${d.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                 style="cursor: pointer;" 
+        //                 onclick="toggleDepartmentStatus('${d.department_code}', ${d.is_active}, '${d.name.replace(/'/g, "\\'")}')" 
+        //                 title="Click to ${d.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                 ${d.is_active == 1 ? 'Active' : 'Inactive'}
+        //             </span>
+        //         </td>
+        //         <td>${d.created_at || 'N/A'}</td>
+        //         <td>
+        //             <button class="action-btn edit" onclick="editDepartment('${d.department_code}')" title="Edit Department">
+        //                 <i class="bi bi-pencil-square"></i>
+        //             </button>
+        //         </td>
+        //     `);
+        // }
+
+        // function applyDepartmentFilters() {
+        //     const statusFilter = document.getElementById('departmentStatusFilter').value;
+        //     const employeeFilter = document.getElementById('departmentEmployeeFilter').value;
+            
+        //     let filteredData = allDepartmentsData.filter(d => {
+        //         let matchStatus = statusFilter === '' || d.is_active == statusFilter;
+        //         let matchEmployee = true;
+                
+        //         if (employeeFilter === 'yes') {
+        //             matchEmployee = (d.employee_count || 0) > 0;
+        //         } else if (employeeFilter === 'no') {
+        //             matchEmployee = (d.employee_count || 0) === 0;
+        //         }
+                
+        //         return matchStatus && matchEmployee;
+        //     });
+            
+        //     renderDepartmentTable(filteredData);
+        //     showFilterResultToast('Department', filteredData.length, allDepartmentsData.length);
+        // }
+
+        // function clearDepartmentFilters() {
+        //     document.getElementById('departmentStatusFilter').value = '';
+        //     document.getElementById('departmentEmployeeFilter').value = '';
+        //     renderDepartmentTable(allDepartmentsData);
+            
+        //     Swal.fire({
+        //         toast: true,
+        //         position: 'top-end',
+        //         icon: 'info',
+        //         title: 'Department filters cleared',
+        //         showConfirmButton: false,
+        //         timer: 1500
+        //     });
+        // }
 
         function toggleDepartmentStatus(departmentCode, currentStatus, departmentName) {
             const newStatus = currentStatus == 1 ? 0 : 1;
@@ -1774,7 +3243,8 @@
                 .then(data => {
                     const select = document.getElementById('employeeDepartmentSelect');
                     select.innerHTML = '<option value="">Select Department</option>';
-                    data.forEach(d => {
+                    // Filter to only show active departments
+                    data.filter(d => d.is_active == 1).forEach(d => {
                         select.innerHTML += `<option value="${d.department_code}">${d.name}</option>`;
                     });
                 });
@@ -2387,81 +3857,223 @@
         //         });
         // }
 
+        // function loadPurposes() {
+        //     fetch(ajaxUrl + '?action=get_all_purposes')
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             if (data.status === 'success') {
+        //                 const tbody = document.getElementById('purposeTableBody');
+        //                 tbody.innerHTML = '';
+                        
+        //                 if (data.purposes.length === 0) {
+        //                     tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No purposes found</td></tr>';
+        //                     return;
+        //                 }
+                        
+        //                 data.purposes.forEach((p, index) => {
+        //                     const isFirst = index === 0;
+        //                     const isLast = index === data.purposes.length - 1;
+                            
+        //                     // Determine if user can edit this purpose
+        //                     const canEdit = canEditPurpose(p.company_owned_by);
+                            
+        //                     const tr = document.createElement('tr');
+        //                     tr.innerHTML = `
+        //                         <td>
+        //                             <button class="btn btn-sm btn-outline-secondary" 
+        //                                     onclick="movePurpose(${p.purpose_id}, 'up')" 
+        //                                     ${isFirst ? 'disabled' : ''} 
+        //                                     title="Move Up">
+        //                                 <i class="bi bi-arrow-up"></i>
+        //                             </button>
+        //                             <button class="btn btn-sm btn-outline-secondary" 
+        //                                     onclick="movePurpose(${p.purpose_id}, 'down')" 
+        //                                     ${isLast ? 'disabled' : ''} 
+        //                                     title="Move Down">
+        //                                 <i class="bi bi-arrow-down"></i>
+        //                             </button>
+        //                         </td>
+        //                         <td><span class="badge bg-secondary">${p.purpose_code}</span></td>
+        //                         <td><strong>${p.purpose_name}</strong></td>
+        //                         <td><i class="${p.icon_class}" style="font-size: 1.5em;"></i></td>
+        //                         <td><span class="${p.color_class}">●</span> ${p.color_class}</td>
+        //                         <td>
+        //                             <span class="badge ${p.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                                 style="cursor: pointer;" 
+        //                                 onclick="togglePurposeStatus(${p.purpose_id}, ${p.is_active}, '${p.purpose_name.replace(/'/g, "\\'")}')" 
+        //                                 title="Click to ${p.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                                 ${p.is_active == 1 ? 'Active' : 'Inactive'}
+        //                             </span>
+        //                         </td>
+        //                         <td>
+        //                             <span class="badge ${getCompanyOwnershipBadge(p.company_owned_by)}">
+        //                                 ${p.company_owned_by}
+        //                             </span>
+        //                         </td>
+        //                         <td>
+        //                             ${canEdit ? `
+        //                                 <button class="action-btn edit" onclick="editPurpose(${p.purpose_id})" title="Edit Purpose">
+        //                                     <i class="bi bi-pencil-square"></i>
+        //                                 </button>
+        //                             ` : ''}
+                                    
+        //                         </td>
+        //                     `;
+        //                     tbody.appendChild(tr);
+        //                 });
+                        
+        //                 if ($.fn.DataTable.isDataTable('#purposeTable')) {
+        //                     $('#purposeTable').DataTable().destroy();
+        //                 }
+        //                 $('#purposeTable').DataTable({
+        //                     pageLength: 10,
+        //                     order: [[0, 'asc']],
+        //                     columnDefs: [
+        //                         { orderable: false, targets: [0, 7] }
+        //                     ]
+        //                 });
+        //             }
+        //         })
+        //         .catch(e => {
+        //             console.error('Error loading purposes:', e);
+        //             Swal.fire('Error', 'Failed to load purposes', 'error');
+        //         });
+        // }
+
+        // ============================================
+        // PURPOSE FILTER FUNCTIONS
+        // ============================================
+
+        // function loadPurposes() {
+        //     fetch(ajaxUrl + '?action=get_all_purposes')
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             if (data.status === 'success') {
+        //                 allPurposesData = data.purposes; // Store all data
+        //                 renderPurposeTable(data.purposes);
+        //             }
+        //         })
+        //         .catch(e => {
+        //             console.error('Error loading purposes:', e);
+        //             Swal.fire('Error', 'Failed to load purposes', 'error');
+        //         });
+        // }
+
+        // function renderPurposeTable(purposes) {
+        //     const tbody = document.getElementById('purposeTableBody');
+        //     tbody.innerHTML = '';
+            
+        //     if (purposes.length === 0) {
+        //         tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No purposes found</td></tr>';
+        //         return;
+        //     }
+            
+        //     purposes.forEach((p, index) => {
+        //         const isFirst = index === 0;
+        //         const isLast = index === purposes.length - 1;
+        //         const canEdit = canEditPurpose(p.company_owned_by);
+                
+        //         const tr = document.createElement('tr');
+        //         tr.innerHTML = `
+        //             <td>
+        //                 <button class="btn btn-sm btn-outline-secondary" 
+        //                         onclick="movePurpose(${p.purpose_id}, 'up')" 
+        //                         ${isFirst ? 'disabled' : ''} 
+        //                         title="Move Up">
+        //                     <i class="bi bi-arrow-up"></i>
+        //                 </button>
+        //                 <button class="btn btn-sm btn-outline-secondary" 
+        //                         onclick="movePurpose(${p.purpose_id}, 'down')" 
+        //                         ${isLast ? 'disabled' : ''} 
+        //                         title="Move Down">
+        //                     <i class="bi bi-arrow-down"></i>
+        //                 </button>
+        //             </td>
+        //             <td><span class="badge bg-secondary">${p.purpose_code}</span></td>
+        //             <td><strong>${p.purpose_name}</strong></td>
+        //             <td><i class="${p.icon_class}" style="font-size: 1.5em;"></i></td>
+        //             <td><span class="${p.color_class}">●</span> ${p.color_class}</td>
+        //             <td>
+        //                 <span class="badge ${p.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                     style="cursor: pointer;" 
+        //                     onclick="togglePurposeStatus(${p.purpose_id}, ${p.is_active}, '${p.purpose_name.replace(/'/g, "\\'")}')" 
+        //                     title="Click to ${p.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                     ${p.is_active == 1 ? 'Active' : 'Inactive'}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 <span class="badge ${getCompanyOwnershipBadge(p.company_owned_by)}">
+        //                     ${p.company_owned_by}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 ${canEdit ? `
+        //                     <button class="action-btn edit" onclick="editPurpose(${p.purpose_id})" title="Edit Purpose">
+        //                         <i class="bi bi-pencil-square"></i>
+        //                     </button>
+        //                 ` : ''}
+        //             </td>
+        //         `;
+        //         tbody.appendChild(tr);
+        //     });
+            
+        //     // Reinitialize DataTable
+        //     if ($.fn.DataTable.isDataTable('#purposeTable')) {
+        //         $('#purposeTable').DataTable().destroy();
+        //     }
+        //     $('#purposeTable').DataTable({
+        //         pageLength: 10,
+        //         order: [[0, 'asc']],
+        //         columnDefs: [
+        //             { orderable: false, targets: [0, 7] }
+        //         ]
+        //     });
+        // }
+
+        // function applyPurposeFilters() {
+        //     const statusFilter = document.getElementById('purposeStatusFilter').value;
+        //     const companyFilter = document.getElementById('purposeCompanyFilter').value;
+        //     const colorFilter = document.getElementById('purposeColorFilter').value;
+            
+        //     let filteredData = allPurposesData.filter(p => {
+        //         let matchStatus = statusFilter === '' || p.is_active == statusFilter;
+        //         let matchCompany = !companyFilter || p.company_owned_by === companyFilter;
+        //         let matchColor = !colorFilter || p.color_class === colorFilter;
+                
+        //         return matchStatus && matchCompany && matchColor;
+        //     });
+            
+        //     renderPurposeTable(filteredData);
+        //     showFilterResultToast('Purpose', filteredData.length, allPurposesData.length);
+        // }
+
+        // function clearPurposeFilters() {
+        //     document.getElementById('purposeStatusFilter').value = '';
+        //     document.getElementById('purposeCompanyFilter').value = '';
+        //     document.getElementById('purposeColorFilter').value = '';
+        //     renderPurposeTable(allPurposesData);
+            
+        //     Swal.fire({
+        //         toast: true,
+        //         position: 'top-end',
+        //         icon: 'info',
+        //         title: 'Purpose filters cleared',
+        //         showConfirmButton: false,
+        //         timer: 1500
+        //     });
+        // }
+
+        // ============================================
+        // PURPOSE FILTER FUNCTIONS
+        // ============================================
+
         function loadPurposes() {
             fetch(ajaxUrl + '?action=get_all_purposes')
                 .then(r => r.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        const tbody = document.getElementById('purposeTableBody');
-                        tbody.innerHTML = '';
-                        
-                        if (data.purposes.length === 0) {
-                            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No purposes found</td></tr>';
-                            return;
-                        }
-                        
-                        data.purposes.forEach((p, index) => {
-                            const isFirst = index === 0;
-                            const isLast = index === data.purposes.length - 1;
-                            
-                            // Determine if user can edit this purpose
-                            const canEdit = canEditPurpose(p.company_owned_by);
-                            
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `
-                                <td>
-                                    <button class="btn btn-sm btn-outline-secondary" 
-                                            onclick="movePurpose(${p.purpose_id}, 'up')" 
-                                            ${isFirst ? 'disabled' : ''} 
-                                            title="Move Up">
-                                        <i class="bi bi-arrow-up"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-secondary" 
-                                            onclick="movePurpose(${p.purpose_id}, 'down')" 
-                                            ${isLast ? 'disabled' : ''} 
-                                            title="Move Down">
-                                        <i class="bi bi-arrow-down"></i>
-                                    </button>
-                                </td>
-                                <td><span class="badge bg-secondary">${p.purpose_code}</span></td>
-                                <td><strong>${p.purpose_name}</strong></td>
-                                <td><i class="${p.icon_class}" style="font-size: 1.5em;"></i></td>
-                                <td><span class="${p.color_class}">●</span> ${p.color_class}</td>
-                                <td>
-                                    <span class="badge ${p.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
-                                        style="cursor: pointer;" 
-                                        onclick="togglePurposeStatus(${p.purpose_id}, ${p.is_active}, '${p.purpose_name.replace(/'/g, "\\'")}')" 
-                                        title="Click to ${p.is_active == 1 ? 'deactivate' : 'activate'}">
-                                        ${p.is_active == 1 ? 'Active' : 'Inactive'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge ${getCompanyOwnershipBadge(p.company_owned_by)}">
-                                        ${p.company_owned_by}
-                                    </span>
-                                </td>
-                                <td>
-                                    ${canEdit ? `
-                                        <button class="action-btn edit" onclick="editPurpose(${p.purpose_id})" title="Edit Purpose">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-                                    ` : ''}
-                                    
-                                </td>
-                            `;
-                            tbody.appendChild(tr);
-                        });
-                        
-                        if ($.fn.DataTable.isDataTable('#purposeTable')) {
-                            $('#purposeTable').DataTable().destroy();
-                        }
-                        $('#purposeTable').DataTable({
-                            pageLength: 10,
-                            order: [[0, 'asc']],
-                            columnDefs: [
-                                { orderable: false, targets: [0, 7] }
-                            ]
-                        });
+                        allPurposesData = data.purposes; // Store all data
+                        renderPurposeTable(data.purposes);
                     }
                 })
                 .catch(e => {
@@ -2469,6 +4081,346 @@
                     Swal.fire('Error', 'Failed to load purposes', 'error');
                 });
         }
+
+        // function renderPurposeTable(purposes) {
+        //     // ALWAYS destroy existing DataTable first
+        //     if ($.fn.DataTable.isDataTable('#purposeTable')) {
+        //         $('#purposeTable').DataTable().clear().destroy();
+        //     }
+            
+        //     const tbody = document.getElementById('purposeTableBody');
+        //     tbody.innerHTML = '';
+            
+        //     if (!purposes || purposes.length === 0) {
+        //         tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No purposes found matching your filters</td></tr>';
+        //         // Still initialize DataTable even for empty results
+        //         $('#purposeTable').DataTable({
+        //             pageLength: 10,
+        //             order: [],
+        //             columnDefs: [
+        //                 { orderable: false, targets: [0, 7] }
+        //             ],
+        //             language: {
+        //                 emptyTable: "No purposes found matching your filters",
+        //                 zeroRecords: "No matching records found"
+        //             }
+        //         });
+        //         return;
+        //     }
+            
+        //     purposes.forEach((p, index) => {
+        //         const isFirst = index === 0;
+        //         const isLast = index === purposes.length - 1;
+        //         const canEdit = canEditPurpose(p.company_owned_by);
+                
+        //         const tr = document.createElement('tr');
+        //         // Store data attributes for filtering reference
+        //         tr.setAttribute('data-status', p.is_active);
+        //         tr.setAttribute('data-company', p.company_owned_by);
+        //         tr.setAttribute('data-color', p.color_class);
+                
+        //         tr.innerHTML = `
+        //             <td>
+        //                 <button class="btn btn-sm btn-outline-secondary" 
+        //                         onclick="movePurpose(${p.purpose_id}, 'up')" 
+        //                         ${isFirst ? 'disabled' : ''} 
+        //                         title="Move Up">
+        //                     <i class="bi bi-arrow-up"></i>
+        //                 </button>
+        //                 <button class="btn btn-sm btn-outline-secondary" 
+        //                         onclick="movePurpose(${p.purpose_id}, 'down')" 
+        //                         ${isLast ? 'disabled' : ''} 
+        //                         title="Move Down">
+        //                     <i class="bi bi-arrow-down"></i>
+        //                 </button>
+        //             </td>
+        //             <td><span class="badge bg-secondary">${p.purpose_code}</span></td>
+        //             <td><strong>${p.purpose_name}</strong></td>
+        //             <td><i class="${p.icon_class}" style="font-size: 1.5em;"></i></td>
+        //             <td><span class="${p.color_class}">●</span> ${p.color_class.replace('text-', '')}</td>
+        //             <td>
+        //                 <span class="badge ${p.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                     style="cursor: pointer;" 
+        //                     onclick="togglePurposeStatus(${p.purpose_id}, ${p.is_active}, '${p.purpose_name.replace(/'/g, "\\'")}')" 
+        //                     title="Click to ${p.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                     ${p.is_active == 1 ? 'Active' : 'Inactive'}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 <span class="badge ${getCompanyOwnershipBadge(p.company_owned_by)}">
+        //                     ${p.company_owned_by}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 ${canEdit ? `
+        //                     <button class="action-btn edit" onclick="editPurpose(${p.purpose_id})" title="Edit Purpose">
+        //                         <i class="bi bi-pencil-square"></i>
+        //                     </button>
+        //                 ` : ''}
+        //             </td>
+        //         `;
+        //         tbody.appendChild(tr);
+        //     });
+            
+        //     // Reinitialize DataTable
+        //     $('#purposeTable').DataTable({
+        //         pageLength: 10,
+        //         order: [], // Don't auto-sort, preserve display_order
+        //         columnDefs: [
+        //             { orderable: false, targets: [0, 7] }
+        //         ],
+        //         language: {
+        //             emptyTable: "No purposes found",
+        //             zeroRecords: "No matching records found"
+        //         }
+        //     });
+        // }
+
+        function renderPurposeTable(purposes) {
+            // Destroy existing DataTable with safety checks
+            if ($.fn.DataTable.isDataTable('#purposeTable')) {
+                try {
+                    $('#purposeTable').DataTable().clear().destroy();
+                } catch (e) {
+                    console.warn('Error destroying purposeTable:', e);
+                }
+            }
+            $('#purposeTable').removeClass('dataTable no-footer');
+            
+            const tbody = document.getElementById('purposeTableBody');
+            tbody.innerHTML = '';
+            
+            if (!purposes || purposes.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="8" class="text-center text-muted">No purposes found matching your filters</td>`;
+                tbody.appendChild(tr);
+                return; // Don't initialize DataTable for empty results
+            }
+            
+            purposes.forEach((p, index) => {
+                const isFirst = index === 0;
+                const isLast = index === purposes.length - 1;
+                const canEdit = canEditPurpose(p.company_owned_by);
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary" 
+                                onclick="movePurpose(${p.purpose_id}, 'up')" 
+                                ${isFirst ? 'disabled' : ''} 
+                                title="Move Up">
+                            <i class="bi bi-arrow-up"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" 
+                                onclick="movePurpose(${p.purpose_id}, 'down')" 
+                                ${isLast ? 'disabled' : ''} 
+                                title="Move Down">
+                            <i class="bi bi-arrow-down"></i>
+                        </button>
+                    </td>
+                    <td><span class="badge bg-secondary">${p.purpose_code}</span></td>
+                    <td><strong>${p.purpose_name}</strong></td>
+                    <td><i class="${p.icon_class}" style="font-size: 1.5em;"></i></td>
+                    <td><span class="${p.color_class}">●</span> ${(p.color_class || '').replace('text-', '')}</td>
+                    <td>
+                        <span class="badge ${p.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+                            style="cursor: pointer;" 
+                            onclick="togglePurposeStatus(${p.purpose_id}, ${p.is_active}, '${(p.purpose_name || '').replace(/'/g, "\\'")}')" 
+                            title="Click to ${p.is_active == 1 ? 'deactivate' : 'activate'}">
+                            ${p.is_active == 1 ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${getCompanyOwnershipBadge(p.company_owned_by)}">
+                            ${p.company_owned_by || 'N/A'}
+                        </span>
+                    </td>
+                    <td>
+                        ${canEdit ? `
+                            <button class="action-btn edit" onclick="editPurpose(${p.purpose_id})" title="Edit Purpose">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                        ` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            try {
+                $('#purposeTable').DataTable({
+                    pageLength: 10,
+                    order: [],
+                    destroy: true,
+                    columnDefs: [
+                        { orderable: false, targets: [0, 7] }
+                    ]
+                });
+            } catch (e) {
+                console.error('Error initializing purposeTable:', e);
+            }
+        }
+
+        // function renderPurposeTable(purposes) {
+        //     const tbody = document.getElementById('purposeTableBody');
+        //     tbody.innerHTML = '';
+            
+        //     if (purposes.length === 0) {
+        //         tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No purposes found</td></tr>';
+        //         return;
+        //     }
+            
+        //     purposes.forEach((p, index) => {
+        //         const isFirst = index === 0;
+        //         const isLast = index === purposes.length - 1;
+        //         const canEdit = canEditPurpose(p.company_owned_by);
+                
+        //         const tr = document.createElement('tr');
+        //         tr.innerHTML = `
+        //             <td>
+        //                 <button class="btn btn-sm btn-outline-secondary" 
+        //                         onclick="movePurpose(${p.purpose_id}, 'up')" 
+        //                         ${isFirst ? 'disabled' : ''} 
+        //                         title="Move Up">
+        //                     <i class="bi bi-arrow-up"></i>
+        //                 </button>
+        //                 <button class="btn btn-sm btn-outline-secondary" 
+        //                         onclick="movePurpose(${p.purpose_id}, 'down')" 
+        //                         ${isLast ? 'disabled' : ''} 
+        //                         title="Move Down">
+        //                     <i class="bi bi-arrow-down"></i>
+        //                 </button>
+        //             </td>
+        //             <td><span class="badge bg-secondary">${p.purpose_code}</span></td>
+        //             <td><strong>${p.purpose_name}</strong></td>
+        //             <td><i class="${p.icon_class}" style="font-size: 1.5em;"></i></td>
+        //             <td><span class="${p.color_class}">●</span> ${p.color_class}</td>
+        //             <td>
+        //                 <span class="badge ${p.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                     style="cursor: pointer;" 
+        //                     onclick="togglePurposeStatus(${p.purpose_id}, ${p.is_active}, '${p.purpose_name.replace(/'/g, "\\'")}')" 
+        //                     title="Click to ${p.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                     ${p.is_active == 1 ? 'Active' : 'Inactive'}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 <span class="badge ${getCompanyOwnershipBadge(p.company_owned_by)}">
+        //                     ${p.company_owned_by}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 ${canEdit ? `
+        //                     <button class="action-btn edit" onclick="editPurpose(${p.purpose_id})" title="Edit Purpose">
+        //                         <i class="bi bi-pencil-square"></i>
+        //                     </button>
+        //                 ` : ''}
+        //             </td>
+        //         `;
+        //         tbody.appendChild(tr);
+        //     });
+            
+        //     // Reinitialize DataTable
+        //     if ($.fn.DataTable.isDataTable('#purposeTable')) {
+        //         $('#purposeTable').DataTable().destroy();
+        //     }
+        //     $('#purposeTable').DataTable({
+        //         pageLength: 10,
+        //         order: [[0, 'asc']],
+        //         columnDefs: [
+        //             { orderable: false, targets: [0, 7] }
+        //         ]
+        //     });
+        // }
+
+        // function applyPurposeFilters() {
+        //     const statusFilter = document.getElementById('purposeStatusFilter').value;
+        //     const companyFilter = document.getElementById('purposeCompanyFilter').value;
+        //     const colorFilter = document.getElementById('purposeColorFilter').value;
+            
+        //     let filteredData = allPurposesData.filter(p => {
+        //         let matchStatus = statusFilter === '' || p.is_active == statusFilter;
+        //         let matchCompany = !companyFilter || p.company_owned_by === companyFilter;
+        //         let matchColor = !colorFilter || p.color_class === colorFilter;
+                
+        //         return matchStatus && matchCompany && matchColor;
+        //     });
+            
+        //     renderPurposeTable(filteredData);
+        //     showFilterResultToast('Purpose', filteredData.length, allPurposesData.length);
+        // }
+
+        function applyPurposeFilters() {
+            const statusFilter = document.getElementById('purposeStatusFilter').value;
+            const companyFilterValue = document.getElementById('purposeCompanyFilter').value;
+            const colorFilter = document.getElementById('purposeColorFilter').value;
+            
+            console.log('Applying filters:', { statusFilter, companyFilterValue, colorFilter }); // Debug log
+            console.log('All purposes data:', allPurposesData); // Debug log
+            
+            if (!allPurposesData || allPurposesData.length === 0) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'No data to filter. Please wait for data to load.',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                return;
+            }
+            
+            let filteredData = allPurposesData.filter(p => {
+                // Status filter: empty means all, otherwise match exact value
+                let matchStatus = statusFilter === '' || String(p.is_active) === statusFilter;
+                
+                // Company filter: empty means all, otherwise match exact value
+                let matchCompany = companyFilterValue === '' || p.company_owned_by === companyFilterValue;
+                
+                // Color filter: empty means all, otherwise match exact value
+                let matchColor = colorFilter === '' || p.color_class === colorFilter;
+                
+                return matchStatus && matchCompany && matchColor;
+            });
+            
+            console.log('Filtered data:', filteredData); // Debug log
+            
+            renderPurposeTable(filteredData);
+            showFilterResultToast('Purpose', filteredData.length, allPurposesData.length);
+        }
+
+        function clearPurposeFilters() {
+            document.getElementById('purposeStatusFilter').value = '';
+            document.getElementById('purposeCompanyFilter').value = '';
+            document.getElementById('purposeColorFilter').value = '';
+            
+            // Re-render with all data
+            renderPurposeTable(allPurposesData);
+            
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'info',
+                title: 'Purpose filters cleared',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
+        // function clearPurposeFilters() {
+        //     document.getElementById('purposeStatusFilter').value = '';
+        //     document.getElementById('purposeCompanyFilter').value = '';
+        //     document.getElementById('purposeColorFilter').value = '';
+        //     renderPurposeTable(allPurposesData);
+            
+        //     Swal.fire({
+        //         toast: true,
+        //         position: 'top-end',
+        //         icon: 'info',
+        //         title: 'Purpose filters cleared',
+        //         showConfirmButton: false,
+        //         timer: 1500
+        //     });
+        // }
+
 
         function canEditPurpose(companyOwnedBy) {
             // Super admin can edit everything
@@ -2522,6 +4474,41 @@
         // }
 
         // Update editPurpose to populate translation fields
+        // function editPurpose(purposeId) {
+        //     fetch(ajaxUrl + `?action=get_purpose&purpose_id=${purposeId}`)
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             if (data.status === 'success') {
+        //                 const purpose = data.purpose;
+                        
+        //                 // Populate main fields
+        //                 document.getElementById('editPurposeId').value = purpose.purpose_id;
+        //                 document.getElementById('editPurposeCode').value = purpose.purpose_code;
+        //                 document.getElementById('editPurposeName').value = purpose.purpose_name;
+        //                 document.getElementById('editIconClass').value = purpose.icon_class;
+        //                 document.getElementById('editColorClass').value = purpose.color_class;
+        //                 document.getElementById('editPurposeCompanyOwnedBy').value = purpose.company_owned_by;
+        //                 document.getElementById('editPurposeActiveCheck').checked = purpose.is_active == 1;
+                        
+        //                 // Populate translation fields
+        //                 document.getElementById('editPurposeNameEn').value = purpose.name_en || '';
+        //                 document.getElementById('editPurposeNameZhTw').value = purpose.name_zh_tw || '';
+        //                 document.getElementById('editPurposeNameZhCn').value = purpose.name_zh_cn || '';
+        //                 document.getElementById('editPurposeNameFil').value = purpose.name_fil || '';
+        //                 document.getElementById('editPurposeNameJa').value = purpose.name_ja || '';
+                        
+        //                 new bootstrap.Modal(document.getElementById('editPurposeModal')).show();
+        //             } else {
+        //                 Swal.fire('Error', data.message || 'Failed to load purpose details', 'error');
+        //             }
+        //         })
+        //         .catch(e => {
+        //             console.error('Error:', e);
+        //             Swal.fire('Error', 'Failed to load purpose details', 'error');
+        //         });
+        // }
+
+        // UPDATED: Edit Purpose function to properly set icon dropdown
         function editPurpose(purposeId) {
             fetch(ajaxUrl + `?action=get_purpose&purpose_id=${purposeId}`)
                 .then(r => r.json())
@@ -2533,8 +4520,41 @@
                         document.getElementById('editPurposeId').value = purpose.purpose_id;
                         document.getElementById('editPurposeCode').value = purpose.purpose_code;
                         document.getElementById('editPurposeName').value = purpose.purpose_name;
-                        document.getElementById('editIconClass').value = purpose.icon_class;
-                        document.getElementById('editColorClass').value = purpose.color_class;
+                        
+                        // Set icon dropdown value
+                        const iconSelect = document.getElementById('editIconSelect');
+                        if (iconSelect) {
+                            // Check if the icon exists in our list
+                            const iconExists = Array.from(iconSelect.options).some(opt => opt.value === purpose.icon_class);
+                            
+                            if (iconExists) {
+                                iconSelect.value = purpose.icon_class;
+                            } else {
+                                // If icon doesn't exist in dropdown, add it as a custom option
+                                const customOption = document.createElement('option');
+                                customOption.value = purpose.icon_class;
+                                customOption.textContent = purpose.icon_class + ' (Custom)';
+                                iconSelect.insertBefore(customOption, iconSelect.firstChild);
+                                iconSelect.value = purpose.icon_class;
+                            }
+                        }
+                        
+                        // Set color dropdown value
+                        const colorSelect = document.getElementById('editColorSelect');
+                        if (colorSelect) {
+                            colorSelect.value = purpose.color_class;
+                        }
+                        
+                        // Update previews
+                        updateIconPreview('edit');
+                        updateColorPreview('edit');
+                        
+                        // Update the preview text
+                        const previewText = document.getElementById('editPurposePreviewText');
+                        if (previewText) {
+                            previewText.textContent = purpose.purpose_name;
+                        }
+                        
                         document.getElementById('editPurposeCompanyOwnedBy').value = purpose.company_owned_by;
                         document.getElementById('editPurposeActiveCheck').checked = purpose.is_active == 1;
                         
@@ -2637,10 +4657,44 @@
             });
         }
 
+        // function movePurpose(purposeId, direction) {
+        //     const formData = new FormData();
+        //     formData.append('purpose_id', purposeId);
+        //     formData.append('direction', direction);
+            
+        //     fetch(ajaxUrl + '?action=update_purpose_order', {
+        //         method: 'POST',
+        //         body: formData
+        //     })
+        //     .then(r => r.json())
+        //     .then(data => {
+        //         if (data.status === 'success') {
+        //             loadPurposes();
+        //         } else {
+        //             Swal.fire('Error', data.message || 'Failed to update order', 'error');
+        //         }
+        //     })
+        //     .catch(e => {
+        //         console.error('Error:', e);
+        //         Swal.fire('Error', 'Failed to update order', 'error');
+        //     });
+        // }
+
+        // UPDATED: Move Purpose function with proper reload
         function movePurpose(purposeId, direction) {
             const formData = new FormData();
             formData.append('purpose_id', purposeId);
             formData.append('direction', direction);
+            
+            // Show loading indicator
+            Swal.fire({
+                title: 'Updating order...',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             
             fetch(ajaxUrl + '?action=update_purpose_order', {
                 method: 'POST',
@@ -2648,7 +4702,28 @@
             })
             .then(r => r.json())
             .then(data => {
+                Swal.close();
+                
                 if (data.status === 'success') {
+                    // Show success toast
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Order updated successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    
+                    // Destroy existing DataTable before reloading
+                    if ($.fn.DataTable.isDataTable('#purposeTable')) {
+                        $('#purposeTable').DataTable().clear().destroy();
+                    }
+                    
+                    // Clear the table body
+                    document.getElementById('purposeTableBody').innerHTML = '';
+                    
+                    // Reload purposes with fresh data
                     loadPurposes();
                 } else {
                     Swal.fire('Error', data.message || 'Failed to update order', 'error');
@@ -2656,6 +4731,7 @@
             })
             .catch(e => {
                 console.error('Error:', e);
+                Swal.close();
                 Swal.fire('Error', 'Failed to update order', 'error');
             });
         }
@@ -2665,6 +4741,17 @@
                 title: 'Purpose Details',
                 text: 'Purpose details viewing feature coming soon',
                 icon: 'info'
+            });
+        }
+
+        function showFilterResultToast(module, filtered, total) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: `Showing ${filtered} of ${total} ${module.toLowerCase()}s`,
+                showConfirmButton: false,
+                timer: 2000
             });
         }
 
@@ -2740,6 +4827,58 @@
         });
 
         $(document).ready(function() {
+            // Initialize icon dropdowns
+            initIconDropdowns();
+
+            // Update preview text on purpose name change (Add modal)
+            $('input[name="purpose_name"]').on('input', function() {
+                const modal = $(this).closest('.modal');
+                const isAdd = modal.attr('id') === 'addPurposeModal';
+                const previewTextId = isAdd ? 'addPurposePreviewText' : 'editPurposePreviewText';
+                const previewText = document.getElementById(previewTextId);
+                if (previewText) {
+                    previewText.textContent = $(this).val() || 'Purpose Preview';
+                }
+            });
+            
+            // Reset add form when modal is closed
+            $('#addPurposeModal').on('hidden.bs.modal', function() {
+                document.getElementById('addPurposeForm').reset();
+                document.getElementById('addIconSelect').value = 'bi-circle';
+                document.getElementById('addColorSelect').value = 'text-primary';
+                updateIconPreview('add');
+                updateColorPreview('add');
+                document.getElementById('addPurposePreviewText').textContent = 'Purpose Preview';
+            }); 
+
+            // Employee filter - apply on Enter key
+            $('#employeeDeptFilter, #employeeStatusFilter, #employeeCompanyFilter').on('keypress', function(e) {
+                if (e.which === 13) {
+                    applyEmployeeFilters();
+                }
+            });
+            
+            // Department filter - apply on Enter key
+            $('#departmentStatusFilter, #departmentEmployeeFilter').on('keypress', function(e) {
+                if (e.which === 13) {
+                    applyDepartmentFilters();
+                }
+            });
+            
+            // Purpose filter - apply on Enter key
+            $('#purposeStatusFilter, #purposeCompanyFilter, #purposeColorFilter').on('keypress', function(e) {
+                if (e.which === 13) {
+                    applyPurposeFilters();
+                }
+            });
+            
+            // Auto-apply filters on change (optional - uncomment if you want instant filtering)
+            /*
+            $('#employeeDeptFilter, #employeeStatusFilter, #employeeCompanyFilter').on('change', applyEmployeeFilters);
+            $('#departmentStatusFilter, #departmentEmployeeFilter').on('change', applyDepartmentFilters);
+            $('#purposeStatusFilter, #purposeCompanyFilter, #purposeColorFilter').on('change', applyPurposeFilters);
+            */
+        
             if (!$.fn.DataTable.isDataTable('#recentActivityTable')) {
                 $('#recentActivityTable').DataTable({ pageLength: 10, order: [] });
             }
@@ -3046,6 +5185,155 @@
                     lastAlertId = data.last_alert_id || 0;
                 }
             });
+
+        // ============================================
+        // ADD EVENT LISTENERS FOR ENTER KEY ON FILTERS
+        // ============================================
+
+        // Add this in your $(document).ready() function:
+        $(document).ready(function() {
+            // Employee filter - apply on Enter key
+            $('#employeeDeptFilter, #employeeStatusFilter, #employeeCompanyFilter').on('keypress', function(e) {
+                if (e.which === 13) {
+                    applyEmployeeFilters();
+                }
+            });
+            
+            // Department filter - apply on Enter key
+            $('#departmentStatusFilter, #departmentEmployeeFilter').on('keypress', function(e) {
+                if (e.which === 13) {
+                    applyDepartmentFilters();
+                }
+            });
+            
+            // Purpose filter - apply on Enter key
+            $('#purposeStatusFilter, #purposeCompanyFilter, #purposeColorFilter').on('keypress', function(e) {
+                if (e.which === 13) {
+                    applyPurposeFilters();
+                }
+            });
+            
+            // Auto-apply filters on change (optional - uncomment if you want instant filtering)
+            /*
+            $('#employeeDeptFilter, #employeeStatusFilter, #employeeCompanyFilter').on('change', applyEmployeeFilters);
+            $('#departmentStatusFilter, #departmentEmployeeFilter').on('change', applyDepartmentFilters);
+            $('#purposeStatusFilter, #purposeCompanyFilter, #purposeColorFilter').on('change', applyPurposeFilters);
+            */
+        });
+
+
+        // Populate Icon Select with grouped options
+        function populateIconSelect(selectId) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            
+            select.innerHTML = '';
+            
+            // Group icons by category
+            const categories = {};
+            bootstrapIconsList.forEach(icon => {
+                if (!categories[icon.category]) {
+                    categories[icon.category] = [];
+                }
+                categories[icon.category].push(icon);
+            });
+            
+            // Create optgroups
+            Object.keys(categories).forEach(category => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = category;
+                
+                categories[category].forEach(icon => {
+                    const option = document.createElement('option');
+                    option.value = icon.value;
+                    option.textContent = icon.label;
+                    option.setAttribute('data-icon', icon.value);
+                    optgroup.appendChild(option);
+                });
+                
+                select.appendChild(optgroup);
+            });
+        }
+
+        // Update Icon Preview
+        function updateIconPreview(mode) {
+            const selectId = mode === 'add' ? 'addIconSelect' : 'editIconSelect';
+            const previewId = mode === 'add' ? 'addIconPreview' : 'editIconPreview';
+            const largePreviewId = mode === 'add' ? 'addPurposeIconPreviewLarge' : 'editPurposeIconPreviewLarge';
+            const colorSelectId = mode === 'add' ? 'addColorSelect' : 'editColorSelect';
+            
+            const select = document.getElementById(selectId);
+            const preview = document.getElementById(previewId);
+            const largePreview = document.getElementById(largePreviewId);
+            const colorSelect = document.getElementById(colorSelectId);
+            
+            if (select && preview) {
+                const iconClass = select.value;
+                preview.className = 'icon-select-preview bi ' + iconClass.replace('bi-', '');
+                preview.classList.add(iconClass);
+            }
+            
+            if (largePreview && select && colorSelect) {
+                const iconClass = select.value;
+                const colorClass = colorSelect.value;
+                largePreview.className = 'bi ' + iconClass.replace('bi-', '') + ' ' + colorClass;
+                largePreview.classList.add(iconClass);
+            }
+        }
+
+        // Update Color Preview
+        function updateColorPreview(mode) {
+            const selectId = mode === 'add' ? 'addIconSelect' : 'editIconSelect';
+            const colorSelectId = mode === 'add' ? 'addColorSelect' : 'editColorSelect';
+            const largePreviewId = mode === 'add' ? 'addPurposeIconPreviewLarge' : 'editPurposeIconPreviewLarge';
+            
+            const iconSelect = document.getElementById(selectId);
+            const colorSelect = document.getElementById(colorSelectId);
+            const largePreview = document.getElementById(largePreviewId);
+            
+            if (largePreview && iconSelect && colorSelect) {
+                const iconClass = iconSelect.value;
+                const colorClass = colorSelect.value;
+                largePreview.className = 'bi ' + iconClass.replace('bi-', '') + ' ' + colorClass;
+                largePreview.classList.add(iconClass);
+            }
+        }
+
+        // function clearEmployeeFilters() {
+        //     document.getElementById('employeeDeptFilter').value = '';
+        //     document.getElementById('employeeStatusFilter').value = '';
+        //     document.getElementById('employeeCompanyFilter').value = '';
+        //     renderEmployeeTable(allEmployeesData);
+            
+        //     Swal.fire({
+        //         toast: true,
+        //         position: 'top-end',
+        //         icon: 'info',
+        //         title: 'Employee filters cleared',
+        //         showConfirmButton: false,
+        //         timer: 1500
+        //     });
+        // }
+
+        function clearEmployeeFilters() {
+            document.getElementById('employeeDeptFilter').value = '';
+            document.getElementById('employeeStatusFilter').value = '';
+            document.getElementById('employeeCompanyFilter').value = '';
+            
+            renderEmployeeTable(allEmployeesData);
+            
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'info',
+                title: 'Employee filters cleared',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
+        
+
     </script>
 
 </body>
