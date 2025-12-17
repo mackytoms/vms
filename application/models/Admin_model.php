@@ -801,4 +801,490 @@ class Admin_model extends CI_Model {
         return ['status' => 'error', 'message' => $this->db->error()['message']];
     }
     
+    // ============================================
+    // PART 1: ADD TO Admin_model.php (at the end before closing brace)
+    // ============================================
+
+    // Report Methods
+    public function getReportTypes() {
+        return [
+            'department' => [
+                'name' => 'Department Report',
+                'description' => 'Visitor statistics grouped by department',
+                'icon' => 'bi-building',
+                'color' => 'primary'
+            ],
+            'employee_visits' => [
+                'name' => 'Employee Visits Report',
+                'description' => 'Visit statistics for each employee host',
+                'icon' => 'bi-person-badge',
+                'color' => 'success'
+            ],
+            'visitor_visits' => [
+                'name' => 'Visitors Report',
+                'description' => 'Complete visitor activity and history',
+                'icon' => 'bi-people',
+                'color' => 'info'
+            ],
+            'purposes' => [
+                'name' => 'Purposes Report',
+                'description' => 'Visit breakdown by purpose type',
+                'icon' => 'bi-flag',
+                'color' => 'warning'
+            ],
+            'daily' => [
+                'name' => 'Daily Report',
+                'description' => 'Day-by-day visitor statistics',
+                'icon' => 'bi-calendar-day',
+                'color' => 'danger'
+            ],
+            'weekly' => [
+                'name' => 'Weekly Report',
+                'description' => 'Week-by-week visitor trends',
+                'icon' => 'bi-calendar-week',
+                'color' => 'secondary'
+            ],
+            'monthly' => [
+                'name' => 'Monthly Report',
+                'description' => 'Monthly visitor analytics',
+                'icon' => 'bi-calendar-month',
+                'color' => 'dark'
+            ],
+            'annual' => [
+                'name' => 'Annual Report',
+                'description' => 'Yearly visitor overview',
+                'icon' => 'bi-calendar',
+                'color' => 'purple'
+            ]
+        ];
+    }
+
+    public function getDepartmentReport($filters = []) {
+        $this->db->select('
+            d.department_code,
+            d.name as department_name,
+            COUNT(DISTINCT e.employee_id) as total_employees,
+            COUNT(DISTINCT v.visit_id) as total_visits,
+            COUNT(DISTINCT v.visitor_id) as unique_visitors,
+            AVG(TIMESTAMPDIFF(MINUTE, v.check_in_time, IFNULL(v.check_out_time, NOW()))) as avg_duration_minutes
+        ');
+        $this->db->from('departments d');
+        $this->db->join('employees e', 'd.department_code = e.department_code', 'left');
+        $this->db->join('visits v', 'e.employee_id = v.host_employee_id', 'left');
+        
+        if (!empty($filters['date_from'])) {
+            $this->db->where('DATE(v.check_in_time) >=', $filters['date_from']);
+        }
+        if (!empty($filters['date_to'])) {
+            $this->db->where('DATE(v.check_in_time) <=', $filters['date_to']);
+        }
+        if (!empty($filters['company_filter'])) {
+            $this->db->where('v.company_visited', $filters['company_filter']);
+        }
+        
+        $this->db->group_by('d.department_code');
+        $this->db->order_by('total_visits', 'DESC');
+        
+        $result = $this->db->get()->result_array();
+        
+        // Calculate totals
+        $totals = [
+            'total_departments' => count($result),
+            'total_employees' => array_sum(array_column($result, 'total_employees')),
+            'total_visits' => array_sum(array_column($result, 'total_visits')),
+            'unique_visitors' => array_sum(array_column($result, 'unique_visitors'))
+        ];
+        
+        return ['status' => 'success', 'data' => $result, 'totals' => $totals];
+    }
+
+    public function getEmployeeVisitsReport($filters = []) {
+        $this->db->select('
+            e.employee_id,
+            e.name as employee_name,
+            e.email,
+            d.name as department_name,
+            e.company_owned_by,
+            COUNT(v.visit_id) as total_visits,
+            COUNT(DISTINCT v.visitor_id) as unique_visitors,
+            MAX(v.check_in_time) as last_visit,
+            AVG(TIMESTAMPDIFF(MINUTE, v.check_in_time, IFNULL(v.check_out_time, NOW()))) as avg_duration_minutes
+        ');
+        $this->db->from('employees e');
+        $this->db->join('departments d', 'e.department_code = d.department_code');
+        $this->db->join('visits v', 'e.employee_id = v.host_employee_id', 'left');
+        
+        if (!empty($filters['date_from'])) {
+            $this->db->where('DATE(v.check_in_time) >=', $filters['date_from']);
+        }
+        if (!empty($filters['date_to'])) {
+            $this->db->where('DATE(v.check_in_time) <=', $filters['date_to']);
+        }
+        if (!empty($filters['company_filter'])) {
+            $this->db->group_start();
+            $this->db->where('e.company_owned_by', $filters['company_filter']);
+            $this->db->or_where('e.company_owned_by', 'Both');
+            $this->db->group_end();
+        }
+        if (!empty($filters['department_code'])) {
+            $this->db->where('e.department_code', $filters['department_code']);
+        }
+        
+        $this->db->group_by('e.employee_id');
+        $this->db->order_by('total_visits', 'DESC');
+        
+        $result = $this->db->get()->result_array();
+        
+        $totals = [
+            'total_employees' => count($result),
+            'total_visits' => array_sum(array_column($result, 'total_visits')),
+            'unique_visitors' => array_sum(array_column($result, 'unique_visitors'))
+        ];
+        
+        return ['status' => 'success', 'data' => $result, 'totals' => $totals];
+    }
+
+    public function getVisitorVisitsReport($filters = []) {
+        $this->db->select('
+            vi.visitor_id,
+            vi.first_name,
+            vi.last_name,
+            vi.email,
+            vi.phone,
+            vi.company,
+            vi.visitor_type,
+            COUNT(v.visit_id) as total_visits,
+            MIN(v.check_in_time) as first_visit,
+            MAX(v.check_in_time) as last_visit,
+            AVG(TIMESTAMPDIFF(MINUTE, v.check_in_time, IFNULL(v.check_out_time, NOW()))) as avg_duration_minutes
+        ');
+        $this->db->from('visitors vi');
+        $this->db->join('visits v', 'vi.visitor_id = v.visitor_id', 'left');
+        
+        if (!empty($filters['date_from'])) {
+            $this->db->where('DATE(v.check_in_time) >=', $filters['date_from']);
+        }
+        if (!empty($filters['date_to'])) {
+            $this->db->where('DATE(v.check_in_time) <=', $filters['date_to']);
+        }
+        if (!empty($filters['company_filter'])) {
+            $this->db->where('v.company_visited', $filters['company_filter']);
+        }
+        if (!empty($filters['visitor_type'])) {
+            $this->db->where('vi.visitor_type', $filters['visitor_type']);
+        }
+        
+        $this->db->group_by('vi.visitor_id');
+        $this->db->having('total_visits >', 0);
+        $this->db->order_by('total_visits', 'DESC');
+        
+        $result = $this->db->get()->result_array();
+        
+        $totals = [
+            'total_visitors' => count($result),
+            'total_visits' => array_sum(array_column($result, 'total_visits')),
+            // 'new_visitors' => count(array_filter($result, fn($r) => $r['visitor_type'] == 'new')),
+            // To this:
+            'new_visitors' => count(array_filter($result, function($r) { return $r['visitor_type'] == 'new'; })),
+            'returning_visitors' => count(array_filter($result, function($r) { return ['visitor_type'] == 'returning'; }))
+        ];
+        
+        return ['status' => 'success', 'data' => $result, 'totals' => $totals];
+    }
+
+    public function getPurposesReport($filters = []) {
+        $this->db->select('
+            p.purpose_code,
+            p.purpose_name,
+            p.icon_class,
+            p.color_class,
+            p.company_owned_by,
+            COUNT(v.visit_id) as total_visits,
+            COUNT(DISTINCT v.visitor_id) as unique_visitors,
+            AVG(TIMESTAMPDIFF(MINUTE, v.check_in_time, IFNULL(v.check_out_time, NOW()))) as avg_duration_minutes
+        ');
+        $this->db->from('purposes p');
+        $this->db->join('visits v', 'p.purpose_code = v.purpose', 'left');
+        
+        if (!empty($filters['date_from'])) {
+            $this->db->where('DATE(v.check_in_time) >=', $filters['date_from']);
+        }
+        if (!empty($filters['date_to'])) {
+            $this->db->where('DATE(v.check_in_time) <=', $filters['date_to']);
+        }
+        if (!empty($filters['company_filter'])) {
+            $this->db->where('v.company_visited', $filters['company_filter']);
+        }
+        
+        $this->db->group_by('p.purpose_code');
+        $this->db->order_by('total_visits', 'DESC');
+        
+        $result = $this->db->get()->result_array();
+        
+        $totals = [
+            'total_purposes' => count($result),
+            'total_visits' => array_sum(array_column($result, 'total_visits')),
+            'unique_visitors' => array_sum(array_column($result, 'unique_visitors'))
+        ];
+        
+        return ['status' => 'success', 'data' => $result, 'totals' => $totals];
+    }
+
+    public function getDailyReport($filters = []) {
+        $dateFrom = $filters['date_from'] ?? date('Y-m-d', strtotime('-30 days'));
+        $dateTo = $filters['date_to'] ?? date('Y-m-d');
+        
+        $this->db->select('
+            DATE(v.check_in_time) as visit_date,
+            DAYNAME(v.check_in_time) as day_name,
+            COUNT(v.visit_id) as total_visits,
+            COUNT(DISTINCT v.visitor_id) as unique_visitors,
+            SUM(CASE WHEN v.check_out_time IS NOT NULL THEN 1 ELSE 0 END) as checked_out,
+            SUM(CASE WHEN v.check_out_time IS NULL THEN 1 ELSE 0 END) as still_in,
+            AVG(TIMESTAMPDIFF(MINUTE, v.check_in_time, IFNULL(v.check_out_time, NOW()))) as avg_duration_minutes
+        ');
+        $this->db->from('visits v');
+        $this->db->where('DATE(v.check_in_time) >=', $dateFrom);
+        $this->db->where('DATE(v.check_in_time) <=', $dateTo);
+        
+        if (!empty($filters['company_filter'])) {
+            $this->db->where('v.company_visited', $filters['company_filter']);
+        }
+        
+        $this->db->group_by('DATE(v.check_in_time)');
+        $this->db->order_by('visit_date', 'ASC');
+        
+        $result = $this->db->get()->result_array();
+        
+        $totals = [
+            'total_days' => count($result),
+            'total_visits' => array_sum(array_column($result, 'total_visits')),
+            'avg_daily_visits' => count($result) > 0 ? round(array_sum(array_column($result, 'total_visits')) / count($result), 1) : 0,
+            'busiest_day' => !empty($result) ? max(array_column($result, 'total_visits')) : 0
+        ];
+        
+        return ['status' => 'success', 'data' => $result, 'totals' => $totals];
+    }
+
+    public function getWeeklyReport($filters = []) {
+        $dateFrom = $filters['date_from'] ?? date('Y-m-d', strtotime('-12 weeks'));
+        $dateTo = $filters['date_to'] ?? date('Y-m-d');
+        
+        $this->db->select('
+            YEARWEEK(v.check_in_time, 1) as year_week,
+            MIN(DATE(v.check_in_time)) as week_start,
+            MAX(DATE(v.check_in_time)) as week_end,
+            COUNT(v.visit_id) as total_visits,
+            COUNT(DISTINCT v.visitor_id) as unique_visitors,
+            AVG(TIMESTAMPDIFF(MINUTE, v.check_in_time, IFNULL(v.check_out_time, NOW()))) as avg_duration_minutes
+        ');
+        $this->db->from('visits v');
+        $this->db->where('DATE(v.check_in_time) >=', $dateFrom);
+        $this->db->where('DATE(v.check_in_time) <=', $dateTo);
+        
+        if (!empty($filters['company_filter'])) {
+            $this->db->where('v.company_visited', $filters['company_filter']);
+        }
+        
+        $this->db->group_by('YEARWEEK(v.check_in_time, 1)');
+        $this->db->order_by('year_week', 'ASC');
+        
+        $result = $this->db->get()->result_array();
+        
+        $totals = [
+            'total_weeks' => count($result),
+            'total_visits' => array_sum(array_column($result, 'total_visits')),
+            'avg_weekly_visits' => count($result) > 0 ? round(array_sum(array_column($result, 'total_visits')) / count($result), 1) : 0
+        ];
+        
+        return ['status' => 'success', 'data' => $result, 'totals' => $totals];
+    }
+
+    public function getMonthlyReport($filters = []) {
+        $dateFrom = $filters['date_from'] ?? date('Y-m-d', strtotime('-12 months'));
+        $dateTo = $filters['date_to'] ?? date('Y-m-d');
+        
+        $this->db->select('
+            DATE_FORMAT(v.check_in_time, "%Y-%m") as year_month,
+            MONTHNAME(v.check_in_time) as month_name,
+            YEAR(v.check_in_time) as year,
+            COUNT(v.visit_id) as total_visits,
+            COUNT(DISTINCT v.visitor_id) as unique_visitors,
+            AVG(TIMESTAMPDIFF(MINUTE, v.check_in_time, IFNULL(v.check_out_time, NOW()))) as avg_duration_minutes
+        ');
+        $this->db->from('visits v');
+        $this->db->where('DATE(v.check_in_time) >=', $dateFrom);
+        $this->db->where('DATE(v.check_in_time) <=', $dateTo);
+        
+        if (!empty($filters['company_filter'])) {
+            $this->db->where('v.company_visited', $filters['company_filter']);
+        }
+        
+        $this->db->group_by('DATE_FORMAT(v.check_in_time, "%Y-%m")');
+        $this->db->order_by('year_month', 'ASC');
+        
+        $result = $this->db->get()->result_array();
+        
+        $totals = [
+            'total_months' => count($result),
+            'total_visits' => array_sum(array_column($result, 'total_visits')),
+            'avg_monthly_visits' => count($result) > 0 ? round(array_sum(array_column($result, 'total_visits')) / count($result), 1) : 0
+        ];
+        
+        return ['status' => 'success', 'data' => $result, 'totals' => $totals];
+    }
+
+    public function getAnnualReport($filters = []) {
+        $this->db->select('
+            YEAR(v.check_in_time) as year,
+            COUNT(v.visit_id) as total_visits,
+            COUNT(DISTINCT v.visitor_id) as unique_visitors,
+            COUNT(DISTINCT DATE(v.check_in_time)) as active_days,
+            AVG(TIMESTAMPDIFF(MINUTE, v.check_in_time, IFNULL(v.check_out_time, NOW()))) as avg_duration_minutes
+        ');
+        $this->db->from('visits v');
+        
+        if (!empty($filters['company_filter'])) {
+            $this->db->where('v.company_visited', $filters['company_filter']);
+        }
+        
+        $this->db->group_by('YEAR(v.check_in_time)');
+        $this->db->order_by('year', 'ASC');
+        
+        $result = $this->db->get()->result_array();
+        
+        $totals = [
+            'total_years' => count($result),
+            'total_visits' => array_sum(array_column($result, 'total_visits')),
+            'avg_yearly_visits' => count($result) > 0 ? round(array_sum(array_column($result, 'total_visits')) / count($result), 1) : 0
+        ];
+        
+        return ['status' => 'success', 'data' => $result, 'totals' => $totals];
+    }
+
+    public function getCompanyComparisonReport($filters = []) {
+        $this->db->select('
+            v.company_visited,
+            COUNT(v.visit_id) as total_visits,
+            COUNT(DISTINCT v.visitor_id) as unique_visitors,
+            COUNT(DISTINCT DATE(v.check_in_time)) as active_days,
+            AVG(TIMESTAMPDIFF(MINUTE, v.check_in_time, IFNULL(v.check_out_time, NOW()))) as avg_duration_minutes
+        ');
+        $this->db->from('visits v');
+        
+        if (!empty($filters['date_from'])) {
+            $this->db->where('DATE(v.check_in_time) >=', $filters['date_from']);
+        }
+        if (!empty($filters['date_to'])) {
+            $this->db->where('DATE(v.check_in_time) <=', $filters['date_to']);
+        }
+        
+        $this->db->group_by('v.company_visited');
+        $this->db->order_by('total_visits', 'DESC');
+        
+        return $this->db->get()->result_array();
+    }
+
+    // ============================================
+    // ADD TO Admin_model.php (add this method)
+    // ============================================
+
+    /**
+     * Bulk checkout multiple visits at once
+     * @param array $visit_ids Array of visit IDs to checkout
+     * @return array Result with success count and any errors
+     */
+    public function bulkCheckoutVisits($visit_ids) {
+        if (empty($visit_ids) || !is_array($visit_ids)) {
+            return [
+                'success' => false, 
+                'error' => 'No visits selected'
+            ];
+        }
+        
+        // Ensure timezone consistency
+        date_default_timezone_set('Asia/Manila'); // Or your timezone
+        
+        $success_count = 0;
+        $failed_count = 0;
+        $failed_ids = [];
+        
+        $this->db->trans_start();
+        
+        foreach ($visit_ids as $visit_id) {
+            $visit_id = (int) $visit_id;
+            
+            // Check if visit exists and is not already checked out
+            $this->db->where('visit_id', $visit_id);
+            $this->db->where('check_out_time IS NULL');
+            $visit = $this->db->get('visits')->row();
+            
+            if ($visit) {
+                $this->db->where('visit_id', $visit_id);
+                $this->db->set('check_out_time', 'NOW()', FALSE);
+                
+                if ($this->db->update('visits')) {
+                    $success_count++;
+                } else {
+                    $failed_count++;
+                    $failed_ids[] = $visit_id;
+                }
+            } else {
+                $failed_count++;
+                $failed_ids[] = $visit_id;
+            }
+        }
+        
+        $this->db->trans_complete();
+        
+        if ($this->db->trans_status() === FALSE) {
+            return [
+                'success' => false,
+                'error' => 'Transaction failed',
+                'success_count' => 0,
+                'failed_count' => count($visit_ids)
+            ];
+        }
+        
+        return [
+            'success' => true,
+            'success_count' => $success_count,
+            'failed_count' => $failed_count,
+            'failed_ids' => $failed_ids,
+            'message' => "{$success_count} visitor(s) checked out successfully" . 
+                        ($failed_count > 0 ? ", {$failed_count} failed" : "")
+        ];
+    }
+
+    /**
+     * Checkout all active visits (optional: with company filter)
+     * @param string|null $companyFilter Company to filter by
+     * @return array Result with success count
+     */
+    public function checkoutAllActiveVisits($companyFilter = null) {
+        date_default_timezone_set('Asia/Manila');
+        
+        // Get all active visit IDs
+        $this->db->select('visit_id');
+        $this->db->from('visits');
+        $this->db->where('check_out_time IS NULL');
+        
+        if ($companyFilter) {
+            $this->db->where('company_visited', $companyFilter);
+        }
+        
+        $active_visits = $this->db->get()->result_array();
+        
+        if (empty($active_visits)) {
+            return [
+                'success' => true,
+                'success_count' => 0,
+                'message' => 'No active visits to check out'
+            ];
+        }
+        
+        $visit_ids = array_column($active_visits, 'visit_id');
+        
+        return $this->bulkCheckoutVisits($visit_ids);
+    }
 }

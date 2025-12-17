@@ -342,6 +342,233 @@
             background: #e3f2fd;
             font-weight: 500;
         }
+
+        /* Report Cards */
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: var(--primary-color);
+        }
+
+        .report-card.selected {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, #fff9e6, #fff);
+        }
+
+        .report-card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.8em;
+            color: white;
+        }
+
+        .report-card h5 {
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            min-height: 350px;
+        }
+
+        /* Report Summary Cards */
+        .report-summary-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid;
+        }
+
+        .report-summary-card.primary { border-left-color: #3498db; }
+        .report-summary-card.success { border-left-color: #27ae60; }
+        .report-summary-card.warning { border-left-color: #f39c12; }
+        .report-summary-card.danger { border-left-color: #e74c3c; }
+        .report-summary-card.info { border-left-color: #00bcd4; }
+
+        .report-summary-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .report-summary-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        /* Report Table Styling */
+        #reportDataTable thead {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+        }
+
+        #reportDataTable thead th {
+            border: none;
+            padding: 12px 15px;
+            font-weight: 500;
+        }
+
+        #reportDataTable tfoot {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        #reportDataTable tbody tr:hover {
+            background: #f5f6fa;
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar, .topbar, .filter-container, .btn, #reportTypeCards {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+            
+            .table-container {
+                box-shadow: none !important;
+            }
+            
+            #reportResults {
+                display: block !important;
+            }
+        }
+
+        /* Animation for report cards */
+        @keyframes reportCardPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .report-card.generating {
+            animation: reportCardPulse 1s infinite;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .report-card {
+                padding: 15px;
+            }
+            
+            .report-card-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.4em;
+            }
+            
+            .chart-container {
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Bulk checkout button styles */
+        #bulkCheckoutBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #bulkCheckoutBtn:not(:disabled):hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(240, 173, 78, 0.4);
+        }
+
+        /* Checkbox styling */
+        .visit-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        #selectAllVisits {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Row hover effect when checkbox is checked */
+        tr:has(.visit-checkbox:checked) {
+            background-color: rgba(13, 110, 253, 0.05) !important;
+        }
+
+        /* Selected count badge animation */
+        #selectedCount {
+            transition: all 0.3s ease;
+        }
+
+        #bulkCheckoutBtn:not(:disabled) #selectedCount {
+            animation: pulse-badge 1.5s infinite;
+        }
+
+        @keyframes pulse-badge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        
+        /* Bulk checkout button styles */
+        #bulkCheckoutBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #bulkCheckoutBtn:not(:disabled):hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(240, 173, 78, 0.4);
+        }
+
+        /* Checkbox styling */
+        .visit-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        #selectAllVisits {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Row hover effect when checkbox is checked */
+        tr:has(.visit-checkbox:checked) {
+            background-color: rgba(13, 110, 253, 0.05) !important;
+        }
+
+        /* Selected count badge animation */
+        #selectedCount {
+            transition: all 0.3s ease;
+        }
+
+        #bulkCheckoutBtn:not(:disabled) #selectedCount {
+            animation: pulse-badge 1.5s infinite;
+        }
+
+        @keyframes pulse-badge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
     </style>
 </head>
 
@@ -386,6 +613,9 @@
             </div>
             <div class="sidebar-item" onclick="showSection('purposes')">
                 <i class="bi bi-flag"></i><span>Purposes</span>
+            </div>
+            <div class="sidebar-item" onclick="showSection('reports')">
+                <i class="bi bi-file-earmark-bar-graph"></i><span>Reports</span>
             </div>
             <div class="sidebar-item" onclick="showSection('settings')">
                 <i class="bi bi-gear"></i><span>Settings</span>
@@ -499,19 +729,71 @@
             <h1 class="page-title">Active Visits</h1>
             <p class="page-subtitle">Visitors currently in the building</p>
             <div class="table-container">
+
+                <!-- Add these buttons in your Active Visits card header -->
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people-fill me-2"></i>Active Visits
+                        <span class="badge bg-primary ms-2" id="activeVisitCount">0</span>
+                    </h5>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-warning btn-sm" id="bulkCheckoutBtn" 
+                                onclick="bulkCheckoutSelected()" disabled>
+                            <i class="bi bi-box-arrow-right me-1"></i>
+                            Checkout Selected (<span id="selectedCount">0</span>)
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="checkoutAllActive()">
+                            <i class="bi bi-door-open me-1"></i>
+                            Checkout All
+                        </button>
+                    </div>
+                </div>
+
                 <div class="table-header">
                     <h3 class="chart-title">Currently Checked In</h3>
                     <button class="btn btn-outline-secondary btn-sm" onclick="loadActiveVisits()">
                         <i class="bi bi-arrow-clockwise"></i> Refresh
                     </button>
                 </div>
-                <table class="table table-hover" id="activeVisitsTable">
+
+                <!-- <table class="table table-hover" id="activeVisitsTable">
                     <thead>
                         <tr>
-                            <th>Badge #</th><th>Visitor</th><th>Company</th><th>Host</th><th>Department</th><th>Purpose</th><th>Notes</th><th>Visiting</th><th>Check-In</th><th>Valid Until</th><th>Actions</th>
+                            <th>Badge #</th>
+                            <th>Visitor</th>
+                            <th>Company</th>
+                            <th>Host</th>
+                            <th>Department</th>
+                            <th>Purpose</th>
+                            <th>Notes</th>
+                            <th>Visiting</th>
+                            <th>Check-In</th>
+                            <th>Valid Until</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="activeVisitsTableBody"></tbody>
+                </table> -->
+
+                <table class="table table-hover" id="activeVisitsTable">
+                    <thead>
+                        <tr>
+                            <th>Visitor</th>
+                            <th>Company</th>
+                            <th>Host</th>
+                            <th>Department</th>
+                            <th>Check-in Time</th>
+                            <th>Duration</th>
+                            <th style="width: 40px;">
+                                <input type="checkbox" class="form-check-input" id="selectAllVisits" 
+                                    onchange="toggleSelectAll(this)">
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activeVisitsBody">
+                        <!-- Rows will be populated by JavaScript -->
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -885,6 +1167,230 @@
                     </thead>
                     <tbody id="purposeTableBody"></tbody>
                 </table>
+            </div>
+        </div>
+
+        <div class="dashboard-content" id="reportsSection" style="display: none;">
+            <h1 class="page-title">Reports & Analytics</h1>
+            <p class="page-subtitle">Generate comprehensive reports and insights</p>
+            
+            <!-- Report Type Selection Cards -->
+            <div class="row mb-4" id="reportTypeCards">
+                <!-- Department Report -->
+                <div class="col-md-3 mb-3">
+                    <div class="report-card" onclick="selectReportType('department')">
+                        <div class="report-card-icon bg-primary">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <h5>Department Report</h5>
+                        <p class="text-muted small">Visitor statistics by department</p>
+                    </div>
+                </div>
+                
+                <!-- Employee Visits Report -->
+                <div class="col-md-3 mb-3">
+                    <div class="report-card" onclick="selectReportType('employee_visits')">
+                        <div class="report-card-icon bg-success">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+                        <h5>Employee Visits</h5>
+                        <p class="text-muted small">Visit stats for each host</p>
+                    </div>
+                </div>
+                
+                <!-- Visitors Report -->
+                <div class="col-md-3 mb-3">
+                    <div class="report-card" onclick="selectReportType('visitor_visits')">
+                        <div class="report-card-icon bg-info">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h5>Visitors Report</h5>
+                        <p class="text-muted small">Complete visitor activity</p>
+                    </div>
+                </div>
+                
+                <!-- Purposes Report -->
+                <div class="col-md-3 mb-3">
+                    <div class="report-card" onclick="selectReportType('purposes')">
+                        <div class="report-card-icon bg-warning">
+                            <i class="bi bi-flag"></i>
+                        </div>
+                        <h5>Purposes Report</h5>
+                        <p class="text-muted small">Breakdown by purpose type</p>
+                    </div>
+                </div>
+                
+                <!-- Daily Report -->
+                <div class="col-md-3 mb-3">
+                    <div class="report-card" onclick="selectReportType('daily')">
+                        <div class="report-card-icon bg-danger">
+                            <i class="bi bi-calendar-day"></i>
+                        </div>
+                        <h5>Daily Report</h5>
+                        <p class="text-muted small">Day-by-day statistics</p>
+                    </div>
+                </div>
+                
+                <!-- Weekly Report -->
+                <div class="col-md-3 mb-3">
+                    <div class="report-card" onclick="selectReportType('weekly')">
+                        <div class="report-card-icon bg-secondary">
+                            <i class="bi bi-calendar-week"></i>
+                        </div>
+                        <h5>Weekly Report</h5>
+                        <p class="text-muted small">Week-by-week trends</p>
+                    </div>
+                </div>
+                
+                <!-- Monthly Report -->
+                <!-- <div class="col-md-3 mb-3 disabled">
+                    <div class="report-card" onclick="selectReportType('monthly')">
+                        <div class="report-card-icon bg-dark">
+                            <i class="bi bi-calendar-month"></i>
+                        </div>
+                        <h5>Monthly Report</h5>
+                        <p class="text-muted small">Monthly analytics</p>
+                    </div>
+                </div> -->
+                
+                <!-- Annual Report -->
+                <!-- <div class="col-md-3 mb-3">
+                    <div class="report-card" onclick="selectReportType('annual')">
+                        <div class="report-card-icon bg-purple">
+                            <i class="bi bi-calendar"></i>
+                        </div>
+                        <h5>Annual Report</h5>
+                        <p class="text-muted small">Yearly overview</p>
+                    </div>
+                </div> -->
+            </div>
+            
+            <!-- Report Generator Panel (Hidden by default) -->
+            <div class="table-container" id="reportGeneratorPanel" style="display: none;">
+                <div class="table-header">
+                    <div>
+                        <h4 id="selectedReportTitle">
+                            <i class="bi bi-file-earmark-bar-graph"></i> Generate Report
+                        </h4>
+                        <small class="text-muted" id="selectedReportDescription"></small>
+                    </div>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="hideReportPanel()">
+                        <i class="bi bi-arrow-left"></i> Back to Reports
+                    </button>
+                </div>
+                
+                <!-- Report Filters -->
+                <div class="filter-container mb-4 p-3 bg-light rounded">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold"><i class="bi bi-calendar-event"></i> Date From</label>
+                            <input type="date" class="form-control" id="reportDateFrom">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold"><i class="bi bi-calendar-event"></i> Date To</label>
+                            <input type="date" class="form-control" id="reportDateTo">
+                        </div>
+                        <div class="col-md-3" id="reportDepartmentFilter" style="display: none;">
+                            <label class="form-label fw-bold"><i class="bi bi-building"></i> Department</label>
+                            <select class="form-select" id="reportDepartmentSelect">
+                                <option value="">All Departments</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3" id="reportVisitorTypeFilter" style="display: none;">
+                            <label class="form-label fw-bold"><i class="bi bi-person"></i> Visitor Type</label>
+                            <select class="form-select" id="reportVisitorTypeSelect">
+                                <option value="">All Types</option>
+                                <option value="new">New</option>
+                                <option value="returning">Returning</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100" onclick="generateReport()">
+                                <i class="bi bi-play-fill"></i> Generate Report
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Date Filters -->
+                    <div class="mt-3 pt-3 border-top">
+                        <label class="form-label fw-bold"><i class="bi bi-lightning"></i> Quick Filters:</label>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="setQuickDateFilter('today')">Today</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="setQuickDateFilter('yesterday')">Yesterday</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="setQuickDateFilter('week')">This Week</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="setQuickDateFilter('month')">This Month</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="setQuickDateFilter('quarter')">This Quarter</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="setQuickDateFilter('year')">This Year</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="setQuickDateFilter('last30')">Last 30 Days</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="setQuickDateFilter('last90')">Last 90 Days</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Report Results -->
+                <div id="reportResults" style="display: none;">
+                    <!-- Summary Cards -->
+                    <div class="row mb-4" id="reportSummaryCards">
+                        <!-- Dynamic summary cards will be inserted here -->
+                    </div>
+                    
+                    <!-- Chart Container -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="chart-container p-3 bg-white rounded shadow-sm">
+                                <canvas id="reportChart" height="300"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="chart-container p-3 bg-white rounded shadow-sm">
+                                <canvas id="reportPieChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Export Buttons -->
+                    <div class="mb-3 d-flex gap-2">
+                        <button class="btn btn-success" onclick="exportReportToExcel()">
+                            <i class="bi bi-file-earmark-excel"></i> Export to Excel
+                        </button>
+                        <button class="btn btn-danger" onclick="exportReportToPDF()">
+                            <i class="bi bi-file-earmark-pdf"></i> Export to PDF
+                        </button>
+                        <button class="btn btn-secondary" onclick="printReport()">
+                            <i class="bi bi-printer"></i> Print
+                        </button>
+                    </div>
+                    
+                    <!-- Data Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped" id="reportDataTable">
+                            <thead id="reportTableHead">
+                                <!-- Dynamic headers -->
+                            </thead>
+                            <tbody id="reportTableBody">
+                                <!-- Dynamic data -->
+                            </tbody>
+                            <tfoot id="reportTableFoot">
+                                <!-- Dynamic totals -->
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="reportLoading" style="display: none;" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Generating report...</p>
+                </div>
+                
+                <!-- No Data State -->
+                <div id="reportNoData" style="display: none;" class="text-center py-5">
+                    <i class="bi bi-inbox" style="font-size: 4em; color: #ccc;"></i>
+                    <h5 class="mt-3 text-muted">No Data Found</h5>
+                    <p class="text-muted">Try adjusting your filters or date range</p>
+                </div>
             </div>
         </div>
 
@@ -1837,7 +2343,6 @@
         </div>
     </div>
 
-
     <!-- Department Employees Modal -->
     <div class="modal fade" id="departmentEmployeesModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -1873,17 +2378,22 @@
             </div>
         </div>
     </div>
+    
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
-        const companyFilter = <?php echo json_encode($companyFilter); ?>;
+        const companyFilter = <?php echo json_encode($companyFilter ?? '' ); ?>;
         const filterParam = companyFilter ? `&company_filter=${encodeURIComponent(companyFilter)}` : '&company_filter=null';
         const ajaxUrl = '<?= base_url("admin/ajax_handler") ?>';
+
+        // Fallback variables - add at TOP of your script section
+        var baseUrl = "<?= base_url(); ?>";
         
         let currentVisitId = null;
         let currentVisitorData = null;
@@ -2106,6 +2616,8 @@
                 'employees': 'employeesSection',
                 'departments': 'departmentsSection',
                 'purposes': 'purposesSection',
+                
+                'reports': 'reportsSection',  
                 'settings': 'settingsSection'
             };
             
@@ -2118,6 +2630,8 @@
                     case 'visitors': loadAllVisitors(); break;
                     case 'employees': loadEmployees(); break;
                     case 'departments': loadDepartments(); break;
+                    
+                    case 'reports': initReportsSection(); break;
                     case 'purposes': loadPurposes(); break;
                 }
             }
@@ -5332,7 +5846,1169 @@
             });
         }
 
+
         
+        // Report Variables
+        let currentReportType = null;
+        let currentReportData = null;
+        let reportChart = null;
+        let reportPieChart = null;
+
+        // Report Type Definitions
+        const reportTypeConfig = {
+            department: {
+                title: 'Department Report',
+                description: 'Visitor statistics grouped by department',
+                icon: 'bi-building',
+                color: '#3498db',
+                showDepartmentFilter: false,
+                showVisitorTypeFilter: false,
+                defaultDateRange: 30,
+                columns: ['Department Code', 'Department Name', 'Employees', 'Total Visits', 'Unique Visitors', 'Avg Duration'],
+                dataKeys: ['department_code', 'department_name', 'total_employees', 'total_visits', 'unique_visitors', 'avg_duration_minutes'],
+                chartLabel: 'Visits by Department',
+                chartType: 'bar'
+            },
+            employee_visits: {
+                title: 'Employee Visits Report',
+                description: 'Visit statistics for each employee host',
+                icon: 'bi-person-badge',
+                color: '#27ae60',
+                showDepartmentFilter: true,
+                showVisitorTypeFilter: false,
+                defaultDateRange: 30,
+                columns: ['Employee ID', 'Name', 'Department', 'Company', 'Total Visits', 'Unique Visitors', 'Last Visit', 'Avg Duration'],
+                dataKeys: ['employee_id', 'employee_name', 'department_name', 'company_owned_by', 'total_visits', 'unique_visitors', 'last_visit', 'avg_duration_minutes'],
+                chartLabel: 'Visits by Employee',
+                chartType: 'bar'
+            },
+            visitor_visits: {
+                title: 'Visitors Report',
+                description: 'Complete visitor activity and history',
+                icon: 'bi-people',
+                color: '#00bcd4',
+                showDepartmentFilter: false,
+                showVisitorTypeFilter: true,
+                defaultDateRange: 30,
+                columns: ['Visitor ID', 'Name', 'Email', 'Phone', 'Company', 'Type', 'Total Visits', 'First Visit', 'Last Visit'],
+                dataKeys: ['visitor_id', 'full_name', 'email', 'phone', 'company', 'visitor_type', 'total_visits', 'first_visit', 'last_visit'],
+                chartLabel: 'Visitors by Visit Count',
+                chartType: 'bar'
+            },
+            purposes: {
+                title: 'Purposes Report',
+                description: 'Visit breakdown by purpose type',
+                icon: 'bi-flag',
+                color: '#f39c12',
+                showDepartmentFilter: false,
+                showVisitorTypeFilter: false,
+                defaultDateRange: 30,
+                columns: ['Purpose Code', 'Purpose Name', 'Company', 'Total Visits', 'Unique Visitors', 'Avg Duration'],
+                dataKeys: ['purpose_code', 'purpose_name', 'company_owned_by', 'total_visits', 'unique_visitors', 'avg_duration_minutes'],
+                chartLabel: 'Visits by Purpose',
+                chartType: 'doughnut'
+            },
+            daily: {
+                title: 'Daily Report',
+                description: 'Day-by-day visitor statistics',
+                icon: 'bi-calendar-day',
+                color: '#e74c3c',
+                showDepartmentFilter: false,
+                showVisitorTypeFilter: false,
+                defaultDateRange: 30,
+                columns: ['Date', 'Day', 'Total Visits', 'Unique Visitors', 'Checked Out', 'Still In', 'Avg Duration'],
+                dataKeys: ['visit_date', 'day_name', 'total_visits', 'unique_visitors', 'checked_out', 'still_in', 'avg_duration_minutes'],
+                chartLabel: 'Daily Visits',
+                chartType: 'line'
+            },
+            weekly: {
+                title: 'Weekly Report',
+                description: 'Week-by-week visitor trends',
+                icon: 'bi-calendar-week',
+                color: '#95a5a6',
+                showDepartmentFilter: false,
+                showVisitorTypeFilter: false,
+                defaultDateRange: 84,
+                columns: ['Week', 'Week Start', 'Week End', 'Total Visits', 'Unique Visitors', 'Avg Duration'],
+                dataKeys: ['year_week', 'week_start', 'week_end', 'total_visits', 'unique_visitors', 'avg_duration_minutes'],
+                chartLabel: 'Weekly Visits',
+                chartType: 'line'
+            },
+            monthly: {
+                title: 'Monthly Report',
+                description: 'Monthly visitor analytics',
+                icon: 'bi-calendar-month',
+                color: '#2c3e50',
+                showDepartmentFilter: false,
+                showVisitorTypeFilter: false,
+                defaultDateRange: 365,
+                columns: ['Month', 'Year', 'Total Visits', 'Unique Visitors', 'Avg Duration'],
+                dataKeys: ['month_name', 'year', 'total_visits', 'unique_visitors', 'avg_duration_minutes'],
+                chartLabel: 'Monthly Visits',
+                chartType: 'bar'
+            },
+            annual: {
+                title: 'Annual Report',
+                description: 'Yearly visitor overview',
+                icon: 'bi-calendar',
+                color: '#9b59b6',
+                showDepartmentFilter: false,
+                showVisitorTypeFilter: false,
+                defaultDateRange: null,
+                columns: ['Year', 'Total Visits', 'Unique Visitors', 'Active Days', 'Avg Duration'],
+                dataKeys: ['year', 'total_visits', 'unique_visitors', 'active_days', 'avg_duration_minutes'],
+                chartLabel: 'Annual Visits',
+                chartType: 'bar'
+            }
+        };
+
+        // ============================================
+        // HELPER FUNCTIONS FOR CLEANUP
+        // ============================================
+
+        // Helper function to properly destroy DataTable
+        function destroyReportDataTable() {
+            try {
+                if ($.fn.DataTable.isDataTable('#reportDataTable')) {
+                    $('#reportDataTable').DataTable().clear().destroy();
+                }
+            } catch (e) {
+                console.warn('Error destroying report DataTable:', e);
+            }
+            
+            // Remove DataTable classes and reset table structure
+            $('#reportDataTable').removeClass('dataTable no-footer');
+            $('#reportDataTable').removeAttr('aria-describedby');
+            $('#reportDataTable').removeAttr('role');
+            
+            // Clear table content
+            const thead = document.getElementById('reportTableHead');
+            const tbody = document.getElementById('reportTableBody');
+            const tfoot = document.getElementById('reportTableFoot');
+            
+            if (thead) thead.innerHTML = '';
+            if (tbody) tbody.innerHTML = '';
+            if (tfoot) tfoot.innerHTML = '';
+        }
+
+        // Helper function to destroy charts
+        function destroyReportCharts() {
+            if (reportChart) {
+                try {
+                    reportChart.destroy();
+                } catch (e) {
+                    console.warn('Error destroying report chart:', e);
+                }
+                reportChart = null;
+            }
+            if (reportPieChart) {
+                try {
+                    reportPieChart.destroy();
+                } catch (e) {
+                    console.warn('Error destroying pie chart:', e);
+                }
+                reportPieChart = null;
+            }
+        }
+
+        // ============================================
+        // MAIN REPORT FUNCTIONS
+        // ============================================
+
+        // Select Report Type
+        function selectReportType(type) {
+            // Destroy existing DataTable and charts when switching report types
+            destroyReportDataTable();
+            destroyReportCharts();
+            
+            currentReportType = type;
+            currentReportData = null;
+            const config = reportTypeConfig[type];
+            
+            // Update UI - remove selected from all cards
+            document.querySelectorAll('.report-card').forEach(card => card.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            
+            // Update panel title
+            document.getElementById('selectedReportTitle').innerHTML = `<i class="bi ${config.icon}"></i> ${config.title}`;
+            document.getElementById('selectedReportDescription').textContent = config.description;
+            
+            // Set default date range
+            const today = new Date();
+            document.getElementById('reportDateTo').value = today.toISOString().split('T')[0];
+            
+            if (config.defaultDateRange) {
+                const fromDate = new Date(today);
+                fromDate.setDate(fromDate.getDate() - config.defaultDateRange);
+                document.getElementById('reportDateFrom').value = fromDate.toISOString().split('T')[0];
+            } else {
+                document.getElementById('reportDateFrom').value = '';
+            }
+            
+            // Show/hide filters
+            document.getElementById('reportDepartmentFilter').style.display = config.showDepartmentFilter ? 'block' : 'none';
+            document.getElementById('reportVisitorTypeFilter').style.display = config.showVisitorTypeFilter ? 'block' : 'none';
+            
+            // Load department options if needed
+            if (config.showDepartmentFilter) {
+                loadDepartmentsForReport();
+            }
+            
+            // Show panel, hide results
+            document.getElementById('reportGeneratorPanel').style.display = 'block';
+            document.getElementById('reportResults').style.display = 'none';
+            document.getElementById('reportNoData').style.display = 'none';
+            document.getElementById('reportLoading').style.display = 'none';
+            
+            // Clear previous results
+            document.getElementById('reportSummaryCards').innerHTML = '';
+            
+            // Scroll to panel
+            document.getElementById('reportGeneratorPanel').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Hide Report Panel
+        function hideReportPanel() {
+            // Destroy DataTable and charts when hiding panel
+            destroyReportDataTable();
+            destroyReportCharts();
+            
+            document.getElementById('reportGeneratorPanel').style.display = 'none';
+            document.querySelectorAll('.report-card').forEach(card => card.classList.remove('selected'));
+            currentReportType = null;
+            currentReportData = null;
+        }
+
+        // Load Departments for Report Filter
+        function loadDepartmentsForReport() {
+            fetch(ajaxUrl + '?action=departments')
+                .then(r => r.json())
+                .then(data => {
+                    const select = document.getElementById('reportDepartmentSelect');
+                    select.innerHTML = '<option value="">All Departments</option>';
+                    data.filter(d => d.is_active == 1).forEach(d => {
+                        select.innerHTML += `<option value="${d.department_code}">${d.name}</option>`;
+                    });
+                });
+        }
+
+        // Quick Date Filters
+        function setQuickDateFilter(range) {
+            const today = new Date();
+            let fromDate = new Date();
+            let toDate = new Date();
+            
+            switch(range) {
+                case 'today':
+                    fromDate = today;
+                    toDate = today;
+                    break;
+                case 'yesterday':
+                    fromDate.setDate(today.getDate() - 1);
+                    toDate.setDate(today.getDate() - 1);
+                    break;
+                case 'week':
+                    const dayOfWeek = today.getDay();
+                    fromDate.setDate(today.getDate() - dayOfWeek);
+                    break;
+                case 'month':
+                    fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    break;
+                case 'quarter':
+                    const quarter = Math.floor(today.getMonth() / 3);
+                    fromDate = new Date(today.getFullYear(), quarter * 3, 1);
+                    break;
+                case 'year':
+                    fromDate = new Date(today.getFullYear(), 0, 1);
+                    break;
+                case 'last30':
+                    fromDate.setDate(today.getDate() - 30);
+                    break;
+                case 'last90':
+                    fromDate.setDate(today.getDate() - 90);
+                    break;
+            }
+            
+            document.getElementById('reportDateFrom').value = fromDate.toISOString().split('T')[0];
+            document.getElementById('reportDateTo').value = toDate.toISOString().split('T')[0];
+        }
+
+        // Generate Report
+        function generateReport() {
+            if (!currentReportType) {
+                Swal.fire('Error', 'Please select a report type first', 'warning');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('report_type', currentReportType);
+            formData.append('date_from', document.getElementById('reportDateFrom').value);
+            formData.append('date_to', document.getElementById('reportDateTo').value);
+            formData.append('department_code', document.getElementById('reportDepartmentSelect')?.value || '');
+            formData.append('visitor_type', document.getElementById('reportVisitorTypeSelect')?.value || '');
+            
+            // IMPORTANT: Destroy existing DataTable and charts BEFORE showing loading
+            destroyReportDataTable();
+            destroyReportCharts();
+            
+            // Clear summary cards
+            document.getElementById('reportSummaryCards').innerHTML = '';
+            
+            // Show loading
+            document.getElementById('reportLoading').style.display = 'block';
+            document.getElementById('reportResults').style.display = 'none';
+            document.getElementById('reportNoData').style.display = 'none';
+            
+            fetch(ajaxUrl + '?action=generate_report', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('reportLoading').style.display = 'none';
+                
+                if (data.status === 'success' && data.data && data.data.length > 0) {
+                    currentReportData = data;
+                    renderReport(data);
+                    document.getElementById('reportResults').style.display = 'block';
+                } else {
+                    document.getElementById('reportNoData').style.display = 'block';
+                }
+            })
+            .catch(e => {
+                console.error('Error generating report:', e);
+                document.getElementById('reportLoading').style.display = 'none';
+                Swal.fire('Error', 'Failed to generate report', 'error');
+            });
+        }
+
+        // Render Report
+        function renderReport(data) {
+            const config = reportTypeConfig[currentReportType];
+            
+            // Render Summary Cards
+            renderSummaryCards(data.totals);
+            
+            // Render Charts
+            renderCharts(data.data, config);
+            
+            // Render Table
+            renderReportTable(data.data, config);
+        }
+
+        // Render Summary Cards
+        function renderSummaryCards(totals) {
+            const container = document.getElementById('reportSummaryCards');
+            container.innerHTML = '';
+            
+            const colors = ['primary', 'success', 'warning', 'danger', 'info'];
+            let colorIndex = 0;
+            
+            for (const [key, value] of Object.entries(totals)) {
+                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                const color = colors[colorIndex % colors.length];
+                
+                container.innerHTML += `
+                    <div class="col-md-3 mb-3">
+                        <div class="report-summary-card ${color}">
+                            <div class="report-summary-value">${formatNumber(value)}</div>
+                            <div class="report-summary-label">${label}</div>
+                        </div>
+                    </div>
+                `;
+                colorIndex++;
+            }
+        }
+
+        // Render Charts
+        function renderCharts(data, config) {
+            // Destroy existing charts using helper function
+            destroyReportCharts();
+            
+            const ctx = document.getElementById('reportChart');
+            const pieCtx = document.getElementById('reportPieChart');
+            
+            if (!ctx || !pieCtx) {
+                console.warn('Chart canvas elements not found');
+                return;
+            }
+            
+            const ctxContext = ctx.getContext('2d');
+            const pieCtxContext = pieCtx.getContext('2d');
+            
+            // Prepare chart data
+            let labels = [];
+            let values = [];
+            
+            // Determine label and value fields based on report type
+            switch(currentReportType) {
+                case 'department':
+                    labels = data.map(d => d.department_name || d.department_code);
+                    values = data.map(d => parseInt(d.total_visits) || 0);
+                    break;
+                case 'employee_visits':
+                    labels = data.slice(0, 15).map(d => d.employee_name);
+                    values = data.slice(0, 15).map(d => parseInt(d.total_visits) || 0);
+                    break;
+                case 'visitor_visits':
+                    labels = data.slice(0, 15).map(d => `${d.first_name} ${d.last_name}`);
+                    values = data.slice(0, 15).map(d => parseInt(d.total_visits) || 0);
+                    break;
+                case 'purposes':
+                    labels = data.map(d => d.purpose_name);
+                    values = data.map(d => parseInt(d.total_visits) || 0);
+                    break;
+                case 'daily':
+                    labels = data.map(d => formatDate(d.visit_date));
+                    values = data.map(d => parseInt(d.total_visits) || 0);
+                    break;
+                case 'weekly':
+                    labels = data.map(d => `Week ${d.year_week}`);
+                    values = data.map(d => parseInt(d.total_visits) || 0);
+                    break;
+                case 'monthly':
+                    labels = data.map(d => `${d.month_name} ${d.year}`);
+                    values = data.map(d => parseInt(d.total_visits) || 0);
+                    break;
+                case 'annual':
+                    labels = data.map(d => d.year);
+                    values = data.map(d => parseInt(d.total_visits) || 0);
+                    break;
+            }
+            
+            // Generate colors
+            const backgroundColors = generateColors(labels.length, 0.7);
+            const borderColors = generateColors(labels.length, 1);
+            
+            // Main Chart
+            reportChart = new Chart(ctxContext, {
+                type: config.chartType === 'doughnut' ? 'bar' : config.chartType,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: config.chartLabel,
+                        data: values,
+                        backgroundColor: config.chartType === 'line' ? 'rgba(52, 152, 219, 0.2)' : backgroundColors,
+                        borderColor: config.chartType === 'line' ? 'rgba(52, 152, 219, 1)' : borderColors,
+                        borderWidth: config.chartType === 'line' ? 2 : 1,
+                        fill: config.chartType === 'line',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: config.chartLabel
+                        }
+                    },
+                    scales: config.chartType !== 'doughnut' ? {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    } : {}
+                }
+            });
+            
+            // Pie Chart
+            reportPieChart = new Chart(pieCtxContext, {
+                type: 'doughnut',
+                data: {
+                    labels: labels.slice(0, 8),
+                    datasets: [{
+                        data: values.slice(0, 8),
+                        backgroundColor: backgroundColors.slice(0, 8),
+                        borderColor: borderColors.slice(0, 8),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: { size: 10 }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribution'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render Report Table
+        function renderReportTable(data, config) {
+            // IMPORTANT: Destroy existing DataTable first with extra safety
+            destroyReportDataTable();
+            
+            const thead = document.getElementById('reportTableHead');
+            const tbody = document.getElementById('reportTableBody');
+            const tfoot = document.getElementById('reportTableFoot');
+            
+            // Build headers
+            let headerRow = '<tr>';
+            headerRow += '<th>#</th>';
+            config.columns.forEach(col => {
+                headerRow += `<th>${col}</th>`;
+            });
+            headerRow += '</tr>';
+            thead.innerHTML = headerRow;
+            
+            // Build body
+            data.forEach((row, index) => {
+                let tr = `<tr><td>${index + 1}</td>`;
+                
+                config.dataKeys.forEach(key => {
+                    let value = row[key];
+                    
+                    // Special formatting
+                    if (key === 'full_name') {
+                        value = `${row.first_name || ''} ${row.last_name || ''}`.trim();
+                    } else if (key === 'avg_duration_minutes') {
+                        value = formatDuration(value);
+                    } else if (key.includes('visit') && key.includes('date') || key === 'first_visit' || key === 'last_visit') {
+                        value = value ? formatDate(value) : 'N/A';
+                    } else if (key === 'week_start' || key === 'week_end') {
+                        value = value ? formatDate(value) : 'N/A';
+                    } else if (key === 'visitor_type') {
+                        value = `<span class="badge ${value === 'returning' ? 'bg-success' : 'bg-info'}">${value || 'new'}</span>`;
+                    } else if (key === 'company_owned_by') {
+                        value = `<span class="badge ${getCompanyOwnershipBadge(value)}">${value || 'N/A'}</span>`;
+                    }
+                    
+                    tr += `<td>${value ?? 'N/A'}</td>`;
+                });
+                
+                tr += '</tr>';
+                tbody.innerHTML += tr;
+            });
+            
+            // Initialize DataTable with a slight delay to ensure DOM is ready
+            setTimeout(() => {
+                try {
+                    if (!$.fn.DataTable.isDataTable('#reportDataTable')) {
+                        $('#reportDataTable').DataTable({
+                            pageLength: 25,
+                            order: [],
+                            destroy: true,
+                            language: {
+                                emptyTable: "No data available",
+                                zeroRecords: "No matching records found"
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error initializing report DataTable:', e);
+                }
+            }, 100);
+        }
+
+        // ============================================
+        // HELPER FUNCTIONS
+        // ============================================
+
+        function formatNumber(num) {
+            if (num === null || num === undefined) return '0';
+            return parseFloat(num).toLocaleString('en-US', { maximumFractionDigits: 1 });
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatDuration(minutes) {
+            if (!minutes || isNaN(minutes)) return 'N/A';
+            const mins = Math.round(parseFloat(minutes));
+            if (mins < 60) return `${mins}m`;
+            const hours = Math.floor(mins / 60);
+            const remainingMins = mins % 60;
+            return `${hours}h ${remainingMins}m`;
+        }
+
+        function generateColors(count, alpha) {
+            const colors = [
+                `rgba(52, 152, 219, ${alpha})`,
+                `rgba(46, 204, 113, ${alpha})`,
+                `rgba(155, 89, 182, ${alpha})`,
+                `rgba(241, 196, 15, ${alpha})`,
+                `rgba(231, 76, 60, ${alpha})`,
+                `rgba(26, 188, 156, ${alpha})`,
+                `rgba(230, 126, 34, ${alpha})`,
+                `rgba(149, 165, 166, ${alpha})`,
+                `rgba(52, 73, 94, ${alpha})`,
+                `rgba(22, 160, 133, ${alpha})`,
+                `rgba(39, 174, 96, ${alpha})`,
+                `rgba(41, 128, 185, ${alpha})`,
+            ];
+            
+            const result = [];
+            for (let i = 0; i < count; i++) {
+                result.push(colors[i % colors.length]);
+            }
+            return result;
+        }
+
+        // ============================================
+        // EXPORT FUNCTIONS
+        // ============================================
+
+        function exportReportToExcel() {
+            if (!currentReportData || !currentReportData.data) {
+                Swal.fire('Error', 'No data to export', 'warning');
+                return;
+            }
+            
+            const config = reportTypeConfig[currentReportType];
+            let csv = config.columns.join(',') + '\n';
+            
+            currentReportData.data.forEach(row => {
+                const rowData = config.dataKeys.map(key => {
+                    let value = row[key];
+                    if (key === 'full_name') {
+                        value = `${row.first_name || ''} ${row.last_name || ''}`.trim();
+                    } else if (key === 'avg_duration_minutes') {
+                        value = formatDuration(value);
+                    }
+                    // Escape commas and quotes
+                    if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+                        value = `"${value.replace(/"/g, '""')}"`;
+                    }
+                    return value ?? '';
+                });
+                csv += rowData.join(',') + '\n';
+            });
+            
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${config.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Report exported to CSV',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+
+        function exportReportToPDF() {
+            Swal.fire({
+                title: 'Export to PDF',
+                text: 'PDF export requires a PDF library. Use the Print function and save as PDF.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Print Now',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    printReport();
+                }
+            });
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        // ============================================
+        // INITIALIZE REPORTS SECTION
+        // ============================================
+
+        function initReportsSection() {
+            // Destroy existing DataTable and charts
+            destroyReportDataTable();
+            destroyReportCharts();
+            
+            // Reset state
+            currentReportType = null;
+            currentReportData = null;
+            
+            // Hide panel and results
+            const panelEl = document.getElementById('reportGeneratorPanel');
+            const resultsEl = document.getElementById('reportResults');
+            const noDataEl = document.getElementById('reportNoData');
+            const loadingEl = document.getElementById('reportLoading');
+            const summaryEl = document.getElementById('reportSummaryCards');
+            
+            if (panelEl) panelEl.style.display = 'none';
+            if (resultsEl) resultsEl.style.display = 'none';
+            if (noDataEl) noDataEl.style.display = 'none';
+            if (loadingEl) loadingEl.style.display = 'none';
+            if (summaryEl) summaryEl.innerHTML = '';
+            
+            // Deselect all cards
+            document.querySelectorAll('.report-card').forEach(card => card.classList.remove('selected'));
+        }
+
+        // ============================================
+        // REMEMBER TO UPDATE showSection() function!
+        // Add 'reports': 'reportsSection' to sectionMap
+        // Add case 'reports': initReportsSection(); break;
+        // ============================================
+
+
+
+        // Track selected visits
+        let selectedVisits = new Set();
+
+        // Function to render active visits with checkboxes
+        function renderActiveVisits(visits) {
+            const tbody = $('#activeVisitsBody');
+            tbody.empty();
+            
+            if (!visits || visits.length === 0) {
+                tbody.html(`
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            No active visits at the moment
+                        </td>
+                    </tr>
+                `);
+                $('#activeVisitCount').text('0');
+                updateBulkCheckoutButton();
+                return;
+            }
+            
+            $('#activeVisitCount').text(visits.length);
+            
+            visits.forEach(visit => {
+                const checkinTime = new Date(visit.check_in_time);
+                const now = new Date();
+                const duration = Math.floor((now - checkinTime) / (1000 * 60)); // minutes
+                const durationDisplay = duration < 60 
+                    ? `${duration} min` 
+                    : `${Math.floor(duration/60)}h ${duration%60}m`;
+                
+                const isChecked = selectedVisits.has(visit.visit_id.toString());
+                
+                const row = `
+                    <tr data-visit-id="${visit.visit_id}">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                ${visit.photo 
+                                    ? `<img src="${visit.photo}" class="rounded-circle me-2" 
+                                        style="width: 40px; height: 40px; object-fit: cover;">` 
+                                    : `<div class="rounded-circle bg-secondary text-white me-2 d-flex 
+                                            align-items-center justify-content-center" 
+                                            style="width: 40px; height: 40px;">
+                                        ${(visit.first_name || 'V')[0]}
+                                    </div>`
+                                }
+                                <div>
+                                    <strong>${visit.first_name} ${visit.last_name}</strong>
+                                    <br><small class="text-muted">${visit.email || ''}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${visit.company || 'N/A'}</td>
+                        <td>${visit.host_name}</td>
+                        <td><span class="badge bg-info">${visit.department_name}</span></td>
+                        <td>
+                            <span class="text-primary">
+                                <i class="bi bi-clock me-1"></i>
+                                ${checkinTime.toLocaleTimeString()}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${duration > 240 ? 'bg-warning' : 'bg-success'}">
+                                ${durationDisplay}
+                            </span>
+                        </td>
+                        <td>
+                            <input type="checkbox" class="form-check-input visit-checkbox" 
+                                value="${visit.visit_id}" 
+                                ${isChecked ? 'checked' : ''}
+                                onchange="toggleVisitSelection(this)">
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger" 
+                                    onclick="checkoutVisitBulk(${visit.visit_id})" 
+                                    title="Check Out">
+                                <i class="bi bi-box-arrow-right"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" 
+                                    onclick="viewVisitDetails(${visit.visit_id})" 
+                                    title="View Details">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+            
+            updateBulkCheckoutButton();
+            updateSelectAllCheckbox();
+        }
+
+        // Toggle individual visit selection
+        function toggleVisitSelection(checkbox) {
+            const visitId = checkbox.value;
+            
+            if (checkbox.checked) {
+                selectedVisits.add(visitId);
+            } else {
+                selectedVisits.delete(visitId);
+            }
+            
+            updateBulkCheckoutButton();
+            updateSelectAllCheckbox();
+        }
+
+        // Toggle select all
+        function toggleSelectAll(checkbox) {
+            const checkboxes = document.querySelectorAll('.visit-checkbox');
+            
+            checkboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+                if (checkbox.checked) {
+                    selectedVisits.add(cb.value);
+                } else {
+                    selectedVisits.delete(cb.value);
+                }
+            });
+            
+            updateBulkCheckoutButton();
+        }
+
+        // Update select all checkbox state
+        function updateSelectAllCheckbox() {
+            const checkboxes = document.querySelectorAll('.visit-checkbox');
+            const selectAll = document.getElementById('selectAllVisits');
+            
+            if (checkboxes.length === 0) {
+                selectAll.checked = false;
+                selectAll.indeterminate = false;
+                return;
+            }
+            
+            const checkedCount = document.querySelectorAll('.visit-checkbox:checked').length;
+            
+            selectAll.checked = checkedCount === checkboxes.length;
+            selectAll.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+        }
+
+        // Update bulk checkout button
+        function updateBulkCheckoutButton() {
+            const btn = document.getElementById('bulkCheckoutBtn');
+            const countSpan = document.getElementById('selectedCount');
+            const count = selectedVisits.size;
+            
+            countSpan.textContent = count;
+            btn.disabled = count === 0;
+        }
+
+        // Update bulk checkout button
+        function updateBulkCheckoutButton() {
+            const btn = document.getElementById('bulkCheckoutBtn');
+            const countSpan = document.getElementById('selectedCount');
+            const count = selectedVisits.size;
+            
+            countSpan.textContent = count;
+            btn.disabled = count === 0;
+        }
+
+        // Bulk checkout selected visits
+        function bulkCheckoutSelected() {
+            if (selectedVisits.size === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Selection',
+                    text: 'Please select at least one visitor to check out.'
+                });
+                return;
+            }
+            
+            Swal.fire({
+                title: 'Bulk Checkout',
+                html: `Are you sure you want to check out <strong>${selectedVisits.size}</strong> visitor(s)?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#f0ad4e',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, Check Out All',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    performBulkCheckout(Array.from(selectedVisits));
+                }
+            });
+        }
+
+        // Checkout all active visits
+        function checkoutAllActive() {
+            const activeCount = $('#activeVisitCount').text();
+            
+            if (parseInt(activeCount) === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'No Active Visits',
+                    text: 'There are no active visits to check out.'
+                });
+                return;
+            }
+            
+            Swal.fire({
+                title: 'Checkout All Active Visits',
+                html: `
+                    <div class="text-danger mb-3">
+                        <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                    </div>
+                    <p>This will check out <strong>ALL ${activeCount}</strong> active visitor(s).</p>
+                    <p class="text-muted">This action cannot be undone.</p>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, Checkout All',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    performCheckoutAll();
+                }
+            });
+        }
+
+        // Perform bulk checkout AJAX call
+        function performBulkCheckout(visitIds) {
+            Swal.fire({
+                title: 'Processing...',
+                html: 'Checking out visitors...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            $.ajax({
+                url: "<?= base_url('admin/ajax_handler'); ?>?action=bulk_checkout&company_filter=<?= $companyFilter ?? '' ?>",
+                method: 'POST',
+                data: {
+                    visit_ids: JSON.stringify(visitIds)
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Checkout Complete',
+                            html: `
+                                <p>${response.message}</p>
+                                ${response.failed_count > 0 
+                                    ? `<p class="text-warning">Failed IDs: ${response.failed_ids.join(', ')}</p>` 
+                                    : ''}
+                            `,
+                            timer: 3000,
+                            showConfirmButton: true
+                        });
+                        
+                        // Clear selections and refresh
+                        selectedVisits.clear();
+                        loadActiveVisits();
+                        if (typeof loadDashboardStats === 'function') loadDashboardStats();
+                        if (typeof refreshDashboard === 'function') refreshDashboard();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Checkout Failed',
+                            text: response.error || 'An error occurred during checkout.'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to process bulk checkout: ' + error
+                    });
+                }
+            });
+        }
+
+        // Perform checkout all AJAX call
+        function performCheckoutAll() {
+            Swal.fire({
+                title: 'Processing...',
+                html: 'Checking out all visitors...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            $.ajax({
+                url: "<?= base_url('admin/ajax_handler'); ?>?action=checkout_all_active&company_filter=<?= $companyFilter ?? '' ?>",
+                method: 'POST',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'All Visitors Checked Out',
+                            text: response.message,
+                            timer: 3000,
+                            showConfirmButton: true
+                        });
+                        
+                        // Clear selections and refresh
+                        selectedVisits.clear();
+                        loadActiveVisits();
+                        if (typeof loadDashboardStats === 'function') loadDashboardStats();
+                        if (typeof refreshDashboard === 'function') refreshDashboard();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Checkout Failed',
+                            text: response.error || 'An error occurred.'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to checkout all visitors: ' + error
+                    });
+                }
+            });
+        }
+
+        // Single visit checkout (existing function - ensure it exists)
+        function checkoutVisit(visitId) {
+            Swal.fire({
+                title: 'Checkout Visitor',
+                text: 'Are you sure you want to check out this visitor?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, Check Out'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: baseUrl + 'admin/ajax_handler?action=checkout',
+                        method: 'POST',
+                        data: { visit_id: visitId },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Checked Out',
+                                    text: 'Visitor has been checked out successfully.',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                selectedVisits.delete(visitId.toString());
+                                loadActiveVisits();
+                                loadDashboardStats();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.error || 'Failed to checkout visitor.'
+                                });
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to process checkout.'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // Single visit checkout for bulk module
+        function checkoutVisitBulk(visitId) {
+            Swal.fire({
+                title: 'Checkout Visitor',
+                text: 'Are you sure you want to check out this visitor?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, Check Out'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "<?= base_url('admin/ajax_handler'); ?>?action=checkout",
+                        method: 'POST',
+                        data: { visit_id: visitId },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Checked Out',
+                                    text: 'Visitor has been checked out successfully.',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                selectedVisits.delete(visitId.toString());
+                                loadActiveVisits();
+                                if (typeof loadDashboardStats === 'function') loadDashboardStats();
+                                if (typeof refreshDashboard === 'function') refreshDashboard();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.error || 'Failed to checkout visitor.'
+                                });
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to process checkout.'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+
+        // Load active visits for bulk checkout module
+        function loadActiveVisits() {
+            $.ajax({
+                url: "<?= base_url('admin/ajax_handler'); ?>?action=active_visits&company_filter=<?= $companyFilter ?? '' ?>",
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    renderActiveVisits(response);
+                },
+                error: function() {
+                    console.error('Failed to load active visits');
+                }
+            });
+        }
 
     </script>
 
