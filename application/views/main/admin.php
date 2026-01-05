@@ -729,6 +729,13 @@
             <h1 class="page-title">Active Visits</h1>
             <p class="page-subtitle">Visitors currently in the building</p>
             <div class="table-container">
+            
+                <div class="table-header">
+                    <h3 class="chart-title">Currently Checked In</h3>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="loadActiveVisits()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
 
                 <!-- Add these buttons in your Active Visits card header -->
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -747,13 +754,6 @@
                             Checkout All
                         </button>
                     </div>
-                </div>
-
-                <div class="table-header">
-                    <h3 class="chart-title">Currently Checked In</h3>
-                    <button class="btn btn-outline-secondary btn-sm" onclick="loadActiveVisits()">
-                        <i class="bi bi-arrow-clockwise"></i> Refresh
-                    </button>
                 </div>
 
                 <!-- <table class="table table-hover" id="activeVisitsTable">
