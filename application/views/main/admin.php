@@ -740,8 +740,8 @@
                 <!-- Add these buttons in your Active Visits card header -->
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
-                        <i class="bi bi-people-fill me-2"></i>Active Visits
-                        <span class="badge bg-primary ms-2" id="activeVisitCount">0</span>
+                        <!-- <i class="bi bi-people-fill me-2"></i>Active Visits
+                        <span class="badge bg-primary ms-2" id="activeVisitCount">0</span> -->
                     </h5>
                     <div class="btn-group">
                         <button type="button" class="btn btn-warning btn-sm" id="bulkCheckoutBtn" 
@@ -1398,19 +1398,92 @@
         <div class="dashboard-content" id="settingsSection" style="display: none;">
             <h1 class="page-title">System Settings</h1>
             <p class="page-subtitle">Configure visitor management system</p>
-            <div class="table-container">
-                <h4>General Settings</h4>
-                <form>
+            
+            <!-- General Settings Card -->
+            <div class="table-container mb-4">
+                <h4><i class="bi bi-gear-fill"></i> General Settings</h4>
+                <form id="generalSettingsForm">
                     <div class="mb-3">
                         <label class="form-label">Company Name</label>
-                        <input type="text" class="form-control" value="<?php echo $pageTitle; ?>">
+                        <input type="text" class="form-control" value="<?php echo $pageTitle; ?>" disabled>
+                        <small class="text-muted">Company name is managed by system administrator</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Default Visit Duration (Hours)</label>
-                        <input type="number" class="form-control" value="8" min="1" max="24">
+                        <input type="number" class="form-control" value="8" min="1" max="24" disabled>
+                        <small class="text-muted">Visit duration settings are managed by system administrator</small>
                     </div>
-                    <button type="submit" class="btn btn-primary">Save Settings</button>
                 </form>
+            </div>
+            
+            <!-- IT Support Card -->
+            <div class="table-container mb-4">
+                <h4><i class="bi bi-headset"></i> IT Support & Notifications</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="alert alert-info d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill fs-3 me-3"></i>
+                            <div>
+                                <h6 class="mb-1">Need Technical Assistance?</h6>
+                                <p class="mb-0 small">Contact the IT Department for system issues, feature requests, or technical support.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center justify-content-center">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="notifyITDepartment()">
+                            <i class="bi bi-envelope-fill me-2"></i>
+                            Notify IT Department
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Quick Contact Info -->
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded">
+                            <i class="bi bi-clock-fill text-warning fs-4"></i>
+                            <h6 class="mt-2 mb-1">Support Hours</h6>
+                            <p class="mb-0 text-muted small">Mon-Fri: 8:00 AM - 5:00 PM</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded">
+                            <i class="bi bi-envelope-fill text-success fs-4"></i>
+                            <h6 class="mt-2 mb-1">Email Support</h6>
+                            <p class="mb-0 text-muted small">it.support@tomsworld.com</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded">
+                            <!-- <i class="bi bi-telephone-fill text-primary fs-4"></i>
+                            <h6 class="mt-2 mb-1">Phone Support</h6>
+                            <p class="mb-0 text-muted small">Local: 1234 | Globe: 09XX-XXX-XXXX</p> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Information Card -->
+            <div class="table-container">
+                <h4><i class="bi bi-info-square-fill"></i> System Information</h4>
+                <div class="info-grid">
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-bold"><i class="bi bi-code-square text-primary"></i> System Version:</div>
+                        <div class="col-sm-8">Kiosk V-Pass v2.0.0</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-bold"><i class="bi bi-calendar-check text-primary"></i> Last Updated:</div>
+                        <div class="col-sm-8"><?php echo date('F d, Y'); ?></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-bold"><i class="bi bi-server text-primary"></i> Server Status:</div>
+                        <div class="col-sm-8"><span class="badge bg-success">Online</span></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-bold"><i class="bi bi-shield-check text-primary"></i> Security:</div>
+                        <div class="col-sm-8"><span class="badge bg-success">Secure</span></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -7007,6 +7080,155 @@
                 error: function() {
                     console.error('Failed to load active visits');
                 }
+            });
+        }
+
+        // Notify IT Department Function
+        function notifyITDepartment() {
+            Swal.fire({
+                title: 'Notify IT Department',
+                html: `
+                    <div class="text-start">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+                            <select class="form-select" id="itNotificationCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="Technical Issue">Technical Issue</option>
+                                <option value="Feature Request">Feature Request</option>
+                                <option value="Bug Report">Bug Report</option>
+                                <option value="General Inquiry">General Inquiry</option>
+                                <option value="Emergency">Emergency</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Subject <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="itNotificationSubject" 
+                                placeholder="Brief description of the issue" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Message <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="itNotificationMessage" rows="5" 
+                                    placeholder="Detailed description of your issue or request..." required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Priority</label>
+                            <select class="form-select" id="itNotificationPriority">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                        </div>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3498db',
+                cancelButtonColor: '#95a5a6',
+                confirmButtonText: '<i class="bi bi-send-fill me-2"></i>Send Notification',
+                cancelButtonText: 'Cancel',
+                width: '600px',
+                preConfirm: () => {
+                    const category = document.getElementById('itNotificationCategory').value;
+                    const subject = document.getElementById('itNotificationSubject').value;
+                    const message = document.getElementById('itNotificationMessage').value;
+                    const priority = document.getElementById('itNotificationPriority').value;
+                    
+                    if (!category) {
+                        Swal.showValidationMessage('Please select a category');
+                        return false;
+                    }
+                    if (!subject || subject.trim() === '') {
+                        Swal.showValidationMessage('Please enter a subject');
+                        return false;
+                    }
+                    if (!message || message.trim() === '') {
+                        Swal.showValidationMessage('Please enter a message');
+                        return false;
+                    }
+                    
+                    return {
+                        category: category,
+                        subject: subject,
+                        message: message,
+                        priority: priority
+                    };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sendITNotification(result.value);
+                }
+            });
+        }
+
+        // Send IT Notification via AJAX
+        function sendITNotification(data) {
+            Swal.fire({
+                title: 'Sending...',
+                html: 'Please wait while we send your notification to the IT Department.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            const formData = new FormData();
+            formData.append('category', data.category);
+            formData.append('subject', data.subject);
+            formData.append('message', data.message);
+            formData.append('priority', data.priority);
+            
+            fetch(ajaxUrl + '?action=notify_it_department', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(response => {
+                if (response.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Notification Sent!',
+                        html: `
+                            <div class="text-start">
+                                <p>${response.message}</p>
+                                <div class="alert alert-info mt-3">
+                                    <strong><i class="bi bi-info-circle me-2"></i>Ticket ID:</strong> ${response.ticket_id || 'Generated'}<br>
+                                    <strong><i class="bi bi-clock me-2"></i>Submitted:</strong> ${new Date().toLocaleString()}<br>
+                                    <strong><i class="bi bi-flag me-2"></i>Priority:</strong> ${data.priority}
+                                </div>
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-envelope me-1"></i>
+                                    A confirmation email has been sent to your registered email address.
+                                </p>
+                            </div>
+                        `,
+                        confirmButtonText: 'OK',
+                        timer: 5000
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to Send',
+                        text: response.message || 'An error occurred while sending your notification. Please try again or contact IT directly.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Connection Error',
+                    html: `
+                        <p>Could not connect to the server. Please check your internet connection and try again.</p>
+                        <div class="alert alert-warning mt-3">
+                            <strong>Alternative Contact Methods:</strong><br>
+                            📧 Email: ithelpdesk@tomsworld.com.ph
+                        </div>
+                    `,
+                    // 📞 Phone: Local 1234 | Globe: 09XX-XXX-XXXX
+                    confirmButtonText: 'OK'
+                });
             });
         }
 

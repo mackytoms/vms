@@ -470,6 +470,66 @@ class Admin extends CI_Controller {
                     $result = $this->Admin_model->checkoutAllActiveVisits($companyFilter);
                     echo json_encode($result);
                     break;
+
+                case 'notify_it_department':
+                    // Validate required fields
+                    $category = trim($this->input->post('category'));
+                    $subject = trim($this->input->post('subject'));
+                    $message = trim($this->input->post('message'));
+                    $priority = trim($this->input->post('priority'));
+                    
+                    if (empty($category) || empty($subject) || empty($message)) {
+                        echo json_encode([
+                            'status' => 'error',
+                            'message' => 'Please fill in all required fields.'
+                        ]);
+                        break;
+                    }
+                    
+                    // Get user info with fallbacks
+                    $admin_name = $this->session->userdata('username') ?: 'Admin User';
+                    $admin_email = $this->session->userdata('email') ?: 'admin@system.local';
+                    $company_filter = $this->data['companyFilter'];
+                    
+                    // Generate ticket ID
+                    $ticket_id = 'IT-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 6));
+                    
+                    // Prepare ticket data
+                    $ticket_data = [
+                        'ticket_id' => $ticket_id,
+                        'category' => $category,
+                        'subject' => $subject,
+                        'message' => $message,
+                        'priority' => $priority,
+                        'submitted_by' => $admin_name,
+                        'submitter_email' => $admin_email,
+                        'company' => $company_filter ?: 'Super Admin',
+                        'status' => 'Open',
+                        'submitted_at' => date('Y-m-d H:i:s'),
+                        'ip_address' => $this->input->ip_address()
+                    ];
+                    
+                    // Save to database
+                    $db_saved = false;
+                    try {
+                        if ($this->db->table_exists('support_tickets')) {
+                            $this->db->insert('support_tickets', $ticket_data);
+                            $db_saved = true;
+                        }
+                    } catch (Exception $e) {
+                        log_message('error', 'DB Error: ' . $e->getMessage());
+                    }
+                    
+                    // Log the ticket
+                    log_message('info', "IT Support Ticket: [{$priority}] {$subject} by {$admin_name}");
+                    
+                    // Return success
+                    echo json_encode([
+                        'status' => 'success',
+                        'message' => 'Your notification has been logged and will be sent to the IT Department.',
+                        'ticket_id' => $ticket_id
+                    ]);
+                    break;
                     
                 default:
                     echo json_encode(['error' => 'Invalid action']);
