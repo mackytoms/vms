@@ -1450,14 +1450,14 @@
                         <div class="p-3 bg-light rounded">
                             <i class="bi bi-envelope-fill text-success fs-4"></i>
                             <h6 class="mt-2 mb-1">Email Support</h6>
-                            <p class="mb-0 text-muted small">it.support@tomsworld.com</p>
+                            <p class="mb-0 text-muted small">itheldesk@tomsworld.com.ph</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="p-3 bg-light rounded">
-                            <!-- <i class="bi bi-telephone-fill text-primary fs-4"></i>
+                            <i class="bi bi-telephone-fill text-primary fs-4"></i>
                             <h6 class="mt-2 mb-1">Phone Support</h6>
-                            <p class="mb-0 text-muted small">Local: 1234 | Globe: 09XX-XXX-XXXX</p> -->
+                            <p class="mb-0 text-muted small">Local: 6211</p>
                         </div>
                     </div>
                 </div>
@@ -7224,9 +7224,9 @@
                         <div class="alert alert-warning mt-3">
                             <strong>Alternative Contact Methods:</strong><br>
                             📧 Email: ithelpdesk@tomsworld.com.ph
+                            📞 Phone: Local 6211
                         </div>
                     `,
-                    // 📞 Phone: Local 1234 | Globe: 09XX-XXX-XXXX
                     confirmButtonText: 'OK'
                 });
             });
