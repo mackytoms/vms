@@ -2845,7 +2845,7 @@
                         <td>${v.company || 'N/A'}</td>
                         <td><span class="badge bg-info">${v.visitor_type || 'new'}</span></td>
                         <td>${v.total_visits || 0}</td>
-                        <td>${v.last_visit ? new Date(v.last_visit).toLocaleDateString() : 'N/A'}</td>
+                        <td>${v.last_visit ? new Date(v.last_visit).toLocaleDateString('en-GB') : 'N/A'}</td>
                         <td>
                             <button class="action-btn view" onclick="viewVisitor(${v.visitor_id})" title="View Details"><i class="bi bi-eye"></i></button>
                             <button class="action-btn" style="color: #3498db;" onclick="viewVisitorHistory(${v.visitor_id}, '${v.first_name} ${v.last_name}')" title="View History"><i class="bi bi-clock-history"></i></button>
@@ -6664,6 +6664,13 @@
             }
             
             $('#activeVisitCount').text(visits.length);
+
+
+            // Sort visits by check-in time in descending order (most recent first)
+            visits.sort((a, b) => new Date(b.check_in_time) - new Date(a.check_in_time));
+
+            // // Sort visits by check-in time in ascending order (oldest first)
+            // visits.sort((a, b) => new Date(a.check_in_time) - new Date(b.check_in_time));
             
             visits.forEach(visit => {
                 const checkinTime = new Date(visit.check_in_time);
