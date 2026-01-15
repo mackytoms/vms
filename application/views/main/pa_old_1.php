@@ -20,7 +20,7 @@
             
             <div class="header-center">
                 <div class="company-logo">
-                    <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" 
+                    <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" 
                         alt="Toms World" 
                         style="width: 40px; height: 40px; object-fit: contain; border-radius: 50%;">
                 </div>
@@ -336,29 +336,39 @@
                 <div class="form-screen">
                     <h2 class="form-title" data-translate="hostTitle">Who are you here to see?</h2>
 
-                    <!-- EMPLOYEE SEARCH INPUT - Now shown immediately -->
-                    <div class="employee-search-container mb-3">
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-search"></i></span>
-                            <input type="text" 
-                                class="form-control form-control-lg" 
-                                id="employeeSearch" 
-                                placeholder="Search employee by name..."
-                                data-translate-placeholder="searchEmployeePlaceholder"
-                                oninput="filterEmployees(this.value)"
-                                autocomplete="off">
-                            <button class="btn btn-outline-secondary" type="button" onclick="clearEmployeeSearch()" title="Clear search">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
+                    <div class="department-selection">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="selectDepartment">Select Department</label>
+                            <select class="form-select form-select-lg" id="departmentSelect" onchange="onDepartmentChange()">
+                                <option value="" data-translate="chooseDepartment">Choose a department...</option>
+                            </select>
                         </div>
-                        <small class="text-muted mt-1 d-block" id="employeeCount"></small>
                     </div>
-                    
-                    <!-- Employee Grid -->
-                    <div class="employee-grid" id="employeeGrid">
-                        <div class="text-center py-4">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <p class="mt-2 text-muted">Loading employees...</p>
+
+                    <div id="employeeSection" style="display: none;">
+                        <label class="form-label" data-translate="selectEmployee">Select Employee</label>
+                        
+                        <!-- EMPLOYEE SEARCH INPUT -->
+                        <div class="employee-search-container mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" 
+                                    class="form-control form-control-lg" 
+                                    id="employeeSearch" 
+                                    placeholder="Search employee by name..."
+                                    data-translate-placeholder="searchEmployeePlaceholder"
+                                    oninput="filterEmployees(this.value)"
+                                    autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" onclick="clearEmployeeSearch()" title="Clear search">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted mt-1 d-block" id="employeeCount"></small>
+                        </div>
+                        <!-- END EMPLOYEE SEARCH INPUT -->
+                        
+                        <div class="employee-grid" id="employeeGrid">
+                            <!-- Employees will be populated here -->
                         </div>
                     </div>
 
@@ -379,63 +389,6 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="screen" id="hostScreen">
-                <div class="form-screen">
-                    <h2 class="form-title" data-translate="hostTitle">Who are you here to see?</h2>
-
-                    <div class="department-selection">
-                        <div class="form-group">
-                            <label class="form-label" data-translate="selectDepartment">Select Department</label>
-                            <select class="form-select form-select-lg" id="departmentSelect" onchange="onDepartmentChange()">
-                                <option value="" data-translate="chooseDepartment">Choose a department...</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div id="employeeSection" style="display: none;">
-                        <label class="form-label" data-translate="selectEmployee">Select Employee</label>
-                        
-                        <!- EMPLOYEE SEARCH INPUT ->
-                        <div class="employee-search-container mb-3">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                <input type="text" 
-                                    class="form-control form-control-lg" 
-                                    id="employeeSearch" 
-                                    placeholder="Search employee by name..."
-                                    data-translate-placeholder="searchEmployeePlaceholder"
-                                    oninput="filterEmployees(this.value)"
-                                    autocomplete="off">
-                                <button class="btn btn-outline-secondary" type="button" onclick="clearEmployeeSearch()" title="Clear search">
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
-                            </div>
-                            <small class="text-muted mt-1 d-block" id="employeeCount"></small>
-                        </div>
-                        <!- END EMPLOYEE SEARCH INPUT ->
-                        
-                        <div class="employee-grid" id="employeeGrid">
-                            <!- Employees will be populated here ->
-                        </div>
-                    </div>
-
-                    <div class="form-group mt-3">
-                        <label class="form-label" data-translate="selectedHost">Selected Host</label>
-                        <div class="form-control form-control-lg" id="selectedHost" style="background: #f8f9fa;">
-                            <span class="text-muted" data-translate="noSelection">No one selected yet</span>
-                        </div>
-                    </div>
-
-                    <div class="nav-buttons">
-                        <button class="btn-large btn-back" onclick="previousScreen()">
-                            <i class="bi bi-arrow-left"></i> <span data-translate="back">Back</span>
-                        </button>
-                        <button class="btn-large btn-next" onclick="nextScreen()" disabled id="hostNextBtn">
-                            <span data-translate="continue">Continue</span> <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div> -->
 
             <!-- Screen 6: Purpose Selection -->
             <div class="screen" id="purposeScreen">
@@ -1471,16 +1424,10 @@
         }
 
         // Screen flow mapping
-        // const screenFlow = {
-        //     'new': [1, 3, 4, 5, 6, 7, 8],
-        //     'returning': [1, 2, 5, 6, 7, 8],
-        //     'delivery': [1, 3, 4, 5, 6, 7, 8]
-        // };
-        // Updated screen flow arrays
         const screenFlow = {
-            'new': [1, 6, 5, 3, 4, 7, 8],        // Purpose is now step 2
-            'returning': [1, 6, 5, 2, 7, 8],     // Purpose after QR scan
-            'delivery': [1, 6, 5, 3, 4, 7, 8]    // Purpose auto-selected
+            'new': [1, 3, 4, 5, 6, 7, 8],
+            'returning': [1, 2, 5, 6, 7, 8],
+            'delivery': [1, 3, 4, 5, 6, 7, 8]
         };
         
         let currentFlow = [];
@@ -2228,54 +2175,6 @@
         //     // clearEmployeeSearch();
         // }
 
-        // NEW: Load all employees (no department filter)
-        function loadAllEmployees() {
-            const employeeGrid = document.getElementById('employeeGrid');
-            const employeeSearch = document.getElementById('employeeSearch');
-            const employeeCount = document.getElementById('employeeCount');
-            
-            // Reset search input
-            if (employeeSearch) {
-                employeeSearch.value = '';
-            }
-            
-            // Show loading indicator
-            employeeGrid.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted">Loading employees...</p></div>';
-            
-            // Fetch all employees from database
-            fetch(`<?= base_url("kiosk/get_all_employees") ?>?company_visited=${encodeURIComponent(COMPANY_VISITED)}`, {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.status === 'success') {
-                    // Store employees for filtering
-                    currentDepartmentEmployees = result.employees.map(emp => ({
-                        ...emp,
-                        deptCode: emp.department_code,
-                        deptName: emp.department_name,
-                        deptOriginalName: emp.department_name
-                    }));
-                    
-                    // Display all employees
-                    displayEmployees(currentDepartmentEmployees);
-                    
-                    // Update employee count
-                    updateEmployeeCount(currentDepartmentEmployees.length, currentDepartmentEmployees.length);
-                } else {
-                    employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees</p>';
-                }
-            })
-            .catch(error => {
-                console.error('Error loading employees:', error);
-                employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees. Please try again.</p>';
-            });
-        }
-
-        // Update selectEmployeeFromCard to work without pre-selected department
         function selectEmployeeFromCard(cardElement) {
             if (!cardElement || !cardElement.classList) {
                 console.error('Invalid card element:', cardElement);
@@ -2307,7 +2206,7 @@
             
             visitorData.host = selectedHost;
             
-            // Update the display
+            // Update the display with translated department name
             document.getElementById('selectedHost').innerHTML = `
                 <div class="d-flex align-items-center gap-3">
                     <i class="bi bi-person-circle" style="font-size: 2em; color: #27ae60;"></i>
@@ -2321,52 +2220,6 @@
             
             document.getElementById('hostNextBtn').disabled = false;
         }
-
-        // function selectEmployeeFromCard(cardElement) {
-        //     if (!cardElement || !cardElement.classList) {
-        //         console.error('Invalid card element:', cardElement);
-        //         return;
-        //     }
-            
-        //     document.querySelectorAll('.employee-card').forEach(card => {
-        //         card.classList.remove('selected');
-        //     });
-            
-        //     cardElement.classList.add('selected');
-            
-        //     const employeeId = cardElement.dataset.employeeId;
-        //     const employeeName = cardElement.dataset.employeeName;
-        //     const employeeEmail = cardElement.dataset.employeeEmail;
-        //     const deptCode = cardElement.dataset.deptCode;
-        //     const deptName = cardElement.dataset.deptName;
-        //     const deptOriginalName = cardElement.dataset.deptOriginalName;
-            
-        //     selectedHost = {
-        //         id: employeeId,
-        //         employeeId: employeeId,
-        //         name: employeeName,
-        //         email: employeeEmail,
-        //         department: deptName,
-        //         departmentOriginal: deptOriginalName,
-        //         departmentCode: deptCode
-        //     };
-            
-        //     visitorData.host = selectedHost;
-            
-        //     // Update the display with translated department name
-        //     document.getElementById('selectedHost').innerHTML = `
-        //         <div class="d-flex align-items-center gap-3">
-        //             <i class="bi bi-person-circle" style="font-size: 2em; color: #27ae60;"></i>
-        //             <div>
-        //                 <div style="font-weight: 600;">${employeeName}</div>
-        //                 <div style="font-size: 0.9em; color: #7f8c8d;">${deptName}</div>
-        //             </div>
-        //             <i class="bi bi-check-circle-fill text-success ms-auto" style="font-size: 1.5em;"></i>
-        //         </div>
-        //     `;
-            
-        //     document.getElementById('hostNextBtn').disabled = false;
-        // }
 
         // Reset host selection
         // function resetHostSelection() {
@@ -2999,9 +2852,8 @@
                     };
                     
                     // Update flow for returning visitor
-                    currentFlow = [1, 2, 6, 5, 7, 8];
+                    currentFlow = [1, 2, 5, 6, 7, 8];
                     currentFlowIndex = 2;
-                    showScreen(6); // Go to Purpose screen
                     
                     // Show welcome back message
                     Swal.fire({
@@ -3020,7 +2872,7 @@
                         confirmButtonText: 'OK'
                     }).then(() => {
                         isProcessingQR = false;
-                        showScreen(6);
+                        showScreen(5);
                     });
                     
                 } else {
@@ -3134,26 +2986,18 @@
         // }
 
 
-        // // FIXED: Skip QR scan - redirect to basic info like first-time visitor
-        // function skipQRScan() {
-        //     isProcessingQR = false;
-        //     isScannerStopping = false;
-            
-        //     stopQRScanner().then(() => {
-        //         // Treat as new visitor since no QR code - use new visitor flow for manual entry
-        //         visitorData.type = 'returning';
-        //         currentFlow = screenFlow['new']; // [1, 3, 4, 5, 6, 7, 8]
-        //         currentFlowIndex = 1;
-        //         showScreen(3); // Go to basic info screen
-        //     });
-        // }
-
-        // Updated skipQRScan for returning visitors
+        // FIXED: Skip QR scan - redirect to basic info like first-time visitor
         function skipQRScan() {
-            visitorData.type = 'returning';
-            currentFlow = screenFlow['new'];
-            currentFlowIndex = 1;
-            showScreen(6); // Go to Purpose screen
+            isProcessingQR = false;
+            isScannerStopping = false;
+            
+            stopQRScanner().then(() => {
+                // Treat as new visitor since no QR code - use new visitor flow for manual entry
+                visitorData.type = 'returning';
+                currentFlow = screenFlow['new']; // [1, 3, 4, 5, 6, 7, 8]
+                currentFlowIndex = 1;
+                showScreen(3); // Go to basic info screen
+            });
         }
 
         // Add this new function to check for existing visitors
@@ -3315,11 +3159,6 @@
             //     }
             // }
 
-            // NEW: Load all employees when entering host selection screen
-            if (screenNumber === 5) {
-                loadAllEmployees();
-            }
-
             // Replace the existing screen 6 handling with this enhanced version:
             if (screenNumber === 6) { // Purpose screen
                 // Reset all cards first
@@ -3362,36 +3201,22 @@
             currentScreen = screenNumber;
         }
 
-        // // Alternative approach: Modify the startCheckIn function to store the initial selection
-        // function startCheckIn(type) {
-        //     visitorData.type = type;
-        //     currentFlow = screenFlow[type];
-        //     currentFlowIndex = 1;
-            
-        //     // Store the initial purpose if it's a delivery type
-        //     if (type === 'delivery') {
-        //         visitorData.initialPurpose = 'delivery';
-        //     }
-            
-        //     if (type === 'returning') {
-        //         showScreen(2);
-        //         initQRScanner();
-        //     } else {
-        //         showScreen(3);
-        //     }
-        // }
-
-        // Updated startCheckIn function
+        // Alternative approach: Modify the startCheckIn function to store the initial selection
         function startCheckIn(type) {
             visitorData.type = type;
             currentFlow = screenFlow[type];
             currentFlowIndex = 1;
             
+            // Store the initial purpose if it's a delivery type
+            if (type === 'delivery') {
+                visitorData.initialPurpose = 'delivery';
+            }
+            
             if (type === 'returning') {
-                showScreen(2); // QR Scanner
+                showScreen(2);
                 initQRScanner();
             } else {
-                showScreen(6); // Purpose screen FIRST
+                showScreen(3);
             }
         }
 
@@ -3494,26 +3319,14 @@
 
         // Update step indicator - FIXED VERSION
         function updateStepIndicator(step) {
-            // // Map screen number to step number (7 total steps shown)
-            // const screenToStep = {
-            //     1: 1,  // Welcome
-            //     2: 2,  // QR Scanner
-            //     3: 2,  // Basic Info (same step as QR for returning visitors)
-            //     4: 3,  // Photo
-            //     5: 4,  // Host
-            //     6: 5,  // Purpose
-            //     7: 6,  // Agreement
-            //     8: 7   // Success
-            // };
-
-            // Updated step indicator mapping
+            // Map screen number to step number (7 total steps shown)
             const screenToStep = {
                 1: 1,  // Welcome
-                2: 2,  // QR Scanner (returning)
-                6: 2,  // Purpose (new visitors) - FIRST STEP
-                5: 3,  // Host
-                3: 4,  // Basic Info
-                4: 5,  // Photo
+                2: 2,  // QR Scanner
+                3: 2,  // Basic Info (same step as QR for returning visitors)
+                4: 3,  // Photo
+                5: 4,  // Host
+                6: 5,  // Purpose
                 7: 6,  // Agreement
                 8: 7   // Success
             };

@@ -1121,5 +1121,32 @@ class Kiosk extends CI_Controller {
     //         ]);
     //     }
     // }
-
+    
+    // In your Kiosk controller
+    public function get_all_employees() {
+        $company_visited = $this->input->get('company_visited');
+        
+        if (!$company_visited) {
+            echo json_encode(['status' => 'error', 'message' => 'Company not specified']);
+            return;
+        }
+        
+        // Query all active employees with department info
+        $this->db->select('e.employee_id, e.name, e.email, e.department_code, d.name as department_name')
+                ->from('employees e')
+                ->join('departments d', 'e.department_code = d.department_code', 'left')
+                ->where('e.is_active', 1)
+                ->group_start()
+                    ->where('e.company_owned_by', $company_visited)
+                    ->or_where('e.company_owned_by', 'Both')
+                ->group_end()
+                ->order_by('e.name', 'ASC');
+        
+        $employees = $this->db->get()->result_array();
+        
+        echo json_encode([
+            'status' => 'success',
+            'employees' => $employees
+        ]);
+    }
 }

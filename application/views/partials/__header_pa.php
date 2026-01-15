@@ -1326,6 +1326,37 @@
                 font-size: 16px; /* Prevents zoom on iOS */
             }
         }
+
+        .employee-department {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .employee-department i {
+            font-size: 0.9em;
+            margin-right: 3px;
+        }
+
+        .employee-search-container .input-group-text {
+            border-right: none !important;
+        }
+
+        .department-filter {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        mark {
+            background-color: #fff3cd !important;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>

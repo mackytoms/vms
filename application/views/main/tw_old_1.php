@@ -20,7 +20,7 @@
             
             <div class="header-center">
                 <div class="company-logo">
-                    <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" 
+                    <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" 
                         alt="Toms World" 
                         style="width: 40px; height: 40px; object-fit: contain; border-radius: 50%;">
                 </div>
@@ -46,7 +46,7 @@
                 </div>
                 
                 <div class="offcanvas-qr-container">
-                    <img src="<?= base_url('assets/images/qr/qr_pa.png') ?>" 
+                    <img src="<?= base_url('assets/images/qr/qr_tw.png') ?>" 
                         alt="QR Code" 
                         class="offcanvas-qr-code">
                     <p class="qr-description">Scan for quick access</p>
@@ -256,9 +256,8 @@
                             <button class="btn-large btn-next" onclick="retakePhoto()" id="retakeBtn" style="display: none;">
                                 <i class="bi bi-arrow-clockwise"></i> <span data-translate="retakePhoto">Retake Photo</span>
                             </button>
-                        </div>                            
+                        </div> 
                         <p class="text-muted mt-2" data-translate="photoGuide">Position your face within the oval guide</p>
-
                     </div>
 
                     <div class="nav-buttons">
@@ -287,7 +286,7 @@
                                 <option value="" data-translate="chooseDepartment">Choose a department...</option>
                             </select>
                         </div>
-                    </div>
+                    </div>                   
 
                     <!- ADD THIS SEARCH INPUT ->
                     <div class="employee-search-container mb-3">
@@ -336,29 +335,39 @@
                 <div class="form-screen">
                     <h2 class="form-title" data-translate="hostTitle">Who are you here to see?</h2>
 
-                    <!-- EMPLOYEE SEARCH INPUT - Now shown immediately -->
-                    <div class="employee-search-container mb-3">
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-search"></i></span>
-                            <input type="text" 
-                                class="form-control form-control-lg" 
-                                id="employeeSearch" 
-                                placeholder="Search employee by name..."
-                                data-translate-placeholder="searchEmployeePlaceholder"
-                                oninput="filterEmployees(this.value)"
-                                autocomplete="off">
-                            <button class="btn btn-outline-secondary" type="button" onclick="clearEmployeeSearch()" title="Clear search">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
+                    <div class="department-selection">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="selectDepartment">Select Department</label>
+                            <select class="form-select form-select-lg" id="departmentSelect" onchange="onDepartmentChange()">
+                                <option value="" data-translate="chooseDepartment">Choose a department...</option>
+                            </select>
                         </div>
-                        <small class="text-muted mt-1 d-block" id="employeeCount"></small>
                     </div>
-                    
-                    <!-- Employee Grid -->
-                    <div class="employee-grid" id="employeeGrid">
-                        <div class="text-center py-4">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <p class="mt-2 text-muted">Loading employees...</p>
+
+                    <div id="employeeSection" style="display: none;">
+                        <label class="form-label" data-translate="selectEmployee">Select Employee</label>
+                        
+                        <!-- EMPLOYEE SEARCH INPUT -->
+                        <div class="employee-search-container mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" 
+                                    class="form-control form-control-lg" 
+                                    id="employeeSearch" 
+                                    placeholder="Search employee by name..."
+                                    data-translate-placeholder="searchEmployeePlaceholder"
+                                    oninput="filterEmployees(this.value)"
+                                    autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" onclick="clearEmployeeSearch()" title="Clear search">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted mt-1 d-block" id="employeeCount"></small>
+                        </div>
+                        <!-- END EMPLOYEE SEARCH INPUT -->
+                        
+                        <div class="employee-grid" id="employeeGrid">
+                            <!-- Employees will be populated here -->
                         </div>
                     </div>
 
@@ -379,63 +388,6 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="screen" id="hostScreen">
-                <div class="form-screen">
-                    <h2 class="form-title" data-translate="hostTitle">Who are you here to see?</h2>
-
-                    <div class="department-selection">
-                        <div class="form-group">
-                            <label class="form-label" data-translate="selectDepartment">Select Department</label>
-                            <select class="form-select form-select-lg" id="departmentSelect" onchange="onDepartmentChange()">
-                                <option value="" data-translate="chooseDepartment">Choose a department...</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div id="employeeSection" style="display: none;">
-                        <label class="form-label" data-translate="selectEmployee">Select Employee</label>
-                        
-                        <!- EMPLOYEE SEARCH INPUT ->
-                        <div class="employee-search-container mb-3">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                <input type="text" 
-                                    class="form-control form-control-lg" 
-                                    id="employeeSearch" 
-                                    placeholder="Search employee by name..."
-                                    data-translate-placeholder="searchEmployeePlaceholder"
-                                    oninput="filterEmployees(this.value)"
-                                    autocomplete="off">
-                                <button class="btn btn-outline-secondary" type="button" onclick="clearEmployeeSearch()" title="Clear search">
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
-                            </div>
-                            <small class="text-muted mt-1 d-block" id="employeeCount"></small>
-                        </div>
-                        <!- END EMPLOYEE SEARCH INPUT ->
-                        
-                        <div class="employee-grid" id="employeeGrid">
-                            <!- Employees will be populated here ->
-                        </div>
-                    </div>
-
-                    <div class="form-group mt-3">
-                        <label class="form-label" data-translate="selectedHost">Selected Host</label>
-                        <div class="form-control form-control-lg" id="selectedHost" style="background: #f8f9fa;">
-                            <span class="text-muted" data-translate="noSelection">No one selected yet</span>
-                        </div>
-                    </div>
-
-                    <div class="nav-buttons">
-                        <button class="btn-large btn-back" onclick="previousScreen()">
-                            <i class="bi bi-arrow-left"></i> <span data-translate="back">Back</span>
-                        </button>
-                        <button class="btn-large btn-next" onclick="nextScreen()" disabled id="hostNextBtn">
-                            <span data-translate="continue">Continue</span> <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div> -->
 
             <!-- Screen 6: Purpose Selection -->
             <div class="screen" id="purposeScreen">
@@ -659,6 +611,7 @@
 
                     </div>
 
+
                     <div style="background: #e8f4fd; border-left: 4px solid #f39c12; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left;">
                         <h5 style="color: #f39c12a8; margin-bottom: 8px;">
                             <i class="bi bi-info-circle"></i> <span data-translate="nextSteps">Next Steps</span>
@@ -725,151 +678,159 @@
             <div class="loading-text" data-translate="processing">Processing...</div>
         </div>
     </div>
-    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Department and Employee Data Structure
-        const departmentData = {
-            'ADM': {
-                name: 'Admin',
-                employees: [
-                    { id: 'ADM001', name: 'John Smith', email: 'j.smith@company.com' },
-                    { id: 'ADM002', name: 'Sarah Johnson', email: 's.johnson@company.com' },
-                    { id: 'ADM003', name: 'Michael Chen', email: 'm.chen@company.com' }
-                ]
-            },
-            'BDD': {
-                name: 'Design & Construction',
-                employees: [
-                    { id: 'BDD001', name: 'Emily Davis', email: 'e.davis@company.com' },
-                    { id: 'BDD002', name: 'Robert Wilson', email: 'r.wilson@company.com' }
-                ]
-            },
-            'CRT': {
-                name: 'Creatives',
-                employees: [
-                    { id: 'CRT001', name: 'Lisa Anderson', email: 'l.anderson@company.com' },
-                    { id: 'CRT002', name: 'David Martinez', email: 'd.martinez@company.com' },
-                    { id: 'CRT003', name: 'Jessica Taylor', email: 'j.taylor@company.com' }
-                ]
-            },
-            'ED': {
-                name: 'Ent. Risk Management',
-                employees: [
-                    { id: 'ED001', name: 'Thomas Brown', email: 't.brown@company.com' },
-                    { id: 'ED002', name: 'Jennifer White', email: 'j.white@company.com' }
-                ]
-            },
-            'EXE': {
-                name: 'Executive',
-                employees: [
-                    { id: 'EXE001', name: 'William Garcia', email: 'w.garcia@company.com' },
-                    { id: 'EXE002', name: 'Patricia Miller', email: 'p.miller@company.com' }
-                ]
-            },
-            'FIN': {
-                name: 'Finance',
-                employees: [
-                    { id: 'FIN001', name: 'Christopher Lee', email: 'c.lee@company.com' },
-                    { id: 'FIN002', name: 'Amanda Jones', email: 'a.jones@company.com' },
-                    { id: 'FIN003', name: 'Daniel Rodriguez', email: 'd.rodriguez@company.com' }
-                ]
-            },
-            'HR': {
-                name: 'Human Resource',
-                employees: [
-                    { id: 'HR001', name: 'Michelle Thompson', email: 'm.thompson@company.com' },
-                    { id: 'HR002', name: 'Kevin Harris', email: 'k.harris@company.com' },
-                    { id: 'HR003', name: 'Rachel Clark', email: 'r.clark@company.com' }
-                ]
-            },
-            'IMP': {
-                name: 'Importation',
-                employees: [
-                    { id: 'IMP001', name: 'Brian Lewis', email: 'b.lewis@company.com' },
-                    { id: 'IMP002', name: 'Sophia Walker', email: 's.walker@company.com' }
-                ]
-            },
-            'ITSD': {
-                name: 'Information Technology & Services',
-                employees: [
-                    { id: 'ITSD001', name: 'James Hall', email: 'j.hall@company.com' },
-                    { id: 'ITSD002', name: 'Olivia Allen', email: 'o.allen@company.com' },
-                    { id: 'ITSD003', name: 'Matthew Young', email: 'm.young@company.com' },
-                    { id: 'ITSD004', name: 'Emma King', email: 'e.king@company.com' }
-                ]
-            },
-            'MRK': {
-                name: 'Marketing',
-                employees: [
-                    { id: 'MRK001', name: 'Andrew Wright', email: 'a.wright@company.com' },
-                    { id: 'MRK002', name: 'Isabella Lopez', email: 'i.lopez@company.com' },
-                    { id: 'MRK003', name: 'Joshua Hill', email: 'j.hill@company.com' }
-                ]
-            },
-            'MER': {
-                name: 'Audit & Merchandising',
-                employees: [
-                    { id: 'MER001', name: 'Megan Scott', email: 'm.scott@company.com' },
-                    { id: 'MER002', name: 'Ryan Green', email: 'r.green@company.com' }
-                ]
-            },
-            'OP': {
-                name: 'Operations',
-                employees: [
-                    { id: 'OP001', name: 'Nicholas Adams', email: 'n.adams@company.com' },
-                    { id: 'OP002', name: 'Victoria Baker', email: 'v.baker@company.com' },
-                    { id: 'OP003', name: 'Alexander Nelson', email: 'a.nelson@company.com' }
-                ]
-            },
-            'ODSM': {
-                name: 'Org. Development & Strat. Mngt.',
-                employees: [
-                    { id: 'ODSM001', name: 'Samantha Carter', email: 's.carter@company.com' },
-                    { id: 'ODSM002', name: 'Joseph Mitchell', email: 'j.mitchell@company.com' }
-                ]
-            },
-            'SPD': {
-                name: 'Special Projects',
-                employees: [
-                    { id: 'SPD001', name: 'Lauren Perez', email: 'l.perez@company.com' },
-                    { id: 'SPD002', name: 'Charles Roberts', email: 'c.roberts@company.com' }
-                ]
-            },
-            'SD': {
-                name: 'Stocks Department',
-                employees: [
-                    { id: 'SD001', name: 'Ashley Turner', email: 'a.turner@company.com' },
-                    { id: 'SD002', name: 'Benjamin Phillips', email: 'b.phillips@company.com' }
-                ]
-            },
-            'TD': {
-                name: 'Technical',
-                employees: [
-                    { id: 'TD001', name: 'Nathan Campbell', email: 'n.campbell@company.com' },
-                    { id: 'TD002', name: 'Madison Parker', email: 'm.parker@company.com' }
-                ]
-            },
-            'WLD': {
-                name: 'Warehouse & Logistics',
-                employees: [
-                    { id: 'WLD001', name: 'Eric Evans', email: 'e.evans@company.com' },
-                    { id: 'WLD002', name: 'Hannah Edwards', email: 'h.edwards@company.com' },
-                    { id: 'WLD003', name: 'Tyler Collins', email: 't.collins@company.com' }
-                ]
-            },
-            'PA': {
-                name: 'Pan Asia HR',
-                employees: [
-                    { id: 'PA001', name: 'Grace Stewart', email: 'g.stewart@company.com' },
-                    { id: 'PA002', name: 'Dylan Sanchez', email: 'd.sanchez@company.com' }
-                ]
-            }
-        };
+        // // Department and Employee Data Structure
+        // const departmentData = {
+        //     'ADM': {
+        //         name: 'Admin',
+        //         employees: [
+        //             { id: 'ADM001', name: 'John Smith', email: 'j.smith@company.com' },
+        //             { id: 'ADM002', name: 'Sarah Johnson', email: 's.johnson@company.com' },
+        //             { id: 'ADM003', name: 'Michael Chen', email: 'm.chen@company.com' }
+        //         ]
+        //     },
+        //     'BDD': {
+        //         name: 'Design & Construction',
+        //         employees: [
+        //             { id: 'BDD001', name: 'Emily Davis', email: 'e.davis@company.com' },
+        //             { id: 'BDD002', name: 'Robert Wilson', email: 'r.wilson@company.com' }
+        //         ]
+        //     },
+        //     'CRT': {
+        //         name: 'Creatives',
+        //         employees: [
+        //             { id: 'CRT001', name: 'Lisa Anderson', email: 'l.anderson@company.com' },
+        //             { id: 'CRT002', name: 'David Martinez', email: 'd.martinez@company.com' },
+        //             { id: 'CRT003', name: 'Jessica Taylor', email: 'j.taylor@company.com' }
+        //         ]
+        //     },
+        //     'ED': {
+        //         name: 'Ent. Risk Management',
+        //         employees: [
+        //             { id: 'ED001', name: 'Thomas Brown', email: 't.brown@company.com' },
+        //             { id: 'ED002', name: 'Jennifer White', email: 'j.white@company.com' }
+        //         ]
+        //     },
+        //     'EXE': {
+        //         name: 'Executive',
+        //         employees: [
+        //             { id: 'EXE001', name: 'William Garcia', email: 'w.garcia@company.com' },
+        //             { id: 'EXE002', name: 'Patricia Miller', email: 'p.miller@company.com' }
+        //         ]
+        //     },
+        //     'FIN': {
+        //         name: 'Finance',
+        //         employees: [
+        //             { id: 'FIN001', name: 'Christopher Lee', email: 'c.lee@company.com' },
+        //             { id: 'FIN002', name: 'Amanda Jones', email: 'a.jones@company.com' },
+        //             { id: 'FIN003', name: 'Daniel Rodriguez', email: 'd.rodriguez@company.com' }
+        //         ]
+        //     },
+        //     'HR': {
+        //         name: 'Human Resource',
+        //         employees: [
+        //             { id: 'HR001', name: 'Michelle Thompson', email: 'm.thompson@company.com' },
+        //             { id: 'HR002', name: 'Kevin Harris', email: 'k.harris@company.com' },
+        //             { id: 'HR003', name: 'Rachel Clark', email: 'r.clark@company.com' }
+        //         ]
+        //     },
+        //     'IMP': {
+        //         name: 'Importation',
+        //         employees: [
+        //             { id: 'IMP001', name: 'Brian Lewis', email: 'b.lewis@company.com' },
+        //             { id: 'IMP002', name: 'Sophia Walker', email: 's.walker@company.com' }
+        //         ]
+        //     },
+        //     'ITSD': {
+        //         name: 'Information Technology & Services',
+        //         employees: [
+        //             { id: 'ITSD001', name: 'James Hall', email: 'j.hall@company.com' },
+        //             { id: 'ITSD002', name: 'Olivia Allen', email: 'o.allen@company.com' },
+        //             { id: 'ITSD003', name: 'Matthew Young', email: 'm.young@company.com' },
+        //             { id: 'ITSD004', name: 'Emma King', email: 'e.king@company.com' }
+        //         ]
+        //     },
+        //     'MRK': {
+        //         name: 'Marketing',
+        //         employees: [
+        //             { id: 'MRK001', name: 'Andrew Wright', email: 'a.wright@company.com' },
+        //             { id: 'MRK002', name: 'Isabella Lopez', email: 'i.lopez@company.com' },
+        //             { id: 'MRK003', name: 'Joshua Hill', email: 'j.hill@company.com' }
+        //         ]
+        //     },
+        //     'MER': {
+        //         name: 'Audit & Merchandising',
+        //         employees: [
+        //             { id: 'MER001', name: 'Megan Scott', email: 'm.scott@company.com' },
+        //             { id: 'MER002', name: 'Ryan Green', email: 'r.green@company.com' }
+        //         ]
+        //     },
+        //     'OP': {
+        //         name: 'Operations',
+        //         employees: [
+        //             { id: 'OP001', name: 'Nicholas Adams', email: 'n.adams@company.com' },
+        //             { id: 'OP002', name: 'Victoria Baker', email: 'v.baker@company.com' },
+        //             { id: 'OP003', name: 'Alexander Nelson', email: 'a.nelson@company.com' }
+        //         ]
+        //     },
+        //     'ODSM': {
+        //         name: 'Org. Development & Strat. Mngt.',
+        //         employees: [
+        //             { id: 'ODSM001', name: 'Samantha Carter', email: 's.carter@company.com' },
+        //             { id: 'ODSM002', name: 'Joseph Mitchell', email: 'j.mitchell@company.com' }
+        //         ]
+        //     },
+        //     'SPD': {
+        //         name: 'Special Projects',
+        //         employees: [
+        //             { id: 'SPD001', name: 'Lauren Perez', email: 'l.perez@company.com' },
+        //             { id: 'SPD002', name: 'Charles Roberts', email: 'c.roberts@company.com' }
+        //         ]
+        //     },
+        //     'SD': {
+        //         name: 'Stocks Department',
+        //         employees: [
+        //             { id: 'SD001', name: 'Ashley Turner', email: 'a.turner@company.com' },
+        //             { id: 'SD002', name: 'Benjamin Phillips', email: 'b.phillips@company.com' }
+        //         ]
+        //     },
+        //     'TD': {
+        //         name: 'Technical',
+        //         employees: [
+        //             { id: 'TD001', name: 'Nathan Campbell', email: 'n.campbell@company.com' },
+        //             { id: 'TD002', name: 'Madison Parker', email: 'm.parker@company.com' }
+        //         ]
+        //     },
+        //     'WLD': {
+        //         name: 'Warehouse & Logistics',
+        //         employees: [
+        //             { id: 'WLD001', name: 'Eric Evans', email: 'e.evans@company.com' },
+        //             { id: 'WLD002', name: 'Hannah Edwards', email: 'h.edwards@company.com' },
+        //             { id: 'WLD003', name: 'Tyler Collins', email: 't.collins@company.com' }
+        //         ]
+        //     },
+        //     'PA': {
+        //         name: 'Pan Asia HR',
+        //         employees: [
+        //             { id: 'PA001', name: 'Grace Stewart', email: 'g.stewart@company.com' },
+        //             { id: 'PA002', name: 'Dylan Sanchez', email: 'd.sanchez@company.com' }
+        //         ]
+        //     },
+        //     'GT': {
+        //         name: 'Game Test',
+        //         employees: [
+        //             { id: 'GT001', name: 'Angelo Ragon', email: 'ar@gmail.com' }
+        //         ]
+        //     }
+        // };
 
         // Language Translations (Extended with new keys)
         const translations = {
             'en': {
-                companyName: "Welcome to PAN-ASIA",
+                companyName: "Welcome to TOM'S WORLD",
                 welcome: "Welcome!",
                 selectLanguage: "Please select your preferred language",
                 firstTimeVisitor: "First Time Visitor",
@@ -1421,17 +1382,41 @@
         // Global variable for QR Code instance
         let qrCodeInstance = null;
         // Add this flag near the top with other state variables
-        let isProcessingQR = false;        
+        let isProcessingQR = false;
         // Purpose
         let availablePurposes = [];
-
-        let isScannerStopping = false;
-
+        
         // Global variable to store department data with translations
         let availableDepartments = [];
 
         // Add this variable near the top with other state variables
         let currentDepartmentEmployees = []; // Store fetched employees for filtering
+
+
+        // Screen flow mapping
+        const screenFlow = {
+            'new': [1, 3, 4, 5, 6, 7, 8],
+            'returning': [1, 2, 5, 6, 7, 8],
+            'delivery': [1, 3, 4, 5, 6, 7, 8]
+        };
+        
+        let currentFlow = [];
+        let currentFlowIndex = 0;
+
+        // Sample pre-scheduled visits
+        const preScheduledVisits = [
+            { 
+                code: 'MEET-2024-001', 
+                name: 'Alice Johnson', 
+                company: 'Tech Solutions Inc.', 
+                host: 'John Smith', 
+                time: '10:00 AM',
+                purpose: 'Sales Meeting'
+            }
+        ];
+
+        // State variables - make sure these are declared near the top with other state variables
+        let isScannerStopping = false;
 
         // FIXED: Safe stop function that checks scanner state first
         async function stopQRScanner() {
@@ -1470,34 +1455,25 @@
             });
         }
 
-        // Screen flow mapping
-        // const screenFlow = {
-        //     'new': [1, 3, 4, 5, 6, 7, 8],
-        //     'returning': [1, 2, 5, 6, 7, 8],
-        //     'delivery': [1, 3, 4, 5, 6, 7, 8]
-        // };
-        // Updated screen flow arrays
-        const screenFlow = {
-            'new': [1, 6, 5, 3, 4, 7, 8],        // Purpose is now step 2
-            'returning': [1, 6, 5, 2, 7, 8],     // Purpose after QR scan
-            'delivery': [1, 6, 5, 3, 4, 7, 8]    // Purpose auto-selected
-        };
+        // // Auto-convert all text inputs to lowercase
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     // Select all text inputs and textareas
+        //     const textInputs = document.querySelectorAll('#firstName, #lastName, #email, #phone, #company, #visitNotes');
+            
+        //     textInputs.forEach(input => {
+        //         // Convert to lowercase on input
+        //         input.addEventListener('input', function() {
+        //             this.value = this.value.toLowerCase();
+        //         });
+                
+        //         // Also convert on blur (when user leaves the field)
+        //         input.addEventListener('blur', function() {
+        //             this.value = this.value.toLowerCase();
+        //         });
+        //     });
+        // });
+
         
-        let currentFlow = [];
-        let currentFlowIndex = 0;
-
-        // Sample pre-scheduled visits
-        const preScheduledVisits = [
-            { 
-                code: 'MEET-2024-001', 
-                name: 'Alice Johnson', 
-                company: 'Tech Solutions Inc.', 
-                host: 'John Smith', 
-                time: '10:00 AM',
-                purpose: 'Sales Meeting'
-            }
-        ];
-
         // // Function to generate QR code data
         // function generateQRCodeData() {
         //     const qrData = {
@@ -1551,7 +1527,7 @@
         //         qrContainer.innerHTML = '<p class="text-danger">Could not generate QR code</p>';
         //     }
         // }
-        
+
         // Function to generate and display QR code on success screen
         function generateVisitorQRCode() {
             const qrContainer = document.getElementById('qrCodeContainer');
@@ -1596,29 +1572,29 @@
             }
         }
 
-        // Function to download QR code as image
-        function downloadQRCode() {
-            const qrContainer = document.getElementById('qrCodeContainer');
-            const canvas = qrContainer.querySelector('canvas');
+        // // Function to download QR code as image
+        // function downloadQRCode() {
+        //     const qrContainer = document.getElementById('qrCodeContainer');
+        //     const canvas = qrContainer.querySelector('canvas');
             
-            if (canvas) {
-                const link = document.createElement('a');
-                link.download = `visitor-qr-${visitorData.firstName}-${visitorData.lastName}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                showNotification(translations[currentLanguage].downloadQR || 'QR Code downloaded!');
-            } else {
-                // Try to get image element if canvas not available
-                const img = qrContainer.querySelector('img');
-                if (img) {
-                    const link = document.createElement('a');
-                    link.download = `visitor-qr-${visitorData.firstName}-${visitorData.lastName}.png`;
-                    link.href = img.src;
-                    link.click();
-                    showNotification(translations[currentLanguage].downloadQR || 'QR Code downloaded!');
-                }
-            }
-        }
+        //     if (canvas) {
+        //         const link = document.createElement('a');
+        //         link.download = `visitor-qr-${visitorData.firstName}-${visitorData.lastName}.png`;
+        //         link.href = canvas.toDataURL('image/png');
+        //         link.click();
+        //         showNotification(translations[currentLanguage].downloadQR || 'QR Code downloaded!');
+        //     } else {
+        //         // Try to get image element if canvas not available
+        //         const img = qrContainer.querySelector('img');
+        //         if (img) {
+        //             const link = document.createElement('a');
+        //             link.download = `visitor-qr-${visitorData.firstName}-${visitorData.lastName}.png`;
+        //             link.href = img.src;
+        //             link.click();
+        //             showNotification(translations[currentLanguage].downloadQR || 'QR Code downloaded!');
+        //         }
+        //     }
+        // }
 
         // Local storage for visitor data
         const STORAGE_KEY = 'kioskVisitorData';
@@ -1641,7 +1617,7 @@
                     this.value = this.value.toLowerCase();
                 });
             });
-            
+
         });
 
         // Update date and time
@@ -2028,6 +2004,70 @@
             });
         }
 
+        // // Function to display employees in the grid
+        // function displayEmployees(employees) {
+        //     const employeeGrid = document.getElementById('employeeGrid');
+        //     employeeGrid.innerHTML = '';
+            
+        //     if (employees.length === 0) {
+        //         const noResultsText = translations[currentLanguage]?.noEmployeesFound || 'No employees found matching your search';
+        //         employeeGrid.innerHTML = `<p class="no-results-message">${noResultsText}</p>`;
+        //         return;
+        //     }
+            
+        //     employees.forEach(employee => {
+        //         const card = document.createElement('div');
+        //         card.className = 'employee-card';
+                
+        //         // Check if this employee is currently selected
+        //         if (selectedHost && selectedHost.id === employee.employee_id) {
+        //             card.classList.add('selected');
+        //         }
+                
+        //         card.innerHTML = `
+        //             <i class="bi bi-person-circle"></i>
+        //             <div class="employee-name">${employee.name}</div>
+        //             <div class="employee-email">${employee.email}</div>
+        //         `;
+                
+        //         // Store data as data attributes
+        //         card.dataset.employeeId = employee.employee_id;
+        //         card.dataset.employeeName = employee.name;
+        //         card.dataset.employeeEmail = employee.email;
+        //         card.dataset.deptCode = employee.deptCode;
+        //         card.dataset.deptName = employee.deptName;
+        //         card.dataset.deptOriginalName = employee.deptOriginalName;
+                
+        //         card.addEventListener('click', function(e) {
+        //             selectEmployeeFromCard(e.currentTarget);
+        //         });
+                
+        //         employeeGrid.appendChild(card);
+        //     });
+        // }
+
+        // Function to filter employees based on search query
+        // function filterEmployees(query) {
+        //     const searchTerm = query.toLowerCase().trim();
+            
+        //     if (!searchTerm) {
+        //         // If search is empty, show all employees
+        //         displayEmployees(currentDepartmentEmployees);
+        //         return;
+        //     }
+            
+        //     // Filter employees by name (case-insensitive)
+        //     const filteredEmployees = currentDepartmentEmployees.filter(employee => {
+        //         const name = employee.name.toLowerCase();
+        //         const email = employee.email.toLowerCase();
+                
+        //         // Search in both name and email
+        //         return name.includes(searchTerm) || email.includes(searchTerm);
+        //     });
+            
+        //     displayEmployees(filteredEmployees);
+        // }
+
         // Function to filter employees based on search query
         function filterEmployees(query) {
             const searchTerm = query.toLowerCase().trim();
@@ -2064,15 +2104,6 @@
         }
 
         // Function to clear employee search
-        // function clearEmployeeSearch() {
-        //     const searchInput = document.getElementById('employeeSearch');
-        //     if (searchInput) {
-        //         searchInput.value = '';
-        //         filterEmployees('');
-        //         searchInput.focus();
-        //     }
-        // }
-
         function clearEmployeeSearch() {
             const searchInput = document.getElementById('employeeSearch');
             if (searchInput) {
@@ -2180,102 +2211,6 @@
         // }
 
         // Updated: Select employee with translated department name (keep selection visible after filtering)
-        // function selectEmployeeFromCard(cardElement) {
-        //     if (!cardElement || !cardElement.classList) {
-        //         console.error('Invalid card element:', cardElement);
-        //         return;
-        //     }
-            
-        //     document.querySelectorAll('.employee-card').forEach(card => {
-        //         card.classList.remove('selected');
-        //     });
-            
-        //     cardElement.classList.add('selected');
-            
-        //     const employeeId = cardElement.dataset.employeeId;
-        //     const employeeName = cardElement.dataset.employeeName;
-        //     const employeeEmail = cardElement.dataset.employeeEmail;
-        //     const deptCode = cardElement.dataset.deptCode;
-        //     const deptName = cardElement.dataset.deptName;
-        //     const deptOriginalName = cardElement.dataset.deptOriginalName;
-            
-        //     selectedHost = {
-        //         id: employeeId,
-        //         employeeId: employeeId,
-        //         name: employeeName,
-        //         email: employeeEmail,
-        //         department: deptName,
-        //         departmentOriginal: deptOriginalName,
-        //         departmentCode: deptCode
-        //     };
-            
-        //     visitorData.host = selectedHost;
-            
-        //     // Update the display with translated department name
-        //     document.getElementById('selectedHost').innerHTML = `
-        //         <div class="d-flex align-items-center gap-3">
-        //             <i class="bi bi-person-circle" style="font-size: 2em;"></i>
-        //             <div>
-        //                 <div style="font-weight: 600;">${employeeName}</div>
-        //                 <div style="font-size: 0.9em; color: #7f8c8d;">${deptName}</div>
-        //             </div>
-        //         </div>
-        //     `;
-            
-        //     document.getElementById('hostNextBtn').disabled = false;
-            
-        //     // Clear search after selection (optional - comment out if you want to keep the search)
-        //     // clearEmployeeSearch();
-        // }
-
-        // NEW: Load all employees (no department filter)
-        function loadAllEmployees() {
-            const employeeGrid = document.getElementById('employeeGrid');
-            const employeeSearch = document.getElementById('employeeSearch');
-            const employeeCount = document.getElementById('employeeCount');
-            
-            // Reset search input
-            if (employeeSearch) {
-                employeeSearch.value = '';
-            }
-            
-            // Show loading indicator
-            employeeGrid.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted">Loading employees...</p></div>';
-            
-            // Fetch all employees from database
-            fetch(`<?= base_url("kiosk/get_all_employees") ?>?company_visited=${encodeURIComponent(COMPANY_VISITED)}`, {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.status === 'success') {
-                    // Store employees for filtering
-                    currentDepartmentEmployees = result.employees.map(emp => ({
-                        ...emp,
-                        deptCode: emp.department_code,
-                        deptName: emp.department_name,
-                        deptOriginalName: emp.department_name
-                    }));
-                    
-                    // Display all employees
-                    displayEmployees(currentDepartmentEmployees);
-                    
-                    // Update employee count
-                    updateEmployeeCount(currentDepartmentEmployees.length, currentDepartmentEmployees.length);
-                } else {
-                    employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees</p>';
-                }
-            })
-            .catch(error => {
-                console.error('Error loading employees:', error);
-                employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees. Please try again.</p>';
-            });
-        }
-
-        // Update selectEmployeeFromCard to work without pre-selected department
         function selectEmployeeFromCard(cardElement) {
             if (!cardElement || !cardElement.classList) {
                 console.error('Invalid card element:', cardElement);
@@ -2307,7 +2242,7 @@
             
             visitorData.host = selectedHost;
             
-            // Update the display
+            // Update the display with translated department name
             document.getElementById('selectedHost').innerHTML = `
                 <div class="d-flex align-items-center gap-3">
                     <i class="bi bi-person-circle" style="font-size: 2em; color: #27ae60;"></i>
@@ -2322,53 +2257,7 @@
             document.getElementById('hostNextBtn').disabled = false;
         }
 
-        // function selectEmployeeFromCard(cardElement) {
-        //     if (!cardElement || !cardElement.classList) {
-        //         console.error('Invalid card element:', cardElement);
-        //         return;
-        //     }
-            
-        //     document.querySelectorAll('.employee-card').forEach(card => {
-        //         card.classList.remove('selected');
-        //     });
-            
-        //     cardElement.classList.add('selected');
-            
-        //     const employeeId = cardElement.dataset.employeeId;
-        //     const employeeName = cardElement.dataset.employeeName;
-        //     const employeeEmail = cardElement.dataset.employeeEmail;
-        //     const deptCode = cardElement.dataset.deptCode;
-        //     const deptName = cardElement.dataset.deptName;
-        //     const deptOriginalName = cardElement.dataset.deptOriginalName;
-            
-        //     selectedHost = {
-        //         id: employeeId,
-        //         employeeId: employeeId,
-        //         name: employeeName,
-        //         email: employeeEmail,
-        //         department: deptName,
-        //         departmentOriginal: deptOriginalName,
-        //         departmentCode: deptCode
-        //     };
-            
-        //     visitorData.host = selectedHost;
-            
-        //     // Update the display with translated department name
-        //     document.getElementById('selectedHost').innerHTML = `
-        //         <div class="d-flex align-items-center gap-3">
-        //             <i class="bi bi-person-circle" style="font-size: 2em; color: #27ae60;"></i>
-        //             <div>
-        //                 <div style="font-weight: 600;">${employeeName}</div>
-        //                 <div style="font-size: 0.9em; color: #7f8c8d;">${deptName}</div>
-        //             </div>
-        //             <i class="bi bi-check-circle-fill text-success ms-auto" style="font-size: 1.5em;"></i>
-        //         </div>
-        //     `;
-            
-        //     document.getElementById('hostNextBtn').disabled = false;
-        // }
-
-        // Reset host selection
+        // // Reset host selection
         // function resetHostSelection() {
         //     selectedHost = null;
         //     document.getElementById('selectedHost').innerHTML = `
@@ -2379,8 +2268,26 @@
         //         card.classList.remove('selected');
         //     });
         // }
-        
+
         // Updated resetHostSelection to also clear search
+        // function resetHostSelection() {
+        //     selectedHost = null;
+        //     currentDepartmentEmployees = [];
+            
+        //     const searchInput = document.getElementById('employeeSearch');
+        //     if (searchInput) {
+        //         searchInput.value = '';
+        //     }
+            
+        //     document.getElementById('selectedHost').innerHTML = `
+        //         <span class="text-muted">${translations[currentLanguage]?.noSelection || 'No one selected yet'}</span>
+        //     `;
+        //     document.getElementById('hostNextBtn').disabled = true;
+        //     document.querySelectorAll('.employee-card').forEach(card => {
+        //         card.classList.remove('selected');
+        //     });
+        // }
+        
         function resetHostSelection() {
             selectedHost = null;
             currentDepartmentEmployees = [];
@@ -2412,31 +2319,45 @@
             translatePage();
         }
 
-        // // Translate page
-        // function translatePage() {
-        //     const elements = document.querySelectorAll('[data-translate]');
-        //     elements.forEach(el => {
-        //         const key = el.getAttribute('data-translate');
-        //         if (translations[currentLanguage] && translations[currentLanguage][key]) {
-        //             el.textContent = translations[currentLanguage][key];
-        //         }
-        //     });
+        // Translate page
+        function translatePage() {
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    el.textContent = translations[currentLanguage][key];
+                }
+            });
 
-        //     const placeholderElements = document.querySelectorAll('[data-translate-placeholder]');
-        //     placeholderElements.forEach(el => {
-        //         const key = el.getAttribute('data-translate-placeholder');
-        //         if (translations[currentLanguage] && translations[currentLanguage][key]) {
-        //             el.placeholder = translations[currentLanguage][key];
-        //         }
-        //     });
+            const placeholderElements = document.querySelectorAll('[data-translate-placeholder]');
+            placeholderElements.forEach(el => {
+                const key = el.getAttribute('data-translate-placeholder');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    el.placeholder = translations[currentLanguage][key];
+                }
+            });
 
-        //     if (document.getElementById('agreementText')) {
-        //         document.getElementById('agreementText').innerHTML = translations[currentLanguage].agreementContent;
-        //     }
+            if (document.getElementById('agreementText')) {
+                document.getElementById('agreementText').innerHTML = translations[currentLanguage].agreementContent;
+            }
 
-        //     if (document.getElementById('nextStepsList')) {
-        //         const steps = translations[currentLanguage].nextStepsContent;
-        //         document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
+            if (document.getElementById('nextStepsList')) {
+                const steps = translations[currentLanguage].nextStepsContent;
+                document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
+            }
+        }
+
+        // // Start check-in process
+        // function startCheckIn(type) {
+        //     visitorData.type = type;
+        //     currentFlow = screenFlow[type];
+        //     currentFlowIndex = 1;
+            
+        //     if (type === 'returning') {
+        //         showScreen(2);
+        //         initQRScanner();
+        //     } else {
+        //         showScreen(3);
         //     }
         // }
 
@@ -2497,7 +2418,7 @@
         //         });
         //     });
         // }
-
+        
         function initQRScanner() {
             if (html5QrCode) {
                 html5QrCode.stop().catch(() => {});
@@ -2612,15 +2533,6 @@
         //     }
         // }
 
-        // // Skip QR scan
-        // function skipQRScan() {
-        //     if (html5QrCode) {
-        //         html5QrCode.stop();
-        //     }
-        //     showScreen(3);
-        // }
-        
-
         // // FIXED: Handle QR code success for returning visitors
         // function handleQRCodeSuccess(decodedText) {
         //     // Prevent multiple calls
@@ -2713,7 +2625,7 @@
         //             }
         //         });
         //     }
-        // }        
+        // }
 
         // // FIXED: Handle QR code success for returning visitors
         // function handleQRCodeSuccess(decodedText) {
@@ -2936,6 +2848,7 @@
                                         <strong>${visitor.first_name} ${visitor.last_name}</strong>, 
                                         you are currently checked in at the premises.
                                     </p>
+
                                     <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #f39c12; margin-bottom: 15px;">
                                         <strong style="color: #f39c12;">Active Visit Details:</strong><br>
                                         <div style="margin-top: 10px; line-height: 1.8;">
@@ -2999,9 +2912,8 @@
                     };
                     
                     // Update flow for returning visitor
-                    currentFlow = [1, 2, 6, 5, 7, 8];
+                    currentFlow = [1, 2, 5, 6, 7, 8];
                     currentFlowIndex = 2;
-                    showScreen(6); // Go to Purpose screen
                     
                     // Show welcome back message
                     Swal.fire({
@@ -3020,7 +2932,7 @@
                         confirmButtonText: 'OK'
                     }).then(() => {
                         isProcessingQR = false;
-                        showScreen(6);
+                        showScreen(5);
                     });
                     
                 } else {
@@ -3077,7 +2989,7 @@
             }
         `;
         document.head.appendChild(style);
-        
+
         // FIXED: Handle QR upload for returning visitors
         function handleQRUpload(input) {
             const file = input.files[0];
@@ -3111,7 +3023,6 @@
             }
         }
 
-
         // UPDATED: Skip QR scan - redirect to basic info like first-time visitor
         // function skipQRScan() {
         //     if (html5QrCode) {
@@ -3133,27 +3044,26 @@
         //     showScreen(3); // Go to basic info screen
         // }
 
-
-        // // FIXED: Skip QR scan - redirect to basic info like first-time visitor
+        // // Skip QR scan
         // function skipQRScan() {
-        //     isProcessingQR = false;
-        //     isScannerStopping = false;
-            
-        //     stopQRScanner().then(() => {
-        //         // Treat as new visitor since no QR code - use new visitor flow for manual entry
-        //         visitorData.type = 'returning';
-        //         currentFlow = screenFlow['new']; // [1, 3, 4, 5, 6, 7, 8]
-        //         currentFlowIndex = 1;
-        //         showScreen(3); // Go to basic info screen
-        //     });
+        //     if (html5QrCode) {
+        //         html5QrCode.stop();
+        //     }
+        //     showScreen(3);
         // }
 
-        // Updated skipQRScan for returning visitors
+        // FIXED: Skip QR scan - redirect to basic info like first-time visitor
         function skipQRScan() {
-            visitorData.type = 'returning';
-            currentFlow = screenFlow['new'];
-            currentFlowIndex = 1;
-            showScreen(6); // Go to Purpose screen
+            isProcessingQR = false;
+            isScannerStopping = false;
+            
+            stopQRScanner().then(() => {
+                // Treat as new visitor since no QR code - use new visitor flow for manual entry
+                visitorData.type = 'returning';
+                currentFlow = screenFlow['new']; // [1, 3, 4, 5, 6, 7, 8]
+                currentFlowIndex = 1;
+                showScreen(3); // Go to basic info screen
+            });
         }
 
         // Add this new function to check for existing visitors
@@ -3315,11 +3225,6 @@
             //     }
             // }
 
-            // NEW: Load all employees when entering host selection screen
-            if (screenNumber === 5) {
-                loadAllEmployees();
-            }
-
             // Replace the existing screen 6 handling with this enhanced version:
             if (screenNumber === 6) { // Purpose screen
                 // Reset all cards first
@@ -3362,36 +3267,22 @@
             currentScreen = screenNumber;
         }
 
-        // // Alternative approach: Modify the startCheckIn function to store the initial selection
-        // function startCheckIn(type) {
-        //     visitorData.type = type;
-        //     currentFlow = screenFlow[type];
-        //     currentFlowIndex = 1;
-            
-        //     // Store the initial purpose if it's a delivery type
-        //     if (type === 'delivery') {
-        //         visitorData.initialPurpose = 'delivery';
-        //     }
-            
-        //     if (type === 'returning') {
-        //         showScreen(2);
-        //         initQRScanner();
-        //     } else {
-        //         showScreen(3);
-        //     }
-        // }
-
-        // Updated startCheckIn function
+        // Alternative approach: Modify the startCheckIn function to store the initial selection
         function startCheckIn(type) {
             visitorData.type = type;
             currentFlow = screenFlow[type];
             currentFlowIndex = 1;
             
+            // Store the initial purpose if it's a delivery type
+            if (type === 'delivery') {
+                visitorData.initialPurpose = 'delivery';
+            }
+            
             if (type === 'returning') {
-                showScreen(2); // QR Scanner
+                showScreen(2);
                 initQRScanner();
             } else {
-                showScreen(6); // Purpose screen FIRST
+                showScreen(3);
             }
         }
 
@@ -3439,6 +3330,179 @@
         //     document.getElementById('purposeNextBtn').disabled = false;
         // }
 
+        // Add this function to load purposes from database
+        function loadPurposesFromDatabase() {
+            fetch('<?= base_url("kiosk/get_purposes") ?>', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    availablePurposes = result.purposes;
+                    populatePurposeGrid();
+                } else {
+                    console.error('Failed to load purposes');
+                    // Fallback to default purposes if API fails
+                    loadDefaultPurposes();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading purposes:', error);
+                loadDefaultPurposes();
+            });
+        }
+
+        // // Populate the purpose grid with database purposes
+        // function populatePurposeGrid() {
+        //     const purposeGrid = document.querySelector('.purpose-grid');
+        //     if (!purposeGrid) return;
+            
+        //     purposeGrid.innerHTML = '';
+            
+        //     availablePurposes.forEach(purpose => {
+        //         const card = document.createElement('div');
+        //         card.className = 'purpose-card';
+        //         card.setAttribute('onclick', `selectPurpose('${purpose.purpose_code}', this)`);
+                
+        //         card.innerHTML = `
+        //             <i class="bi ${purpose.icon_class} ${purpose.color_class}"></i>
+        //             <h5 data-translate="${purpose.purpose_code}">${purpose.purpose_name}</h5>
+        //         `;
+                
+        //         purposeGrid.appendChild(card);
+        //     });
+        // }
+
+        // Updated function to populate purpose grid with database translations
+        function populatePurposeGrid() {
+            const purposeGrid = document.querySelector('.purpose-grid');
+            if (!purposeGrid) return;
+            
+            purposeGrid.innerHTML = '';
+            
+            availablePurposes.forEach(purpose => {
+                const card = document.createElement('div');
+                card.className = 'purpose-card';
+                card.setAttribute('onclick', `selectPurpose('${purpose.purpose_code}', this)`);
+                
+                // Get translated name based on current language
+                const translatedName = getTranslatedPurposeName(purpose);
+                
+                card.innerHTML = `
+                    <i class="bi ${purpose.icon_class} ${purpose.color_class}"></i>
+                    <h5>${translatedName}</h5>
+                `;
+                
+                purposeGrid.appendChild(card);
+            });
+        }
+
+        // Helper function to get translated purpose name
+        function getTranslatedPurposeName(purpose) {
+            // Map JavaScript language codes to database column names
+            const languageMap = {
+                'en': 'name_en',
+                'zh-TW': 'name_zh_tw',
+                'zh-CN': 'name_zh_cn',
+                'fil': 'name_fil',
+                'ja': 'name_ja'
+            };
+            
+            const columnName = languageMap[currentLanguage];
+            
+            // Return translated name from database, fallback to English
+            return purpose[columnName] || purpose.name_en || purpose.purpose_name;
+        }
+
+        // Updated translatePage function to also update department names when language changes
+        function translatePage() {
+            // Existing translation code for other elements
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    el.textContent = translations[currentLanguage][key];
+                }
+            });
+
+            const placeholderElements = document.querySelectorAll('[data-translate-placeholder]');
+            placeholderElements.forEach(el => {
+                const key = el.getAttribute('data-translate-placeholder');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    el.placeholder = translations[currentLanguage][key];
+                }
+            });
+
+            if (document.getElementById('agreementText')) {
+                document.getElementById('agreementText').innerHTML = translations[currentLanguage].agreementContent;
+            }
+
+            if (document.getElementById('nextStepsList')) {
+                const steps = translations[currentLanguage].nextStepsContent;
+                document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
+            }
+            
+            // Update purpose cards if loaded
+            if (availablePurposes.length > 0 && document.querySelector('.purpose-grid')) {
+                populatePurposeGrid();
+            }
+            
+            // NEW: Update department dropdown if loaded
+            if (availableDepartments.length > 0) {
+                const select = document.getElementById('departmentSelect');
+                const currentValue = select.value; // Preserve selection
+                
+                select.innerHTML = '<option value="">Choose a department...</option>';
+                
+                availableDepartments.forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept.department_code;
+                    option.textContent = getTranslatedDepartmentName(dept);
+                    if (dept.department_code === currentValue) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                
+                // Update selected host display if there's a selection
+                if (selectedHost && selectedHost.departmentCode === currentValue) {
+                    const deptObj = availableDepartments.find(d => d.department_code === currentValue);
+                    if (deptObj) {
+                        const translatedDeptName = getTranslatedDepartmentName(deptObj);
+                        selectedHost.department = translatedDeptName;
+                        
+                        document.getElementById('selectedHost').innerHTML = `
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="bi bi-person-circle" style="font-size: 2em;"></i>
+                                <div>
+                                    <div style="font-weight: 600;">${selectedHost.name}</div>
+                                    <div style="font-size: 0.9em; color: #7f8c8d;">${translatedDeptName}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            }
+        }
+
+        // Fallback function for default purposes (in case API fails)
+        function loadDefaultPurposes() {
+            availablePurposes = [
+                { purpose_code: 'meeting', purpose_name: 'Meeting', icon_class: 'bi-people', color_class: 'text-primary' },
+                { purpose_code: 'interview', purpose_name: 'Interview', icon_class: 'bi-briefcase', color_class: 'text-success' },
+                { purpose_code: 'delivery', purpose_name: 'Delivery', icon_class: 'bi-box', color_class: 'text-warning' },
+                { purpose_code: 'service', purpose_name: 'Service/Repair', icon_class: 'bi-tools', color_class: 'text-info' },
+                { purpose_code: 'training', purpose_name: 'Training', icon_class: 'bi-mortarboard', color_class: 'text-danger' },
+                { purpose_code: 'tour', purpose_name: 'Tour', icon_class: 'bi-map', color_class: 'text-secondary' },
+                { purpose_code: 'event', purpose_name: 'Event', icon_class: 'bi-calendar-event', color_class: 'text-purple' },
+                { purpose_code: 'other', purpose_name: 'Other', icon_class: 'bi-three-dots', color_class: 'text-dark' }
+            ];
+            populatePurposeGrid();
+        }
+        
         // Update selectPurpose function to prevent selection when disabled:
         function selectPurpose(purpose, element) {
             // Check if card is disabled
@@ -3494,26 +3558,14 @@
 
         // Update step indicator - FIXED VERSION
         function updateStepIndicator(step) {
-            // // Map screen number to step number (7 total steps shown)
-            // const screenToStep = {
-            //     1: 1,  // Welcome
-            //     2: 2,  // QR Scanner
-            //     3: 2,  // Basic Info (same step as QR for returning visitors)
-            //     4: 3,  // Photo
-            //     5: 4,  // Host
-            //     6: 5,  // Purpose
-            //     7: 6,  // Agreement
-            //     8: 7   // Success
-            // };
-
-            // Updated step indicator mapping
+            // Map screen number to step number (7 total steps shown)
             const screenToStep = {
                 1: 1,  // Welcome
-                2: 2,  // QR Scanner (returning)
-                6: 2,  // Purpose (new visitors) - FIRST STEP
-                5: 3,  // Host
-                3: 4,  // Basic Info
-                4: 5,  // Photo
+                2: 2,  // QR Scanner
+                3: 2,  // Basic Info (same step as QR for returning visitors)
+                4: 3,  // Photo
+                5: 4,  // Host
+                6: 5,  // Purpose
                 7: 6,  // Agreement
                 8: 7   // Success
             };
@@ -3640,7 +3692,7 @@
                     if (!isValid) {
                         showNotification('Please correct the highlighted fields');
                     }
-                    return isValid;                    
+                    return isValid;
                     
                     // NEW: Check for duplicate before proceeding
                     // This returns a promise, so we need to handle it differently
@@ -3711,7 +3763,7 @@
                 showScreen(currentScreen + 1);
             }
         }
-
+        
         // Clear validation errors on input
         document.addEventListener('DOMContentLoaded', function() {
             const inputs = document.querySelectorAll('.form-control-lg');
@@ -3925,179 +3977,6 @@
         //     document.getElementById('purposeNextBtn').disabled = false;
         // }
 
-        // Add this function to load purposes from database
-        function loadPurposesFromDatabase() {
-            fetch('<?= base_url("kiosk/get_purposes") ?>', {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.status === 'success') {
-                    availablePurposes = result.purposes;
-                    populatePurposeGrid();
-                } else {
-                    console.error('Failed to load purposes');
-                    // Fallback to default purposes if API fails
-                    loadDefaultPurposes();
-                }
-            })
-            .catch(error => {
-                console.error('Error loading purposes:', error);
-                loadDefaultPurposes();
-            });
-        }
-
-        // // Populate the purpose grid with database purposes
-        // function populatePurposeGrid() {
-        //     const purposeGrid = document.querySelector('.purpose-grid');
-        //     if (!purposeGrid) return;
-            
-        //     purposeGrid.innerHTML = '';
-            
-        //     availablePurposes.forEach(purpose => {
-        //         const card = document.createElement('div');
-        //         card.className = 'purpose-card';
-        //         card.setAttribute('onclick', `selectPurpose('${purpose.purpose_code}', this)`);
-                
-        //         card.innerHTML = `
-        //             <i class="bi ${purpose.icon_class} ${purpose.color_class}"></i>
-        //             <h5 data-translate="${purpose.purpose_code}">${purpose.purpose_name}</h5>
-        //         `;
-                
-        //         purposeGrid.appendChild(card);
-        //     });
-        // }
-
-        // Updated function to populate purpose grid with database translations
-        function populatePurposeGrid() {
-            const purposeGrid = document.querySelector('.purpose-grid');
-            if (!purposeGrid) return;
-            
-            purposeGrid.innerHTML = '';
-            
-            availablePurposes.forEach(purpose => {
-                const card = document.createElement('div');
-                card.className = 'purpose-card';
-                card.setAttribute('onclick', `selectPurpose('${purpose.purpose_code}', this)`);
-                
-                // Get translated name based on current language
-                const translatedName = getTranslatedPurposeName(purpose);
-                
-                card.innerHTML = `
-                    <i class="bi ${purpose.icon_class} ${purpose.color_class}"></i>
-                    <h5>${translatedName}</h5>
-                `;
-                
-                purposeGrid.appendChild(card);
-            });
-        }
-
-        // Helper function to get translated purpose name
-        function getTranslatedPurposeName(purpose) {
-            // Map JavaScript language codes to database column names
-            const languageMap = {
-                'en': 'name_en',
-                'zh-TW': 'name_zh_tw',
-                'zh-CN': 'name_zh_cn',
-                'fil': 'name_fil',
-                'ja': 'name_ja'
-            };
-            
-            const columnName = languageMap[currentLanguage];
-            
-            // Return translated name from database, fallback to English
-            return purpose[columnName] || purpose.name_en || purpose.purpose_name;
-        }
-
-        // Updated translatePage function to also update department names when language changes
-        function translatePage() {
-            // Existing translation code for other elements
-            const elements = document.querySelectorAll('[data-translate]');
-            elements.forEach(el => {
-                const key = el.getAttribute('data-translate');
-                if (translations[currentLanguage] && translations[currentLanguage][key]) {
-                    el.textContent = translations[currentLanguage][key];
-                }
-            });
-
-            const placeholderElements = document.querySelectorAll('[data-translate-placeholder]');
-            placeholderElements.forEach(el => {
-                const key = el.getAttribute('data-translate-placeholder');
-                if (translations[currentLanguage] && translations[currentLanguage][key]) {
-                    el.placeholder = translations[currentLanguage][key];
-                }
-            });
-
-            if (document.getElementById('agreementText')) {
-                document.getElementById('agreementText').innerHTML = translations[currentLanguage].agreementContent;
-            }
-
-            if (document.getElementById('nextStepsList')) {
-                const steps = translations[currentLanguage].nextStepsContent;
-                document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
-            }
-            
-            // Update purpose cards if loaded
-            if (availablePurposes.length > 0 && document.querySelector('.purpose-grid')) {
-                populatePurposeGrid();
-            }
-            
-            // NEW: Update department dropdown if loaded
-            if (availableDepartments.length > 0) {
-                const select = document.getElementById('departmentSelect');
-                const currentValue = select.value; // Preserve selection
-                
-                select.innerHTML = '<option value="">Choose a department...</option>';
-                
-                availableDepartments.forEach(dept => {
-                    const option = document.createElement('option');
-                    option.value = dept.department_code;
-                    option.textContent = getTranslatedDepartmentName(dept);
-                    if (dept.department_code === currentValue) {
-                        option.selected = true;
-                    }
-                    select.appendChild(option);
-                });
-                
-                // Update selected host display if there's a selection
-                if (selectedHost && selectedHost.departmentCode === currentValue) {
-                    const deptObj = availableDepartments.find(d => d.department_code === currentValue);
-                    if (deptObj) {
-                        const translatedDeptName = getTranslatedDepartmentName(deptObj);
-                        selectedHost.department = translatedDeptName;
-                        
-                        document.getElementById('selectedHost').innerHTML = `
-                            <div class="d-flex align-items-center gap-3">
-                                <i class="bi bi-person-circle" style="font-size: 2em;"></i>
-                                <div>
-                                    <div style="font-weight: 600;">${selectedHost.name}</div>
-                                    <div style="font-size: 0.9em; color: #7f8c8d;">${translatedDeptName}</div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                }
-            }
-        }
-
-        // Fallback function for default purposes (in case API fails)
-        function loadDefaultPurposes() {
-            availablePurposes = [
-                { purpose_code: 'meeting', purpose_name: 'Meeting', icon_class: 'bi-people', color_class: 'text-primary' },
-                { purpose_code: 'interview', purpose_name: 'Interview', icon_class: 'bi-briefcase', color_class: 'text-success' },
-                { purpose_code: 'delivery', purpose_name: 'Delivery', icon_class: 'bi-box', color_class: 'text-warning' },
-                { purpose_code: 'service', purpose_name: 'Service/Repair', icon_class: 'bi-tools', color_class: 'text-info' },
-                { purpose_code: 'training', purpose_name: 'Training', icon_class: 'bi-mortarboard', color_class: 'text-danger' },
-                { purpose_code: 'tour', purpose_name: 'Tour', icon_class: 'bi-map', color_class: 'text-secondary' },
-                { purpose_code: 'event', purpose_name: 'Event', icon_class: 'bi-calendar-event', color_class: 'text-purple' },
-                { purpose_code: 'other', purpose_name: 'Other', icon_class: 'bi-three-dots', color_class: 'text-dark' }
-            ];
-            populatePurposeGrid();
-        }
-
         // Agreement check
         function checkAgreement() {
             const terms = document.getElementById('agreeTerms').checked;
@@ -4239,31 +4118,13 @@
         //     document.getElementById('hostNextBtn').disabled = true;
         //     document.getElementById('purposeNextBtn').disabled = true;
         //     document.getElementById('agreeNextBtn').disabled = true;
+
+        //     // Hard refresh the page
+        //     window.location.href = window.location.href.split('?')[0]; // Removes any query parameters
+        //     // OR use this for a complete reload:
+        //     // window.location.reload(true); // true forces reload from server, not cache
             
         //     showScreen(1);
-        // }
-
-        // async function stopQRScanner() {
-        //     if (!html5QrCode || isScannerStopping) {
-        //         return Promise.resolve();
-        //     }
-            
-        //     isScannerStopping = true;
-            
-        //     return new Promise((resolve) => {
-        //         try {
-        //             html5QrCode.stop().then(() => {
-        //                 isScannerStopping = false;
-        //                 resolve();
-        //             }).catch(() => {
-        //                 isScannerStopping = false;
-        //                 resolve();
-        //             });
-        //         } catch (e) {
-        //             isScannerStopping = false;
-        //             resolve();
-        //         }
-        //     });
         // }
 
         // Pre-scheduled visit functions
@@ -4376,7 +4237,7 @@
             });
         }
 
-        // Emergency call - FOR PAN-ASIA
+        // Emergency call - FOR TOM'S WORLD
         function callEmergency() {
             Swal.fire({
                 title: translations[currentLanguage].emergencyTitle || 'Emergency Assistance',
@@ -4393,8 +4254,8 @@
                         visitor_name: visitorData.firstName && visitorData.lastName 
                             ? `${visitorData.firstName} ${visitorData.lastName}` 
                             : 'Anonymous Visitor',
-                        location: 'Pan-Asia Kiosk',
-                        company_visited: 'Pan Asia'
+                        location: 'Tom\'s World Kiosk',
+                        company_visited: 'Toms World'
                     };
                     
                     fetch('<?= base_url("kiosk/emergency_alert") ?>', {
@@ -4412,9 +4273,9 @@
                                 title: translations[currentLanguage].emergencyNotified || 'Security has been notified!',
                                 html: `
                                     <p>${translations[currentLanguage].emergencyMessage || 'Help is on the way. Please stay where you are.'}</p>
-                                    <div style="margin-top: 15px; padding: 10px; background: #d4edda; border-radius: 8px; border: 2px solid #1e9338;">
-                                        <strong style="color: #1e9338;">
-                                            <i class="bi bi-building"></i> Pan-Asia Security Team Notified
+                                    <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-radius: 8px; border: 2px solid #f39c12;">
+                                        <strong style="color: #f39c12;">
+                                            <i class="bi bi-building"></i> Tom's World Security Team Notified
                                         </strong>
                                     </div>
                                 `,
@@ -4425,7 +4286,7 @@
                         } else {
                             Swal.fire({
                                 title: 'Notification Failed',
-                                text: 'Please contact Pan-Asia staff directly at the reception desk.',
+                                text: 'Please contact Tom\'s World staff directly at the reception desk.',
                                 icon: 'error',
                                 confirmButtonColor: '#e74c3c'
                             });
@@ -4435,7 +4296,7 @@
                         console.error('Emergency alert error:', error);
                         Swal.fire({
                             title: 'Connection Error',
-                            text: 'Please contact Pan-Asia staff directly at the reception desk.',
+                            text: 'Please contact Tom\'s World staff directly at the reception desk.',
                             icon: 'error',
                             confirmButtonColor: '#e74c3c'
                         });
@@ -4702,7 +4563,7 @@
             });
         }
 
-        // // Updated employee loading function to fetch from database
+        // Updated employee loading function to fetch from database
         // function onDepartmentChange() {
         //     const deptCode = document.getElementById('departmentSelect').value;
         //     const employeeSection = document.getElementById('employeeSection');
@@ -5037,9 +4898,8 @@
 
 
         
-
         // Add this constant at the top of the script section (after the departmentData declaration)
-        const COMPANY_VISITED = 'Pan Asia';
+        const COMPANY_VISITED = 'Toms World';
 
         // // Update the completeCheckIn function - find this function and replace it:
         // function completeCheckIn() {
@@ -5289,7 +5149,7 @@
             // window.location.href = window.location.href.split('?')[0]; // Removes any query parameters
             // OR use this for a complete reload:
             window.location.reload(true); // true forces reload from server, not cache
-            
+        
             showScreen(1);
         }
 
@@ -5392,6 +5252,5 @@
                 }
             });
         });
-
 
     </script>

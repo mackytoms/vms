@@ -1353,12 +1353,12 @@
                         <button class="btn btn-success" onclick="exportReportToExcel()">
                             <i class="bi bi-file-earmark-excel"></i> Export to Excel
                         </button>
-                        <button class="btn btn-danger" onclick="exportReportToPDF()">
+                        <!-- <button class="btn btn-danger" onclick="exportReportToPDF()">
                             <i class="bi bi-file-earmark-pdf"></i> Export to PDF
                         </button>
                         <button class="btn btn-secondary" onclick="printReport()">
                             <i class="bi bi-printer"></i> Print
-                        </button>
+                        </button> -->
                     </div>
                     
                     <!-- Data Table -->
@@ -3059,9 +3059,30 @@
             showFilterResultToast('Employee', filteredData.length, allEmployeesData.length);
         }
 
+        // function canEditEmployee(companyOwnedBy) {
+        //     // Super admin can edit everything
+        //     if (companyFilter === null) {
+        //         return true;
+        //     }
+            
+        //     // Both companies can be edited by any admin
+        //     if (companyOwnedBy === 'Both') {
+        //         return true;
+        //     }
+            
+        //     // Check if the employee belongs to the admin's company
+        //     return companyOwnedBy === companyFilter;
+        // }
+
         function canEditEmployee(companyOwnedBy) {
+            console.log('Comparing:', {
+                companyOwnedBy: companyOwnedBy,
+                companyFilter: companyFilter,
+                isMatch: companyOwnedBy === companyFilter
+            });
+
             // Super admin can edit everything
-            if (companyFilter === null) {
+            if (!companyFilter) {
                 return true;
             }
             
@@ -3070,8 +3091,11 @@
                 return true;
             }
             
-            // Check if the employee belongs to the admin's company
-            return companyOwnedBy === companyFilter;
+            // Case-insensitive comparison
+            const filterLower = companyFilter.toLowerCase().trim();
+            const companyLower = (companyOwnedBy || '').toLowerCase().trim();
+            
+            return companyLower === filterLower;
         }
 
         function editEmployee(employeeId) {
