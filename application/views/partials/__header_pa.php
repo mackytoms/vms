@@ -1357,6 +1357,23 @@
             border-radius: 3px;
             font-weight: 600;
         }
+
+        /* Add this to your existing CSS */
+        #successScreen {
+            display: none;
+        }
+
+        #successScreen.active {
+            display: block !important;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block !important;
+        }
     </style>
 </head>
 <body>

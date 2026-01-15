@@ -1623,15 +1623,45 @@
         // Local storage for visitor data
         const STORAGE_KEY = 'kioskVisitorData';
         
-        // Initialize
+        // // Initialize
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     updateDateTime();
+        //     setInterval(updateDateTime, 1000);
+        //     translatePage();
+        //     populateDepartments();
+        //     loadPurposesFromDatabase(); // ADD THIS LINE
+
+        //     // ADD THIS SECTION - Auto-convert to lowercase
+        //     const textInputs = document.querySelectorAll('#firstName, #lastName, #email, #phone, #company, #visitNotes');
+        //     textInputs.forEach(input => {
+        //         input.addEventListener('input', function() {
+        //             this.value = this.value.toLowerCase();
+        //         });
+        //         input.addEventListener('blur', function() {
+        //             this.value = this.value.toLowerCase();
+        //         });
+        //     });
+            
+        // });
+
+        // Initialize - FIXED VERSION
         document.addEventListener('DOMContentLoaded', function() {
             updateDateTime();
             setInterval(updateDateTime, 1000);
             translatePage();
-            populateDepartments();
-            loadPurposesFromDatabase(); // ADD THIS LINE
+            
+            // IMPORTANT: Only call these if we're NOT on the welcome screen
+            // or if the elements actually exist
+            if (document.getElementById('departmentSelect')) {
+                populateDepartments();
+            }
+            
+            // Only load purposes if the grid exists
+            if (document.querySelector('.purpose-grid')) {
+                loadPurposesFromDatabase();
+            }
 
-            // ADD THIS SECTION - Auto-convert to lowercase
+            // Auto-convert to lowercase
             const textInputs = document.querySelectorAll('#firstName, #lastName, #email, #phone, #company, #visitNotes');
             textInputs.forEach(input => {
                 input.addEventListener('input', function() {
@@ -1641,7 +1671,6 @@
                     this.value = this.value.toLowerCase();
                 });
             });
-            
         });
 
         // Update date and time
@@ -3267,11 +3296,11 @@
         //     currentScreen = screenNumber;
         // }
 
-        // FIXED: showScreen function - update the part that handles screen 2
+        // Updated showScreen function - load departments/purposes only when needed
         function showScreen(screenNumber) {
-            // Stop QR scanner when leaving screen 2 (but don't throw error)
+            // Stop QR scanner when leaving screen 2
             if (currentScreen === 2 && screenNumber !== 2) {
-                stopQRScanner(); // This now safely handles already-stopped scanner
+                stopQRScanner();
             }
             
             if (currentScreen === 4 && screenNumber !== 4) {
@@ -3296,53 +3325,36 @@
                 document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
             }
             
-            // // AUTO-SELECT DELIVERY PURPOSE IF VISITOR TYPE IS DELIVERY
-            // if (screenNumber === 6) { // Purpose screen
-            //     if (visitorData.type === 'delivery') {
-            //         setTimeout(() => {
-            //             const deliveryCard = Array.from(document.querySelectorAll('.purpose-card'))
-            //                 .find(card => card.getAttribute('onclick').includes("'delivery'"));
-                        
-            //             if (deliveryCard) {
-            //                 document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
-            //                 deliveryCard.classList.add('selected');
-            //                 selectedPurpose = 'delivery';
-            //                 visitorData.purpose = 'delivery';
-            //                 document.getElementById('purposeNextBtn').disabled = false;
-            //                 showNotification('Delivery purpose auto-selected based on your visit type');
-            //             }
-            //         }, 100);
-            //     }
-            // }
-
-            // NEW: Load all employees when entering host selection screen
+            // NEW: Load departments when entering host screen (screen 5)
             if (screenNumber === 5) {
+                // Load employees for all departments
                 loadAllEmployees();
+                
+                // Also ensure departments are loaded (in case they weren't loaded initially)
+                if (availableDepartments.length === 0 && document.getElementById('departmentSelect')) {
+                    populateDepartments();
+                }
             }
 
-            // Replace the existing screen 6 handling with this enhanced version:
-            if (screenNumber === 6) { // Purpose screen
-                // Reset all cards first
-                document.querySelectorAll('.purpose-card').forEach(card => {
-                    card.classList.remove('selected', 'disabled');
-                    card.style.opacity = '1';
-                    card.style.cursor = 'pointer';
-                    card.style.pointerEvents = 'auto';
-                });
+            // NEW: Load purposes when entering purpose screen (screen 6)
+            if (screenNumber === 6) {
+                // Ensure purposes are loaded (in case they weren't loaded initially)
+                if (availablePurposes.length === 0 && document.querySelector('.purpose-grid')) {
+                    loadPurposesFromDatabase();
+                }
                 
+                // Handle delivery auto-selection
                 if (visitorData.type === 'delivery') {
                     setTimeout(() => {
                         const deliveryCard = Array.from(document.querySelectorAll('.purpose-card'))
                             .find(card => card.getAttribute('onclick')?.includes("'delivery'"));
                         
                         if (deliveryCard) {
-                            // Auto-select delivery
                             deliveryCard.classList.add('selected');
                             selectedPurpose = 'delivery';
                             visitorData.purpose = 'delivery';
                             document.getElementById('purposeNextBtn').disabled = false;
                             
-                            // Disable all other purpose cards
                             document.querySelectorAll('.purpose-card').forEach(card => {
                                 if (card !== deliveryCard) {
                                     card.classList.add('disabled');
@@ -3361,6 +3373,101 @@
             updateStepIndicator(screenNumber);
             currentScreen = screenNumber;
         }
+
+        // // FIXED: showScreen function - update the part that handles screen 2
+        // function showScreen(screenNumber) {
+        //     // Stop QR scanner when leaving screen 2 (but don't throw error)
+        //     if (currentScreen === 2 && screenNumber !== 2) {
+        //         stopQRScanner(); // This now safely handles already-stopped scanner
+        //     }
+            
+        //     if (currentScreen === 4 && screenNumber !== 4) {
+        //         stopCamera();
+        //     }
+            
+        //     document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            
+        //     const screens = ['', 'welcomeScreen', 'qrScannerScreen', 'basicInfoScreen', 'photoScreen', 
+        //                 'hostScreen', 'purposeScreen', 'agreementScreen', 'successScreen'];
+            
+        //     if (screens[screenNumber]) {
+        //         document.getElementById(screens[screenNumber]).classList.add('active');
+        //     }
+            
+        //     if (screenNumber === 4) startCamera();
+        //     if (screenNumber === 7) {
+        //         document.getElementById('agreementText').innerHTML = translations[currentLanguage].agreementContent;
+        //     }
+        //     if (screenNumber === 8) {
+        //         const steps = translations[currentLanguage].nextStepsContent;
+        //         document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
+        //     }
+            
+        //     // // AUTO-SELECT DELIVERY PURPOSE IF VISITOR TYPE IS DELIVERY
+        //     // if (screenNumber === 6) { // Purpose screen
+        //     //     if (visitorData.type === 'delivery') {
+        //     //         setTimeout(() => {
+        //     //             const deliveryCard = Array.from(document.querySelectorAll('.purpose-card'))
+        //     //                 .find(card => card.getAttribute('onclick').includes("'delivery'"));
+                        
+        //     //             if (deliveryCard) {
+        //     //                 document.querySelectorAll('.purpose-card').forEach(card => card.classList.remove('selected'));
+        //     //                 deliveryCard.classList.add('selected');
+        //     //                 selectedPurpose = 'delivery';
+        //     //                 visitorData.purpose = 'delivery';
+        //     //                 document.getElementById('purposeNextBtn').disabled = false;
+        //     //                 showNotification('Delivery purpose auto-selected based on your visit type');
+        //     //             }
+        //     //         }, 100);
+        //     //     }
+        //     // }
+
+        //     // NEW: Load all employees when entering host selection screen
+        //     if (screenNumber === 5) {
+        //         loadAllEmployees();
+        //     }
+
+        //     // Replace the existing screen 6 handling with this enhanced version:
+        //     if (screenNumber === 6) { // Purpose screen
+        //         // Reset all cards first
+        //         document.querySelectorAll('.purpose-card').forEach(card => {
+        //             card.classList.remove('selected', 'disabled');
+        //             card.style.opacity = '1';
+        //             card.style.cursor = 'pointer';
+        //             card.style.pointerEvents = 'auto';
+        //         });
+                
+        //         if (visitorData.type === 'delivery') {
+        //             setTimeout(() => {
+        //                 const deliveryCard = Array.from(document.querySelectorAll('.purpose-card'))
+        //                     .find(card => card.getAttribute('onclick')?.includes("'delivery'"));
+                        
+        //                 if (deliveryCard) {
+        //                     // Auto-select delivery
+        //                     deliveryCard.classList.add('selected');
+        //                     selectedPurpose = 'delivery';
+        //                     visitorData.purpose = 'delivery';
+        //                     document.getElementById('purposeNextBtn').disabled = false;
+                            
+        //                     // Disable all other purpose cards
+        //                     document.querySelectorAll('.purpose-card').forEach(card => {
+        //                         if (card !== deliveryCard) {
+        //                             card.classList.add('disabled');
+        //                             card.style.opacity = '0.4';
+        //                             card.style.cursor = 'not-allowed';
+        //                             card.style.pointerEvents = 'none';
+        //                         }
+        //                     });
+                            
+        //                     showNotification('Delivery purpose auto-selected based on your visit type');
+        //                 }
+        //             }, 100);
+        //         }
+        //     }
+            
+        //     updateStepIndicator(screenNumber);
+        //     currentScreen = screenNumber;
+        // }
 
         // // Alternative approach: Modify the startCheckIn function to store the initial selection
         // function startCheckIn(type) {
@@ -4167,19 +4274,45 @@
             }, 2000);
         }
 
-        // Countdown timer
+        // FIXED: Countdown timer with better logging
         function startCountdown() {
+            console.log('Starting countdown timer...');
+            
             let seconds = 60;
+            const countdownEl = document.getElementById('countdown');
+            
+            if (!countdownEl) {
+                console.error('Countdown element not found');
+                return;
+            }
+            
+            countdownEl.textContent = seconds;
+            
             countdownTimer = setInterval(() => {
                 seconds--;
-                document.getElementById('countdown').textContent = seconds;
+                countdownEl.textContent = seconds;
                 
                 if (seconds <= 0) {
                     clearInterval(countdownTimer);
+                    console.log('Countdown complete, resetting kiosk...');
                     resetKiosk();
                 }
             }, 1000);
         }
+
+        // // Countdown timer
+        // function startCountdown() {
+        //     let seconds = 60;
+        //     countdownTimer = setInterval(() => {
+        //         seconds--;
+        //         document.getElementById('countdown').textContent = seconds;
+                
+        //         if (seconds <= 0) {
+        //             clearInterval(countdownTimer);
+        //             resetKiosk();
+        //         }
+        //     }, 1000);
+        // }
 
         // // Reset kiosk
         // function resetKiosk() {
@@ -4603,41 +4736,96 @@
         //     visitorData.badge_number = data.badge_number;
         // }
 
-        // UPDATED: Update success screen to include QR code generation
+        // // UPDATED: Update success screen to include QR code generation
+        // function updateSuccessScreen(data) {
+        //     // Update badge number
+        //     document.getElementById('badgeNumber').textContent = data.badge_number;
+            
+        //     // Update visitor information
+        //     document.getElementById('visitorName').textContent = data.visitor_name;
+        //     document.getElementById('visitorCompany').textContent = data.company;
+            
+        //     // Update host information
+        //     document.getElementById('badgeHost').textContent = data.host_name;
+            
+        //     // Update valid until time
+        //     const validUntilDate = new Date(data.valid_until);
+        //     document.getElementById('validUntil').textContent = 
+        //         validUntilDate.toLocaleTimeString('en-US', { 
+        //             hour: '2-digit', 
+        //             minute: '2-digit', 
+        //             hour12: true 
+        //         });
+            
+        //     // Update badge photo if available
+        //     const badgePhotoDiv = document.getElementById('badgePhotoDisplay');
+        //     if (visitorData.photo) {
+        //         badgePhotoDiv.innerHTML = `<img src="${visitorData.photo}" alt="Visitor Photo" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">`;
+        //     } else {
+        //         badgePhotoDiv.innerHTML = '<i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>';
+        //     }
+            
+        //     // Store visit ID and badge number FIRST
+        //     visitorData.visit_id = data.visit_id;
+        //     visitorData.badge_number = data.badge_number;
+
+        //     // THEN generate QR code (needs badge_number to be set)
+        //     generateVisitorQRCode();
+        // }
+
+        // FIXED: Update success screen function
         function updateSuccessScreen(data) {
+            console.log('Updating success screen with data:', data);
+            
             // Update badge number
-            document.getElementById('badgeNumber').textContent = data.badge_number;
+            const badgeNumberEl = document.getElementById('badgeNumber');
+            if (badgeNumberEl) {
+                badgeNumberEl.textContent = data.badge_number;
+            }
             
             // Update visitor information
-            document.getElementById('visitorName').textContent = data.visitor_name;
-            document.getElementById('visitorCompany').textContent = data.company;
+            const visitorNameEl = document.getElementById('visitorName');
+            if (visitorNameEl) {
+                visitorNameEl.textContent = data.visitor_name;
+            }
+            
+            const visitorCompanyEl = document.getElementById('visitorCompany');
+            if (visitorCompanyEl) {
+                visitorCompanyEl.textContent = data.company;
+            }
             
             // Update host information
-            document.getElementById('badgeHost').textContent = data.host_name;
+            const badgeHostEl = document.getElementById('badgeHost');
+            if (badgeHostEl) {
+                badgeHostEl.textContent = data.host_name;
+            }
             
             // Update valid until time
-            const validUntilDate = new Date(data.valid_until);
-            document.getElementById('validUntil').textContent = 
-                validUntilDate.toLocaleTimeString('en-US', { 
+            const validUntilEl = document.getElementById('validUntil');
+            if (validUntilEl) {
+                const validUntilDate = new Date(data.valid_until);
+                validUntilEl.textContent = validUntilDate.toLocaleTimeString('en-US', { 
                     hour: '2-digit', 
                     minute: '2-digit', 
                     hour12: true 
                 });
+            }
             
             // Update badge photo if available
             const badgePhotoDiv = document.getElementById('badgePhotoDisplay');
-            if (visitorData.photo) {
-                badgePhotoDiv.innerHTML = `<img src="${visitorData.photo}" alt="Visitor Photo" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">`;
-            } else {
-                badgePhotoDiv.innerHTML = '<i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>';
+            if (badgePhotoDiv) {
+                if (visitorData.photo) {
+                    badgePhotoDiv.innerHTML = `<img src="${visitorData.photo}" alt="Visitor Photo" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">`;
+                } else {
+                    badgePhotoDiv.innerHTML = '<i class="bi bi-person-circle" style="font-size: 3em; color: #dee2e6;"></i>';
+                }
             }
             
-            // Store visit ID and badge number FIRST
-            visitorData.visit_id = data.visit_id;
-            visitorData.badge_number = data.badge_number;
-
-            // THEN generate QR code (needs badge_number to be set)
+            // Generate QR code (needs badge_number to be set first)
+            console.log('Generating QR code...');
             generateVisitorQRCode();
+            
+            console.log('Success screen update complete');
         }
 
         // // Updated department loading function to fetch from database
@@ -4669,8 +4857,49 @@
         //     });
         // }
 
-        // Updated: Populate departments with translations
+        // // Updated: Populate departments with translations
+        // function populateDepartments() {
+        //     fetch('<?= base_url("kiosk/get_departments") ?>', {
+        //         method: 'GET',
+        //         headers: {
+        //             'X-Requested-With': 'XMLHttpRequest'
+        //         }
+        //     })
+        //     .then(response => response.json())
+        //     .then(result => {
+        //         if (result.status === 'success') {
+        //             // Store departments globally for translation
+        //             availableDepartments = result.departments;
+                    
+        //             const select = document.getElementById('departmentSelect');
+        //             select.innerHTML = '<option value="">Choose a department...</option>';
+                    
+        //             result.departments.forEach(dept => {
+        //                 const option = document.createElement('option');
+        //                 option.value = dept.department_code;
+        //                 // Use translated name
+        //                 option.textContent = getTranslatedDepartmentName(dept);
+        //                 select.appendChild(option);
+        //             });
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error('Error loading departments:', error);
+        //         // Fallback to hardcoded departments if API fails
+        //         populateDepartmentsStatic();
+        //     });
+        // }
+
+        // Updated: Populate departments with translations - WITH NULL CHECK
         function populateDepartments() {
+            const select = document.getElementById('departmentSelect');
+            
+            // CRITICAL: Check if element exists
+            if (!select) {
+                console.warn('Department select element not found - skipping population');
+                return;
+            }
+            
             fetch('<?= base_url("kiosk/get_departments") ?>', {
                 method: 'GET',
                 headers: {
@@ -4683,7 +4912,6 @@
                     // Store departments globally for translation
                     availableDepartments = result.departments;
                     
-                    const select = document.getElementById('departmentSelect');
                     select.innerHTML = '<option value="">Choose a department...</option>';
                     
                     result.departments.forEach(dept => {
@@ -4697,7 +4925,7 @@
             })
             .catch(error => {
                 console.error('Error loading departments:', error);
-                // Fallback to hardcoded departments if API fails
+                // Fallback to static departments if API fails
                 populateDepartmentsStatic();
             });
         }
@@ -5021,16 +5249,44 @@
             });
         }
 
-        // Keep the static populate function as fallback
+        // // Keep the static populate function as fallback
+        // function populateDepartmentsStatic() {
+        //     const select = document.getElementById('departmentSelect');
+        //     select.innerHTML = '<option value="">Choose a department...</option>';
+            
+        //     // Use the original departmentData object as fallback
+        //     Object.keys(departmentData).forEach(deptCode => {
+        //         const option = document.createElement('option');
+        //         option.value = deptCode;
+        //         option.textContent = departmentData[deptCode].name;
+        //         select.appendChild(option);
+        //     });
+        // }
+
+        // Keep the static populate function as fallback - WITH NULL CHECK
         function populateDepartmentsStatic() {
             const select = document.getElementById('departmentSelect');
+            
+            // CRITICAL: Check if element exists
+            if (!select) {
+                console.warn('Department select element not found - skipping static population');
+                return;
+            }
+            
             select.innerHTML = '<option value="">Choose a department...</option>';
             
-            // Use the original departmentData object as fallback
-            Object.keys(departmentData).forEach(deptCode => {
+            // Use a simple fallback if departmentData doesn't exist
+            const fallbackDepartments = [
+                { code: 'ITSD', name: 'Information Technology & Services' },
+                { code: 'HR', name: 'Human Resources' },
+                { code: 'FIN', name: 'Finance' },
+                { code: 'ADM', name: 'Admin' }
+            ];
+            
+            fallbackDepartments.forEach(dept => {
                 const option = document.createElement('option');
-                option.value = deptCode;
-                option.textContent = departmentData[deptCode].name;
+                option.value = dept.code;
+                option.textContent = dept.name;
                 select.appendChild(option);
             });
         }
@@ -5126,6 +5382,7 @@
         //     });
         // }
 
+        // FIXED: Complete check-in function
         function completeCheckIn() {
             showLoading();
             
@@ -5164,16 +5421,12 @@
                 notes: visitorData.notes || null,
                 booking_code: visitorData.booking_code || null,
                 company_visited: COMPANY_VISITED,
-                // ADD THESE LINES FOR TIMEZONE FIX:
                 check_in_time: formatDateTime(phTime),
                 client_timezone: 'Asia/Manila',
                 timezone_offset: now.getTimezoneOffset()
             };
             
-            // Debug: Log times to console
-            console.log('Browser time:', now.toString());
-            console.log('Philippines time:', phTime.toString());
-            console.log('Sending to DB:', checkInData.check_in_time);
+            console.log('Sending check-in data:', checkInData);
             
             // Send data to server for database insertion
             fetch('<?= base_url("kiosk/complete_checkin") ?>', {
@@ -5184,11 +5437,23 @@
                 },
                 body: JSON.stringify(checkInData)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(result => {
+                console.log('Check-in response:', result);
                 hideLoading();
                 
                 if (result.status === 'success') {
+                    // Store visit data before updating screen
+                    visitorData.visit_id = result.data.visit_id;
+                    visitorData.badge_number = result.data.badge_number;
+                    
+                    console.log('Check-in successful, updating screen...');
+                    
                     // Update success screen with actual data from database
                     updateSuccessScreen(result.data);
                     
@@ -5201,9 +5466,10 @@
                     // Start countdown timer
                     startCountdown();
                     
-                    console.log('Check-in successful:', result.data);
+                    console.log('Success screen displayed');
                     
                 } else {
+                    console.error('Check-in failed:', result.message);
                     // Show error message
                     Swal.fire({
                         title: 'Check-in Failed',
@@ -5226,17 +5492,127 @@
             });
         }
 
-        // FIXED: resetKiosk function
+        // function completeCheckIn() {
+        //     showLoading();
+            
+        //     // Get current time in Philippines timezone
+        //     const now = new Date();
+        //     const phTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+            
+        //     // Format as MySQL datetime: YYYY-MM-DD HH:MM:SS
+        //     const formatDateTime = (date) => {
+        //         const year = date.getFullYear();
+        //         const month = String(date.getMonth() + 1).padStart(2, '0');
+        //         const day = String(date.getDate()).padStart(2, '0');
+        //         const hours = String(date.getHours()).padStart(2, '0');
+        //         const minutes = String(date.getMinutes()).padStart(2, '0');
+        //         const seconds = String(date.getSeconds()).padStart(2, '0');
+        //         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        //     };
+            
+        //     // Prepare data for database insertion
+        //     const checkInData = {
+        //         firstName: visitorData.firstName,
+        //         lastName: visitorData.lastName,
+        //         email: visitorData.email,
+        //         phone: visitorData.phone,
+        //         company: visitorData.company,
+        //         photo: visitorData.photo || null,
+        //         type: visitorData.type,
+        //         host: {
+        //             id: selectedHost.id || selectedHost.employeeId,
+        //             name: selectedHost.name,
+        //             email: selectedHost.email,
+        //             department: selectedHost.department,
+        //             departmentCode: selectedHost.departmentCode
+        //         },
+        //         purpose: selectedPurpose,
+        //         notes: visitorData.notes || null,
+        //         booking_code: visitorData.booking_code || null,
+        //         company_visited: COMPANY_VISITED,
+        //         // ADD THESE LINES FOR TIMEZONE FIX:
+        //         check_in_time: formatDateTime(phTime),
+        //         client_timezone: 'Asia/Manila',
+        //         timezone_offset: now.getTimezoneOffset()
+        //     };
+            
+        //     // Debug: Log times to console
+        //     console.log('Browser time:', now.toString());
+        //     console.log('Philippines time:', phTime.toString());
+        //     console.log('Sending to DB:', checkInData.check_in_time);
+            
+        //     // Send data to server for database insertion
+        //     fetch('<?= base_url("kiosk/complete_checkin") ?>', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'X-Requested-With': 'XMLHttpRequest'
+        //         },
+        //         body: JSON.stringify(checkInData)
+        //     })
+        //     .then(response => response.json())
+        //     .then(result => {
+        //         hideLoading();
+                
+        //         if (result.status === 'success') {
+        //             // Update success screen with actual data from database
+        //             updateSuccessScreen(result.data);
+                    
+        //             // Update step indicator to show final step
+        //             updateStepIndicator(8);
+                    
+        //             // Show success screen
+        //             showScreen(8);
+                    
+        //             // Start countdown timer
+        //             startCountdown();
+                    
+        //             console.log('Check-in successful:', result.data);
+                    
+        //         } else {
+        //             // Show error message
+        //             Swal.fire({
+        //                 title: 'Check-in Failed',
+        //                 text: result.message || 'An error occurred during check-in. Please try again.',
+        //                 icon: 'error',
+        //                 confirmButtonColor: '#e74c3c'
+        //             });
+        //         }
+        //     })
+        //     .catch(error => {
+        //         hideLoading();
+        //         console.error('Check-in error:', error);
+                
+        //         Swal.fire({
+        //             title: 'Connection Error',
+        //             text: 'Unable to connect to the server. Please check your connection and try again.',
+        //             icon: 'error',
+        //             confirmButtonColor: '#e74c3c'
+        //         });
+        //     });
+        // }
+
+        // FIXED: Reset kiosk function with better error handling
         function resetKiosk() {
-            clearInterval(countdownTimer);
+            console.log('Starting kiosk reset...');
+            
+            // Clear countdown timer
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            
+            // Stop camera safely
             stopCamera();
             
             // Reset flags
             isProcessingQR = false;
             isScannerStopping = false;
             
-            // Stop scanner safely (won't throw error if already stopped)
-            stopQRScanner();
+            // Stop scanner safely
+            stopQRScanner().catch(() => {
+                console.log('Scanner stop error during reset (ignored)');
+            });
             
             // Clear QR code instance
             if (qrCodeInstance) {
@@ -5247,6 +5623,7 @@
                 qrCodeInstance = null;
             }
             
+            // Reset state variables
             visitorData = {};
             selectedHost = null;
             selectedPurpose = null;
@@ -5256,42 +5633,146 @@
             currentFlow = [];
             currentFlowIndex = 0;
             
-            document.querySelectorAll('input').forEach(input => {
-                if (input.type !== 'checkbox') {
-                    input.value = '';
-                    input.classList.remove('is-invalid');
-                } else {
-                    input.checked = false;
+            // Reset form inputs safely
+            try {
+                document.querySelectorAll('input').forEach(input => {
+                    if (input.type !== 'checkbox' && input.type !== 'file') {
+                        input.value = '';
+                        input.classList.remove('is-invalid');
+                    } else if (input.type === 'checkbox') {
+                        input.checked = false;
+                    }
+                });
+                
+                document.querySelectorAll('textarea').forEach(textarea => {
+                    textarea.value = '';
+                });
+                
+                document.querySelectorAll('.purpose-card').forEach(card => {
+                    card.classList.remove('selected', 'disabled');
+                    card.style.opacity = '1';
+                    card.style.cursor = 'pointer';
+                    card.style.pointerEvents = 'auto';
+                });
+                
+                // Reset department select if it exists
+                const deptSelect = document.getElementById('departmentSelect');
+                if (deptSelect) {
+                    deptSelect.value = '';
                 }
-            });
+                
+                // Reset employee section if it exists
+                const employeeSection = document.getElementById('employeeSection');
+                if (employeeSection) {
+                    employeeSection.style.display = 'none';
+                }
+                
+                // Reset selected host display if it exists
+                const selectedHostEl = document.getElementById('selectedHost');
+                if (selectedHostEl) {
+                    selectedHostEl.innerHTML = `<span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>`;
+                }
+                
+                // Reset photo capture buttons if they exist
+                const captureBtn = document.getElementById('captureBtn');
+                const retakeBtn = document.getElementById('retakeBtn');
+                const capturedImage = document.getElementById('capturedImage');
+                const photoSkipBtn = document.getElementById('photoSkipBtn');
+                const photoNextBtn = document.getElementById('photoNextBtn');
+                
+                if (captureBtn) captureBtn.style.display = 'block';
+                if (retakeBtn) retakeBtn.style.display = 'none';
+                if (capturedImage) capturedImage.style.display = 'none';
+                if (photoSkipBtn) photoSkipBtn.style.display = 'block';
+                if (photoNextBtn) photoNextBtn.style.display = 'none';
+                
+                // Reset navigation buttons if they exist
+                const hostNextBtn = document.getElementById('hostNextBtn');
+                const purposeNextBtn = document.getElementById('purposeNextBtn');
+                const agreeNextBtn = document.getElementById('agreeNextBtn');
+                
+                if (hostNextBtn) hostNextBtn.disabled = true;
+                if (purposeNextBtn) purposeNextBtn.disabled = true;
+                if (agreeNextBtn) agreeNextBtn.disabled = true;
+                
+            } catch (error) {
+                console.error('Error during form reset:', error);
+            }
             
-            document.querySelectorAll('textarea').forEach(textarea => {
-                textarea.value = '';
-            });
+            console.log('Reset complete, showing welcome screen...');
             
-            document.querySelectorAll('.purpose-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            document.getElementById('departmentSelect').value = '';
-            document.getElementById('employeeSection').style.display = 'none';
-            document.getElementById('selectedHost').innerHTML = `<span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>`;
-            document.getElementById('captureBtn').style.display = 'block';
-            document.getElementById('retakeBtn').style.display = 'none';
-            document.getElementById('capturedImage').style.display = 'none';
-            document.getElementById('photoSkipBtn').style.display = 'block';
-            document.getElementById('photoNextBtn').style.display = 'none';
-            document.getElementById('hostNextBtn').disabled = true;
-            document.getElementById('purposeNextBtn').disabled = true;
-            document.getElementById('agreeNextBtn').disabled = true;            
-
-            // Hard refresh the page
-            // window.location.href = window.location.href.split('?')[0]; // Removes any query parameters
-            // OR use this for a complete reload:
-            window.location.reload(true); // true forces reload from server, not cache
-            
+            // Show welcome screen
             showScreen(1);
+            
+            console.log('Kiosk reset successful');
         }
+
+        // // FIXED: resetKiosk function
+        // function resetKiosk() {
+        //     clearInterval(countdownTimer);
+        //     stopCamera();
+            
+        //     // Reset flags
+        //     isProcessingQR = false;
+        //     isScannerStopping = false;
+            
+        //     // Stop scanner safely (won't throw error if already stopped)
+        //     stopQRScanner();
+            
+        //     // Clear QR code instance
+        //     if (qrCodeInstance) {
+        //         const qrContainer = document.getElementById('qrCodeContainer');
+        //         if (qrContainer) {
+        //             qrContainer.innerHTML = '';
+        //         }
+        //         qrCodeInstance = null;
+        //     }
+            
+        //     visitorData = {};
+        //     selectedHost = null;
+        //     selectedPurpose = null;
+        //     selectedDepartment = null;
+        //     capturedPhotoData = null;
+        //     photoTaken = false;
+        //     currentFlow = [];
+        //     currentFlowIndex = 0;
+            
+        //     document.querySelectorAll('input').forEach(input => {
+        //         if (input.type !== 'checkbox') {
+        //             input.value = '';
+        //             input.classList.remove('is-invalid');
+        //         } else {
+        //             input.checked = false;
+        //         }
+        //     });
+            
+        //     document.querySelectorAll('textarea').forEach(textarea => {
+        //         textarea.value = '';
+        //     });
+            
+        //     document.querySelectorAll('.purpose-card').forEach(card => {
+        //         card.classList.remove('selected');
+        //     });
+            
+        //     document.getElementById('departmentSelect').value = '';
+        //     document.getElementById('employeeSection').style.display = 'none';
+        //     document.getElementById('selectedHost').innerHTML = `<span class="text-muted">${translations[currentLanguage].noSelection || 'No one selected yet'}</span>`;
+        //     document.getElementById('captureBtn').style.display = 'block';
+        //     document.getElementById('retakeBtn').style.display = 'none';
+        //     document.getElementById('capturedImage').style.display = 'none';
+        //     document.getElementById('photoSkipBtn').style.display = 'block';
+        //     document.getElementById('photoNextBtn').style.display = 'none';
+        //     document.getElementById('hostNextBtn').disabled = true;
+        //     document.getElementById('purposeNextBtn').disabled = true;
+        //     document.getElementById('agreeNextBtn').disabled = true;            
+
+        //     // Hard refresh the page
+        //     // window.location.href = window.location.href.split('?')[0]; // Removes any query parameters
+        //     // OR use this for a complete reload:
+        //     window.location.reload(true); // true forces reload from server, not cache
+            
+        //     showScreen(1);
+        // }
 
         // Add this function to load purposes from database
         function loadPurposesFromDatabase() {

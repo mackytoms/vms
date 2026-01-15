@@ -1324,6 +1324,23 @@
                 font-size: 16px; /* Prevents zoom on iOS */
             }
         }
+
+        /* Add this to your existing CSS */
+        #successScreen {
+            display: none;
+        }
+
+        #successScreen.active {
+            display: block !important;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block !important;
+        }
     </style>
 </head>
 <body>
