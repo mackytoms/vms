@@ -27,6 +27,23 @@
                 <h1 data-translate="companyName">Welcome to TOMS WORLD</h1>
                 <div class="datetime-display" id="datetime"></div>
             </div>
+
+            <!-- Enhanced Switch to Toms World Link with Logo -->
+            <a href="https://sandbox.tomsworld.com.ph/vms/main/tw" 
+            class="switch-company-link" 
+            aria-label="Switch to Toms World"
+            title="Switch to Toms World">
+                <div class="switch-content">
+                    <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" 
+                        alt="Toms World Logo" 
+                        class="switch-logo">
+                    <div class="switch-text">
+                        <span class="switch-label">Switch to</span>
+                        <span class="switch-company">Tom's World</span>
+                    </div>
+                    <i class="bi bi-arrow-right-circle switch-icon"></i>
+                </div>
+            </a>
         </div>
         
         <!-- Off-canvas Info Panel -->

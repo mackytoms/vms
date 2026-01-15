@@ -1341,6 +1341,138 @@
         .screen.active {
             display: block !important;
         }
+
+        /* Enhanced Switch Company Link with Logo */
+        .switch-company-link {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .switch-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #1e9338a8, #1e9338);
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .switch-company-link:hover .switch-content {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.5);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .switch-logo {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: white;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .switch-text {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            line-height: 1.2;
+        }
+
+        .switch-label {
+            font-size: 0.7em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .switch-company {
+            font-size: 0.95em;
+            font-weight: 700;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .switch-icon {
+            font-size: 1.3em;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .switch-company-link:hover .switch-icon {
+            transform: translateX(3px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .switch-content {
+                padding: 8px 14px;
+                gap: 8px;
+            }
+            
+            .switch-logo {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .switch-label {
+                font-size: 0.65em;
+            }
+            
+            .switch-company {
+                font-size: 0.9em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .switch-company-link {
+                right: 15px;
+            }
+            
+            .switch-text {
+                display: none;
+            }
+            
+            .switch-content {
+                padding: 10px;
+                border-radius: 50%;
+                gap: 0;
+            }
+            
+            .switch-logo {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .switch-icon {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .switch-company-link {
+                right: 10px;
+            }
+            
+            .switch-content {
+                padding: 8px;
+            }
+            
+            .switch-logo {
+                width: 26px;
+                height: 26px;
+            }
+        }
     </style>
 </head>
 <body>

@@ -27,6 +27,23 @@
                 <h1 data-translate="companyName">Welcome to TOMS WORLD</h1>
                 <div class="datetime-display" id="datetime"></div>
             </div>
+
+            <!-- Enhanced Switch to Toms World Link with Logo -->
+            <a href="https://sandbox.tomsworld.com.ph/vms/main/pa" 
+            class="switch-company-link" 
+            aria-label="Switch to Pan-Asia"
+            title="Switch to Pan-Asia">
+                <div class="switch-content">
+                    <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" 
+                        alt="Pan-Asia Logo" 
+                        class="switch-logo">
+                    <div class="switch-text">
+                        <span class="switch-label">Switch to</span>
+                        <span class="switch-company">Pan-Asia</span>
+                    </div>
+                    <i class="bi bi-arrow-right-circle switch-icon"></i>
+                </div>
+            </a>
         </div>
         
         <!-- Off-canvas Info Panel -->
