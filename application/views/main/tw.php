@@ -3269,7 +3269,85 @@
         //     currentScreen = screenNumber;
         // }
 
-        // Updated showScreen function - load departments/purposes only when needed
+        // // Updated showScreen function - load departments/purposes only when needed
+        // function showScreen(screenNumber) {
+        //     // Stop QR scanner when leaving screen 2
+        //     if (currentScreen === 2 && screenNumber !== 2) {
+        //         stopQRScanner();
+        //     }
+            
+        //     if (currentScreen === 4 && screenNumber !== 4) {
+        //         stopCamera();
+        //     }
+            
+        //     document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            
+        //     const screens = ['', 'welcomeScreen', 'qrScannerScreen', 'basicInfoScreen', 'photoScreen', 
+        //                 'hostScreen', 'purposeScreen', 'agreementScreen', 'successScreen'];
+            
+        //     if (screens[screenNumber]) {
+        //         document.getElementById(screens[screenNumber]).classList.add('active');
+        //     }
+            
+        //     if (screenNumber === 4) startCamera();
+        //     if (screenNumber === 7) {
+        //         document.getElementById('agreementText').innerHTML = translations[currentLanguage].agreementContent;
+        //     }
+        //     if (screenNumber === 8) {
+        //         const steps = translations[currentLanguage].nextStepsContent;
+        //         document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
+        //     }
+            
+        //     // NEW: Load departments when entering host screen (screen 5)
+        //     if (screenNumber === 5) {
+        //         // Load employees for all departments
+        //         loadAllEmployees();
+                
+        //         // Also ensure departments are loaded (in case they weren't loaded initially)
+        //         if (availableDepartments.length === 0 && document.getElementById('departmentSelect')) {
+        //             populateDepartments();
+        //         }
+        //     }
+
+        //     // NEW: Load purposes when entering purpose screen (screen 6)
+        //     if (screenNumber === 6) {
+        //         // Ensure purposes are loaded (in case they weren't loaded initially)
+        //         if (availablePurposes.length === 0 && document.querySelector('.purpose-grid')) {
+        //             loadPurposesFromDatabase();
+        //         }
+                
+        //         // Handle delivery auto-selection
+        //         if (visitorData.type === 'delivery') {
+        //             setTimeout(() => {
+        //                 const deliveryCard = Array.from(document.querySelectorAll('.purpose-card'))
+        //                     .find(card => card.getAttribute('onclick')?.includes("'delivery'"));
+                        
+        //                 if (deliveryCard) {
+        //                     deliveryCard.classList.add('selected');
+        //                     selectedPurpose = 'delivery';
+        //                     visitorData.purpose = 'delivery';
+        //                     document.getElementById('purposeNextBtn').disabled = false;
+                            
+        //                     document.querySelectorAll('.purpose-card').forEach(card => {
+        //                         if (card !== deliveryCard) {
+        //                             card.classList.add('disabled');
+        //                             card.style.opacity = '0.4';
+        //                             card.style.cursor = 'not-allowed';
+        //                             card.style.pointerEvents = 'none';
+        //                         }
+        //                     });
+                            
+        //                     showNotification('Delivery purpose auto-selected based on your visit type');
+        //                 }
+        //             }, 100);
+        //         }
+        //     }
+            
+        //     updateStepIndicator(screenNumber);
+        //     currentScreen = screenNumber;
+        // }
+
+        // FIXED: showScreen function with QR scanner reinitialization
         function showScreen(screenNumber) {
             // Stop QR scanner when leaving screen 2
             if (currentScreen === 2 && screenNumber !== 2) {
@@ -3289,6 +3367,14 @@
                 document.getElementById(screens[screenNumber]).classList.add('active');
             }
             
+            // IMPORTANT: Initialize QR scanner when entering screen 2
+            if (screenNumber === 2) {
+                // Small delay to ensure DOM is ready
+                setTimeout(() => {
+                    initQRScanner();
+                }, 100);
+            }
+            
             if (screenNumber === 4) startCamera();
             if (screenNumber === 7) {
                 document.getElementById('agreementText').innerHTML = translations[currentLanguage].agreementContent;
@@ -3298,25 +3384,21 @@
                 document.getElementById('nextStepsList').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
             }
             
-            // NEW: Load departments when entering host screen (screen 5)
+            // Load departments when entering host screen (screen 5)
             if (screenNumber === 5) {
-                // Load employees for all departments
                 loadAllEmployees();
                 
-                // Also ensure departments are loaded (in case they weren't loaded initially)
                 if (availableDepartments.length === 0 && document.getElementById('departmentSelect')) {
                     populateDepartments();
                 }
             }
 
-            // NEW: Load purposes when entering purpose screen (screen 6)
+            // Load purposes when entering purpose screen (screen 6)
             if (screenNumber === 6) {
-                // Ensure purposes are loaded (in case they weren't loaded initially)
                 if (availablePurposes.length === 0 && document.querySelector('.purpose-grid')) {
                     loadPurposesFromDatabase();
                 }
                 
-                // Handle delivery auto-selection
                 if (visitorData.type === 'delivery') {
                     setTimeout(() => {
                         const deliveryCard = Array.from(document.querySelectorAll('.purpose-card'))
@@ -3461,17 +3543,31 @@
         //     }
         // }
 
-        // Updated startCheckIn function
+        // // Updated startCheckIn function
+        // function startCheckIn(type) {
+        //     visitorData.type = type;
+        //     currentFlow = screenFlow[type];
+        //     currentFlowIndex = 1;
+            
+        //     if (type === 'returning') {
+        //         showScreen(2); // QR Scanner
+        //         initQRScanner();
+        //     } else {
+        //         showScreen(6); // Purpose screen FIRST
+        //     }
+        // }
+
+        // FIXED: startCheckIn function
         function startCheckIn(type) {
             visitorData.type = type;
             currentFlow = screenFlow[type];
             currentFlowIndex = 1;
             
             if (type === 'returning') {
-                showScreen(2); // QR Scanner
-                initQRScanner();
+                showScreen(2); // This will now trigger QR scanner initialization
+                // Don't call initQRScanner() here - let showScreen() handle it
             } else {
-                showScreen(6); // Purpose screen FIRST
+                showScreen(6); // Purpose screen FIRST for new visitors
             }
         }
 
@@ -4382,7 +4478,7 @@
                 }
             }, 1000);
         }
-        
+
         // // Countdown timer
         // function startCountdown() {
         //     let seconds = 60;
@@ -5656,7 +5752,7 @@
         //     });
         // }
 
-        // FIXED: Reset kiosk function with better error handling
+        // ENHANCED: resetKiosk with better scanner cleanup
         function resetKiosk() {
             console.log('Starting kiosk reset...');
             
@@ -5673,9 +5769,13 @@
             isProcessingQR = false;
             isScannerStopping = false;
             
-            // Stop scanner safely
-            stopQRScanner().catch(() => {
-                console.log('Scanner stop error during reset (ignored)');
+            // Stop scanner and clear instance
+            stopQRScanner().then(() => {
+                html5QrCode = null; // IMPORTANT: Clear the scanner instance
+                console.log('QR Scanner cleared');
+            }).catch(() => {
+                html5QrCode = null;
+                console.log('Scanner clear error (ignored)');
             });
             
             // Clear QR code instance
@@ -5696,6 +5796,7 @@
             photoTaken = false;
             currentFlow = [];
             currentFlowIndex = 0;
+            currentDepartmentEmployees = []; // Also clear employee list
             
             // Reset form inputs safely
             try {
@@ -5729,6 +5830,17 @@
                 const employeeSection = document.getElementById('employeeSection');
                 if (employeeSection) {
                     employeeSection.style.display = 'none';
+                }
+                
+                // Clear employee search
+                const employeeSearch = document.getElementById('employeeSearch');
+                if (employeeSearch) {
+                    employeeSearch.value = '';
+                }
+                
+                const employeeCount = document.getElementById('employeeCount');
+                if (employeeCount) {
+                    employeeCount.textContent = '';
                 }
                 
                 // Reset selected host display if it exists
