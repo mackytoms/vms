@@ -649,6 +649,10 @@
                     <div class="quick-stat-label">Currently In Building</div>
                 </div>
                 <div class="quick-stat-item">
+                    <div class="quick-stat-value" id="currentlyOut"><?php echo $dashboardStats['today_total'] - $dashboardStats['currently_in']; ?></div>
+                    <div class="quick-stat-label">Out of the Building</div>
+                </div>
+                <div class="quick-stat-item">
                     <div class="quick-stat-value" id="avgDuration"><?php echo $dashboardStats['avg_duration']; ?></div>
                     <div class="quick-stat-label">Avg. Visit Duration</div>
                 </div>
@@ -902,7 +906,7 @@
                 <table class="table table-hover" id="employeeTable">
                     <thead>
                         <tr>
-                            <th>Employee ID</th>
+                            <th>Host ID</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Department</th>
@@ -1469,7 +1473,7 @@
                 <div class="info-grid">
                     <div class="row mb-2">
                         <div class="col-sm-4 fw-bold"><i class="bi bi-code-square text-primary"></i> System Version:</div>
-                        <div class="col-sm-8">Kiosk V-Pass v2.0.0</div>
+                        <div class="col-sm-8">Kiosk V-Pass v1.5.6.9.4</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-sm-4 fw-bold"><i class="bi bi-calendar-check text-primary"></i> Last Updated:</div>
@@ -1587,7 +1591,62 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <form id="addEmployeeForm">
-                    <!-- Modify Add Employee Modal body -->
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><i class="bi bi-telephone"></i> Phone Number</label>
+                                <input type="text" class="form-control" name="phone_number" placeholder="+63 XXX-XXX-XXXX">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><i class="bi bi-briefcase"></i> Position</label>
+                                <input type="text" class="form-control" name="position" placeholder="e.g., Manager">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Department <span class="text-danger">*</span></label>
+                            <select class="form-select" name="department_code" id="employeeDepartmentSelect" required>
+                                <option value="">Select Department</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Company Ownership</label>
+                            <select class="form-select" name="company_owned_by" id="addCompanyOwnedBy">
+                                <option value="Both">Both Companies</option>
+                                <option value="Toms World">Tom's World Only</option>
+                                <option value="Pan Asia">Pan-Asia Only</option>
+                            </select>
+                            <small class="text-muted">Determines which company can see this employee</small>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" name="is_active" id="isActiveCheck" checked>
+                            <label class="form-check-label" for="isActiveCheck">Active Employee</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save Employee</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="modal fade" id="addEmployeeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
+                    <h5 class="modal-title"><i class="bi bi-person-plus"></i> Add New Employee</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addEmployeeForm">
+                    <!- Modify Add Employee Modal body ->
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Full Name <span class="text-danger">*</span></label>
@@ -1624,10 +1683,105 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> -->
 
-    <!-- Edit Employee Modal -->
+    <!-- Edit Employee Modal - UPDATED WITH POSITION, PHONE & PROFILE PIC -->
     <div class="modal fade" id="editEmployeeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header <?php echo $modalHeaderClass; ?>">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Employee</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editEmployeeForm">
+                    <input type="hidden" name="employee_id" id="editEmployeeId">
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- Profile Picture Column -->
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="mb-3">
+                                    <img id="editEmployeeProfilePic" 
+                                    src="<?= base_url('assets/images/icons/default-avatar.png') ?>" 
+                                    alt="Employee Photo" 
+                                    class="rounded-circle border border-3 border-primary shadow"
+                                    style="width: 150px; height: 150px; object-fit: cover;"
+                                    onerror="this.src='<?= base_url('assets/images/icons/default-avatar.png') ?>'">
+                                </div>
+                                <div class="mb-2">
+                                    <span class="badge bg-secondary" id="editEmployeeIdBadge"></span>
+                                </div>
+                                <div id="editEmployeeStatusBadge"></div>
+                            </div>
+                            
+                            <!-- Form Fields Column -->
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Host ID</label>
+                                        <input type="text" class="form-control" id="editEmployeeIdDisplay" readonly>
+                                        <small class="text-muted">Cannot be changed</small>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="name" id="editEmployeeName" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" name="email" id="editEmployeeEmail" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label"><i class="bi bi-telephone"></i> Phone Number</label>
+                                        <input type="text" class="form-control" name="phone_number" id="editEmployeePhone" 
+                                            placeholder="+63 XXX-XXX-XXXX">
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Department <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="department_code" id="editEmployeeDepartment" required>
+                                            <option value="">Select Department</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label"><i class="bi bi-briefcase"></i> Position</label>
+                                        <input type="text" class="form-control" name="position" id="editEmployeePosition" 
+                                            placeholder="e.g., Manager, Officer, Staff">
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Company Ownership</label>
+                                        <select class="form-select" name="company_owned_by" id="editCompanyOwnedBy">
+                                            <option value="Both">Both Companies</option>
+                                            <option value="Toms World">Tom's World Only</option>
+                                            <option value="Pan Asia">Pan-Asia Only</option>
+                                        </select>
+                                        <small class="text-muted">Determines which company can see this employee</small>
+                                    </div>
+                                    <div class="col-md-6 mb-3 d-flex align-items-end">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" name="is_active" id="editIsActiveCheck">
+                                            <label class="form-check-label" for="editIsActiveCheck">Active Employee</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Update Employee</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="modal fade" id="editEmployeeModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header <?php echo $modalHeaderClass; ?>">
@@ -1677,7 +1831,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- Replace the Add Department Modal with this: -->
     <div class="modal fade" id="addDepartmentModal" tabindex="-1">
@@ -2433,7 +2587,7 @@
                         <table class="table table-hover" id="departmentEmployeesTable">
                             <thead>
                                 <tr>
-                                    <th>Employee ID</th>
+                                    <th>Host ID</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Status</th>
@@ -3098,6 +3252,35 @@
             return companyLower === filterLower;
         }
 
+        // function editEmployee(employeeId) {
+        //     fetch(ajaxUrl + `?action=get_employee&employee_id=${employeeId}`)
+        //         .then(r => r.json())
+        //         .then(data => {
+        //             if (data.status === 'success') {
+        //                 const employee = data.employee;
+                        
+        //                 // Populate form fields
+        //                 document.getElementById('editEmployeeId').value = employee.employee_id;
+        //                 document.getElementById('editEmployeeIdDisplay').value = employee.employee_id;
+        //                 document.getElementById('editEmployeeName').value = employee.name;
+        //                 document.getElementById('editEmployeeEmail').value = employee.email;
+        //                 document.getElementById('editCompanyOwnedBy').value = employee.company_owned_by;
+        //                 document.getElementById('editIsActiveCheck').checked = employee.is_active == 1;
+                        
+        //                 // Load departments and set selected
+        //                 loadDepartmentsForEditSelect(employee.department_code);
+                        
+        //                 new bootstrap.Modal(document.getElementById('editEmployeeModal')).show();
+        //             } else {
+        //                 Swal.fire('Error', data.message || 'Failed to load employee details', 'error');
+        //             }
+        //         })
+        //         .catch(e => {
+        //             console.error('Error:', e);
+        //             Swal.fire('Error', 'Failed to load employee details', 'error');
+        //         });
+        // }
+
         function editEmployee(employeeId) {
             fetch(ajaxUrl + `?action=get_employee&employee_id=${employeeId}`)
                 .then(r => r.json())
@@ -3108,10 +3291,37 @@
                         // Populate form fields
                         document.getElementById('editEmployeeId').value = employee.employee_id;
                         document.getElementById('editEmployeeIdDisplay').value = employee.employee_id;
+                        document.getElementById('editEmployeeIdBadge').textContent = employee.employee_id;
                         document.getElementById('editEmployeeName').value = employee.name;
                         document.getElementById('editEmployeeEmail').value = employee.email;
+                        document.getElementById('editEmployeePhone').value = employee.phone_number || '';
+                        document.getElementById('editEmployeePosition').value = employee.position || '';
                         document.getElementById('editCompanyOwnedBy').value = employee.company_owned_by;
                         document.getElementById('editIsActiveCheck').checked = employee.is_active == 1;
+                        
+                        // Set profile picture
+                        const profilePic = document.getElementById('editEmployeeProfilePic');
+                        if (employee.profile_pic && employee.profile_pic !== '') {
+                            // Check if it's a full URL, base64, or relative path
+                            if (employee.profile_pic.startsWith('http') || employee.profile_pic.startsWith('data:image')) {
+                                profilePic.src = employee.profile_pic;
+                            } else if (employee.profile_pic.startsWith('/') || employee.profile_pic.startsWith('assets/')) {
+                                profilePic.src = employee.profile_pic;
+                            } else {
+                                // Assume it's stored in a specific folder or needs base URL
+                                profilePic.src = baseUrl + employee.profile_pic;
+                            }
+                        } else {
+                            profilePic.src = baseUrl + 'assets/images/icons/default-avatar.png';
+                        }
+                        
+                        // Set status badge
+                        const statusBadge = document.getElementById('editEmployeeStatusBadge');
+                        if (employee.is_active == 1) {
+                            statusBadge.innerHTML = '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Active</span>';
+                        } else {
+                            statusBadge.innerHTML = '<span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Inactive</span>';
+                        }
                         
                         // Load departments and set selected
                         loadDepartmentsForEditSelect(employee.department_code);
@@ -3419,8 +3629,93 @@
         //     });
         // }
 
+        // function renderEmployeeTable(data) {
+        //     // ALWAYS destroy existing DataTable first - with extra safety checks
+        //     if ($.fn.DataTable.isDataTable('#employeeTable')) {
+        //         try {
+        //             $('#employeeTable').DataTable().clear().destroy();
+        //         } catch (e) {
+        //             console.warn('Error destroying DataTable:', e);
+        //         }
+        //     }
+            
+        //     // Also remove any DataTable classes/attributes that might persist
+        //     $('#employeeTable').removeClass('dataTable no-footer');
+        //     $('#employeeTable').removeAttr('aria-describedby');
+            
+        //     const tbody = document.getElementById('employeeTableBody');
+        //     tbody.innerHTML = '';
+            
+        //     // Handle empty data - create proper empty rows with correct column count
+        //     if (!data || data.length === 0) {
+        //         // Create 8 empty cells to match header column count
+        //         const tr = document.createElement('tr');
+        //         tr.innerHTML = `
+        //             <td colspan="8" class="text-center text-muted">No employees found matching your filters</td>
+        //         `;
+        //         tbody.appendChild(tr);
+                
+        //         // DON'T initialize DataTable when empty - just show the message
+        //         // This avoids the column count mismatch error
+        //         return;
+        //     }
+            
+        //     data.forEach(e => {
+        //         const canEdit = canEditEmployee(e.company_owned_by);
+                
+        //         const tr = document.createElement('tr');
+        //         // Ensure exactly 8 <td> elements to match 8 <th> in header
+        //         tr.innerHTML = `
+        //             <td>${e.employee_id || ''}</td>
+        //             <td><strong>${e.name || ''}</strong></td>
+        //             <td>${e.email || ''}</td>
+        //             <td>${e.department_name || ''}</td>
+        //             <td>
+        //                 <span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
+        //                     style="cursor: pointer;" 
+        //                     onclick="toggleEmployeeStatus('${e.employee_id}', ${e.is_active}, '${(e.name || '').replace(/'/g, "\\'")}')" 
+        //                     title="Click to ${e.is_active == 1 ? 'deactivate' : 'activate'}">
+        //                     ${e.is_active == 1 ? 'Active' : 'Inactive'}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 ${e.total_visits || 0}
+        //                 ${(e.total_visits || 0) > 0 ? `<button class="btn btn-sm btn-link" onclick="viewEmployeeHistory('${e.employee_id}', '${(e.name || '').replace(/'/g, "\\'")}')" title="View History"><i class="bi bi-clock-history"></i></button>` : ''}
+        //             </td>
+        //             <td>
+        //                 <span class="badge ${getCompanyOwnershipBadge(e.company_owned_by)}">
+        //                     ${e.company_owned_by || 'N/A'}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 ${canEdit ? `
+        //                     <button class="action-btn edit" onclick="editEmployee('${e.employee_id}')" title="Edit Employee">
+        //                         <i class="bi bi-pencil-square"></i>
+        //                     </button>
+        //                 ` : ''}
+        //             </td>
+        //         `;
+        //         tbody.appendChild(tr);
+        //     });
+            
+        //     // Only initialize DataTable when we have data
+        //     try {
+        //         $('#employeeTable').DataTable({
+        //             pageLength: 10,
+        //             order: [[0, 'asc']],
+        //             destroy: true, // Add this for safety
+        //             language: {
+        //                 emptyTable: "No employees found",
+        //                 zeroRecords: "No matching records found"
+        //             }
+        //         });
+        //     } catch (e) {
+        //         console.error('Error initializing DataTable:', e);
+        //     }
+        // }
+
         function renderEmployeeTable(data) {
-            // ALWAYS destroy existing DataTable first - with extra safety checks
+            // ALWAYS destroy existing DataTable first
             if ($.fn.DataTable.isDataTable('#employeeTable')) {
                 try {
                     $('#employeeTable').DataTable().clear().destroy();
@@ -3429,36 +3724,56 @@
                 }
             }
             
-            // Also remove any DataTable classes/attributes that might persist
             $('#employeeTable').removeClass('dataTable no-footer');
             $('#employeeTable').removeAttr('aria-describedby');
             
             const tbody = document.getElementById('employeeTableBody');
             tbody.innerHTML = '';
             
-            // Handle empty data - create proper empty rows with correct column count
             if (!data || data.length === 0) {
-                // Create 8 empty cells to match header column count
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td colspan="8" class="text-center text-muted">No employees found matching your filters</td>
-                `;
+                tr.innerHTML = `<td colspan="10" class="text-center text-muted">No employees found matching your filters</td>`;
                 tbody.appendChild(tr);
-                
-                // DON'T initialize DataTable when empty - just show the message
-                // This avoids the column count mismatch error
                 return;
             }
             
             data.forEach(e => {
                 const canEdit = canEditEmployee(e.company_owned_by);
                 
+                // Profile pic handling
+                let profilePicHtml = '';
+                if (e.profile_pic && e.profile_pic !== '') {
+                    let picSrc = e.profile_pic;
+                    if (!picSrc.startsWith('http') && !picSrc.startsWith('data:image') && !picSrc.startsWith('/')) {
+                        picSrc = baseUrl + picSrc;
+                    }
+                    profilePicHtml = `<img src="${picSrc}" class="rounded-circle me-2" 
+                                    style="width: 35px; height: 35px; object-fit: cover;" 
+                                    onerror="this.src='${baseUrl}assets/images/icons/default-avatar.png'">`;
+                } else {
+                    profilePicHtml = `<div class="rounded-circle bg-secondary text-white me-2 d-inline-flex 
+                                    align-items-center justify-content-center" 
+                                    style="width: 35px; height: 35px; font-size: 14px;">
+                                    ${(e.name || 'E')[0].toUpperCase()}
+                                    </div>`;
+                }
+                
                 const tr = document.createElement('tr');
-                // Ensure exactly 8 <td> elements to match 8 <th> in header
                 tr.innerHTML = `
                     <td>${e.employee_id || ''}</td>
-                    <td><strong>${e.name || ''}</strong></td>
-                    <td>${e.email || ''}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            ${profilePicHtml}
+                            <div>
+                                <strong>${e.name || ''}</strong>
+                                ${e.position ? `<br><small class="text-muted">${e.position}</small>` : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="mailto:${e.email}" class="text-decoration-none">${e.email || ''}</a>
+                        ${e.phone_number ? `<br><small class="text-muted"><i class="bi bi-telephone"></i> ${e.phone_number}</small>` : ''}
+                    </td>
                     <td>${e.department_name || ''}</td>
                     <td>
                         <span class="badge ${e.is_active == 1 ? 'bg-success' : 'bg-secondary'}" 
@@ -3488,12 +3803,11 @@
                 tbody.appendChild(tr);
             });
             
-            // Only initialize DataTable when we have data
             try {
                 $('#employeeTable').DataTable({
                     pageLength: 10,
                     order: [[0, 'asc']],
-                    destroy: true, // Add this for safety
+                    destroy: true,
                     language: {
                         emptyTable: "No employees found",
                         zeroRecords: "No matching records found"
@@ -3881,7 +4195,7 @@
                     
                     currentVisitId = visit.visit_id;
                     
-                    let photoSrc = '<?= base_url("assets/images/default-avatar.png") ?>';
+                    let photoSrc = '<?= base_url("assets/images/icons/default-avatar.png") ?>';
                     if (visit.photo) {
                         photoSrc = visit.photo.startsWith('data:image') ? visit.photo : 
                                    (visit.photo.startsWith('/') || visit.photo.startsWith('assets/')) ? visit.photo :
@@ -3889,7 +4203,7 @@
                     }
                     
                     document.getElementById('modalVisitorPhoto').src = photoSrc;
-                    document.getElementById('modalVisitorPhoto').onerror = function() { this.src = '<?= base_url("assets/images/default-avatar.png") ?>'; };
+                    document.getElementById('modalVisitorPhoto').onerror = function() { this.src = '<?= base_url("assets/images/icons/default-avatar.png") ?>'; };
                     document.getElementById('modalBadgeNumber').textContent = visit.badge_number;
                     document.getElementById('modalVisitorName').textContent = `${visit.first_name} ${visit.last_name}`;
                     document.getElementById('modalEmail').textContent = visit.email || 'N/A';
@@ -3928,7 +4242,7 @@
                     
                     currentVisitorData = visitor;
                     
-                    let photoSrc = '<?= base_url("assets/images/default-avatar.png") ?>';
+                    let photoSrc = '<?= base_url("assets/images/icons/default-avatar.png") ?>';
                     if (visitor.photo) {
                         photoSrc = visitor.photo.startsWith('data:image') ? visitor.photo : 
                                    (visitor.photo.startsWith('/') || visitor.photo.startsWith('assets/')) ? visitor.photo :
@@ -3936,7 +4250,7 @@
                     }
                     
                     document.getElementById('allVisitorPhoto').src = photoSrc;
-                    document.getElementById('allVisitorPhoto').onerror = function() { this.src = '<?= base_url("assets/images/default-avatar.png") ?>'; };
+                    document.getElementById('allVisitorPhoto').onerror = function() { this.src = '<?= base_url("assets/images/icons/default-avatar.png") ?>'; };
                     document.getElementById('visitorTypeText').textContent = (visitor.visitor_type || 'new').charAt(0).toUpperCase() + (visitor.visitor_type || 'new').slice(1);
                     document.getElementById('allVisitorFullName').textContent = `${visitor.first_name} ${visitor.last_name}`;
                     document.getElementById('allVisitorEmail').textContent = visitor.email || 'Not provided';
@@ -5974,7 +6288,7 @@
                 showDepartmentFilter: true,
                 showVisitorTypeFilter: false,
                 defaultDateRange: 30,
-                columns: ['Employee ID', 'Name', 'Department', 'Company', 'Total Visits', 'Unique Visitors', 'Last Visit', 'Avg Duration'],
+                columns: ['Host ID', 'Name', 'Department', 'Company', 'Total Visits', 'Unique Visitors', 'Last Visit', 'Avg Duration'],
                 dataKeys: ['employee_id', 'employee_name', 'department_name', 'company_owned_by', 'total_visits', 'unique_visitors', 'last_visit', 'avg_duration_minutes'],
                 chartLabel: 'Visits by Employee',
                 chartType: 'bar'

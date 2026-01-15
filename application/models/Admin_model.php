@@ -11,11 +11,17 @@ class Admin_model extends CI_Model {
     // Dashboard Statistics
     public function getDashboardStats($companyFilter = null) {
         $stats = array();
+
+        // Today's total visitors (ALL types - new AND returning)
+        $this->db->select('COUNT(*) as today_total');
+        $this->db->from('visits v');
+        $this->db->join('visitors vis', 'v.visitor_id = vis.visitor_id', 'left');
+        $this->db->where('DATE(v.check_in_time)', date('Y-m-d'));
         
         // Today's total visitors
-        $this->db->select('COUNT(DISTINCT visitor_id) as today_total');
-        $this->db->from('visits');
-        $this->db->where('DATE(check_in_time)', 'CURDATE()', false);
+        // $this->db->select('COUNT(DISTINCT visitor_id) as today_total');
+        // $this->db->from('visits');
+        // $this->db->where('DATE(check_in_time)', 'CURDATE()', false);
         if ($companyFilter) {
             $this->db->where('company_visited', $companyFilter);
         }

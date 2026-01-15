@@ -21,21 +21,22 @@
             <div class="header-center">
                 <div class="company-logo">
                     <img src="<?= base_url('assets/images/icons/473762608_905226608452197_3072891570387687458_n.jpg') ?>" 
-                        alt="Toms World" 
+                        alt="Pan-Asia" 
                         style="width: 40px; height: 40px; object-fit: contain; border-radius: 50%;">
                 </div>
-                <h1 data-translate="companyName">Welcome to TOMS WORLD</h1>
+                <h1 data-translate="companyName">Welcome to Pan-Asia</h1>
                 <div class="datetime-display" id="datetime"></div>
             </div>
 
-            <!-- Enhanced Switch to Toms World Link with Logo -->
-            <a href="https://sandbox.tomsworld.com.ph/vms/main/tw" 
+            <!-- Enhanced Switch to Tom's World Link with Logo -->
+            <a href="javascript:void(0);" 
+            onclick="confirmCompanySwitch('https://sandbox.tomsworld.com.ph/vms/main/tw')"
             class="switch-company-link" 
-            aria-label="Switch to Toms World"
-            title="Switch to Toms World">
+            aria-label="Switch to Tom's World"
+            title="Switch to Tom's World">
                 <div class="switch-content">
                     <img src="<?= base_url('assets/images/icons/stufftoy - Copy.png') ?>" 
-                        alt="Toms World Logo" 
+                        alt="Tom's World Logo" 
                         class="switch-logo">
                     <div class="switch-text">
                         <span class="switch-label">Switch to</span>
@@ -212,7 +213,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label class="form-label" data-translate="phone">Phone Number</label>
                                 <small class="text-muted">(At least one required: email or phone)</small>
@@ -232,9 +233,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label class="form-label" data-translate="company">Company / Branch *</label>
+                                <label class="form-label" data-translate="company">Company / Branch </label>
                                 <input type="text" class="form-control form-control-lg" id="company" data-translate-placeholder="companyPlaceholder" placeholder="Your Affiliated Company">
                                 <div class="invalid-feedback" data-translate="companyRequired">Company name is required</div>
                             </div>
@@ -353,7 +354,54 @@
                 <div class="form-screen">
                     <h2 class="form-title" data-translate="hostTitle">Who are you here to see?</h2>
 
-                    <!-- EMPLOYEE SEARCH INPUT - Now shown immediately -->
+                    <!-- EMPLOYEE SEARCH INPUT -->
+                    <div class="employee-search-container mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" 
+                                class="form-control form-control-lg" 
+                                id="employeeSearch" 
+                                placeholder="Search employee by name, position, or department..."
+                                data-translate-placeholder="searchEmployeePlaceholder"
+                                oninput="filterEmployees(this.value)"
+                                autocomplete="off">
+                            <button class="btn btn-outline-secondary" type="button" onclick="clearEmployeeSearch()" title="Clear search">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted mt-1 d-block" id="employeeCount"></small>
+                    </div>
+                    
+                    <!-- Employee Grid -->
+                    <div class="employee-grid" id="employeeGrid">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-2 text-muted">Loading employees...</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label class="form-label" data-translate="selectedHost">Selected Host</label>
+                        <div class="form-control form-control-lg" id="selectedHost" style="background: #f8f9fa; min-height: 70px; display: flex; align-items: center;">
+                            <span class="text-muted" data-translate="noSelection">No one selected yet</span>
+                        </div>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <button class="btn-large btn-back" onclick="previousScreen()">
+                            <i class="bi bi-arrow-left"></i> <span data-translate="back">Back</span>
+                        </button>
+                        <button class="btn-large btn-next" onclick="nextScreen()" disabled id="hostNextBtn">
+                            <span data-translate="continue">Continue</span> <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="screen" id="hostScreen">
+                <div class="form-screen">
+                    <h2 class="form-title" data-translate="hostTitle">Who are you here to see?</h2>
+
+                    <!- EMPLOYEE SEARCH INPUT - Now shown immediately ->
                     <div class="employee-search-container mb-3">
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-search"></i></span>
@@ -371,7 +419,7 @@
                         <small class="text-muted mt-1 d-block" id="employeeCount"></small>
                     </div>
                     
-                    <!-- Employee Grid -->
+                    <!- Employee Grid ->
                     <div class="employee-grid" id="employeeGrid">
                         <div class="text-center py-4">
                             <div class="spinner-border text-primary" role="status"></div>
@@ -395,7 +443,7 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <!-- <div class="screen" id="hostScreen">
                 <div class="form-screen">
                     <h2 class="form-title" data-translate="hostTitle">Who are you here to see?</h2>
@@ -731,9 +779,9 @@
     </div>
 
     <!-- Emergency Button -->
-    <div class="emergency-btn" onclick="callEmergency()">
+    <!-- <div class="emergency-btn" onclick="callEmergency()">
         <i class="bi bi-telephone-fill"></i>
-    </div>
+    </div> -->
 
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
@@ -905,7 +953,7 @@
                 email: "Email Address *",
                 phone: "Phone Number *",
                 emailOrPhoneRequired: "At least one required: email or phone",
-                company: "Company / Branch *",
+                company: "Company / Branch",
                 companyPlaceholder: "Your Company Name",
                 back: "Back",
                 continue: "Continue",
@@ -1012,7 +1060,7 @@
                 email: "電子郵件地址 *",
                 phone: "電話號碼 *",
                 emailOrPhoneRequired: "至少需要一項：電子郵件或電話",
-                company: "公司 / 分支 *",
+                company: "公司 / 分支",
                 companyPlaceholder: "您的公司名稱",
                 back: "返回",
                 continue: "繼續",
@@ -1119,7 +1167,7 @@
                 email: "电子邮件地址 *",
                 phone: "电话号码 *",
                 emailOrPhoneRequired: "至少需要一项：电子邮件或电话",
-                company: "公司 / 分支 *",
+                company: "公司 / 分支",
                 companyPlaceholder: "您的公司名称",
                 back: "返回",
                 continue: "继续",
@@ -1226,7 +1274,7 @@
                 email: "Email Address *",
                 phone: "Numero ng Telepono *",
                 emailOrPhoneRequired: "Kailangan ang kahit isa: email o telepono",
-                company: "Kumpanya / Sangay *",
+                company: "Kumpanya / Sangay",
                 companyPlaceholder: "Pangalan ng Kumpanya",
                 back: "Bumalik",
                 continue: "Magpatuloy",
@@ -1333,7 +1381,7 @@
                 email: "メールアドレス *",
                 phone: "電話番号 *",
                 emailOrPhoneRequired: "いずれか1つ必須：メールまたは電話",
-                company: "会社 / 支店 *",
+                company: "会社 / 支店",
                 companyPlaceholder: "会社名を入力",
                 back: "戻る",
                 continue: "続ける",
@@ -2028,6 +2076,128 @@
         }
 
         // Function to display employees in the grid
+        // function displayEmployees(employees) {
+        //     const employeeGrid = document.getElementById('employeeGrid');
+        //     employeeGrid.innerHTML = '';
+            
+        //     if (employees.length === 0) {
+        //         const noResultsText = translations[currentLanguage]?.noEmployeesFound || 'No employees found matching your search';
+        //         employeeGrid.innerHTML = `
+        //             <div class="no-results-message">
+        //                 <i class="bi bi-search"></i>
+        //                 <p>${noResultsText}</p>
+        //             </div>
+        //         `;
+        //         return;
+        //     }
+            
+        //     employees.forEach(employee => {
+        //         const card = document.createElement('div');
+        //         card.className = 'employee-card';
+                
+        //         // Check if this employee is currently selected
+        //         if (selectedHost && selectedHost.id === employee.employee_id) {
+        //             card.classList.add('selected');
+        //         }
+                
+        //         card.innerHTML = `
+        //             <i class="bi bi-person-circle"></i>
+        //             <div class="employee-name">${employee.name}</div>
+        //             <div class="employee-email">${employee.email}</div>
+        //         `;
+                
+        //         // Store data as data attributes
+        //         card.dataset.employeeId = employee.employee_id;
+        //         card.dataset.employeeName = employee.name;
+        //         card.dataset.employeeEmail = employee.email;
+        //         card.dataset.deptCode = employee.deptCode;
+        //         card.dataset.deptName = employee.deptName;
+        //         card.dataset.deptOriginalName = employee.deptOriginalName;
+                
+        //         card.addEventListener('click', function(e) {
+        //             selectEmployeeFromCard(e.currentTarget);
+        //         });
+                
+        //         employeeGrid.appendChild(card);
+        //     });
+        // }
+
+        // Display employees in grid - NEW LAYOUT
+        // function displayEmployees(employees) {
+        //     const employeeGrid = document.getElementById('employeeGrid');
+        //     employeeGrid.innerHTML = '';
+            
+        //     if (employees.length === 0) {
+        //         const noResultsText = translations[currentLanguage]?.noEmployeesFound || 'No employees found matching your search';
+        //         employeeGrid.innerHTML = `
+        //             <div class="no-results-message">
+        //                 <i class="bi bi-search"></i>
+        //                 <p>${noResultsText}</p>
+        //             </div>
+        //         `;
+        //         return;
+        //     }
+            
+        //     employees.forEach(employee => {
+        //         const card = document.createElement('div');
+        //         card.className = 'employee-card';
+                
+        //         if (selectedHost && selectedHost.id === employee.employee_id) {
+        //             card.classList.add('selected');
+        //         }
+                
+        //         // Photo or placeholder
+        //         const photoHTML = employee.profile_pic 
+        //             ? `<img src="<?= base_url('assets/images/employees/') ?>${employee.profile_pic}" alt="${employee.name}" class="employee-photo">`
+        //             : `<div class="employee-photo-placeholder"><i class="bi bi-person-fill"></i></div>`;
+                
+        //         // Phone display
+        //         const phoneHTML = employee.phone_number 
+        //             ? `<p class="employee-phone"><i class="bi bi-telephone"></i> ${employee.phone_number}</p>`
+        //             : `<p class="employee-phone"><i class="bi bi-telephone"></i> N/A</p>`;
+                
+        //         // Visit count styling
+        //         const activeVisits = parseInt(employee.active_visits) || 0;
+        //         const visitCountClass = activeVisits > 0 ? 'has-visits' : '';
+        //         const visitLabel = activeVisits === 1 ? 'Active<br>Visit' : 'Active<br>Visits';
+                
+        //         card.innerHTML = `
+        //             <div class="employee-card-left">
+        //                 ${photoHTML}
+        //             </div>
+        //             <div class="employee-card-center">
+        //                 <h5 class="employee-name" title="${employee.name}">${employee.name}</h5>
+        //                 <p class="employee-position">${employee.position || 'N/A'}</p>
+        //                 <p class="employee-department"><i class="bi bi-building"></i> ${employee.deptName}</p>
+        //                 <p class="employee-email"><i class="bi bi-envelope"></i> ${employee.email}</p>
+        //                 ${phoneHTML}
+        //             </div>
+        //             <div class="employee-card-right">
+        //                 <span class="visit-count ${visitCountClass}">${activeVisits}</span>
+        //                 <span class="visit-label">${visitLabel}</span>
+        //             </div>
+        //         `;
+                
+        //         // Store data attributes
+        //         card.dataset.employeeId = employee.employee_id;
+        //         card.dataset.employeeName = employee.name;
+        //         card.dataset.employeeEmail = employee.email;
+        //         card.dataset.employeePosition = employee.position || '';
+        //         card.dataset.employeePhone = employee.phone_number || '';
+        //         card.dataset.deptCode = employee.deptCode;
+        //         card.dataset.deptName = employee.deptName;
+        //         card.dataset.deptOriginalName = employee.deptOriginalName;
+        //         card.dataset.activeVisits = activeVisits;
+                
+        //         card.addEventListener('click', function(e) {
+        //             selectEmployeeFromCard(e.currentTarget);
+        //         });
+                
+        //         employeeGrid.appendChild(card);
+        //     });
+        // }
+
+        // Display employees in grid - NEW LAYOUT with active visits
         function displayEmployees(employees) {
             const employeeGrid = document.getElementById('employeeGrid');
             employeeGrid.innerHTML = '';
@@ -2047,24 +2217,52 @@
                 const card = document.createElement('div');
                 card.className = 'employee-card';
                 
-                // Check if this employee is currently selected
                 if (selectedHost && selectedHost.id === employee.employee_id) {
                     card.classList.add('selected');
                 }
                 
+                // Photo or placeholder
+                const photoHTML = employee.profile_pic 
+                    ? `<img src="<?= base_url('assets/images/employees/') ?>${employee.profile_pic}" alt="${employee.name}" class="employee-photo" onerror="this.parentElement.innerHTML='<div class=\\'employee-photo-placeholder\\'><i class=\\'bi bi-person-fill\\'></i></div>'">`
+                    : `<div class="employee-photo-placeholder"><i class="bi bi-person-fill"></i></div>`;
+                
+                // Phone display
+                const phoneHTML = employee.phone_number 
+                    ? `<p class="employee-phone"><i class="bi bi-telephone"></i> ${employee.phone_number}</p>`
+                    : `<p class="employee-phone"><i class="bi bi-telephone"></i> N/A</p>`;
+                
+                // Visit count styling - ensure it's a number
+                const activeVisits = parseInt(employee.active_visits) || 0;
+                const visitCountClass = activeVisits > 0 ? 'has-visits' : '';
+                const visitLabel = activeVisits === 1 ? 'Active<br>Visit' : 'Active<br>Visits';
+                
                 card.innerHTML = `
-                    <i class="bi bi-person-circle"></i>
-                    <div class="employee-name">${employee.name}</div>
-                    <div class="employee-email">${employee.email}</div>
+                    <div class="employee-card-left">
+                        ${photoHTML}
+                    </div>
+                    <div class="employee-card-center">
+                        <h5 class="employee-name" title="${employee.name}">${employee.name}</h5>
+                        <p class="employee-position">${employee.position || 'N/A'}</p>
+                        <p class="employee-department"><i class="bi bi-building"></i> ${employee.deptName || employee.department_name || 'N/A'}</p>
+                        <p class="employee-email"><i class="bi bi-envelope"></i> ${employee.email}</p>
+                        ${phoneHTML}
+                    </div>
+                    <div class="employee-card-right">
+                        <span class="visit-count ${visitCountClass}">${activeVisits}</span>
+                        <span class="visit-label">${visitLabel}</span>
+                    </div>
                 `;
                 
-                // Store data as data attributes
+                // Store data attributes
                 card.dataset.employeeId = employee.employee_id;
                 card.dataset.employeeName = employee.name;
                 card.dataset.employeeEmail = employee.email;
-                card.dataset.deptCode = employee.deptCode;
-                card.dataset.deptName = employee.deptName;
-                card.dataset.deptOriginalName = employee.deptOriginalName;
+                card.dataset.employeePosition = employee.position || '';
+                card.dataset.employeePhone = employee.phone_number || '';
+                card.dataset.deptCode = employee.deptCode || employee.department_code;
+                card.dataset.deptName = employee.deptName || employee.department_name;
+                card.dataset.deptOriginalName = employee.deptOriginalName || employee.department_name;
+                card.dataset.activeVisits = activeVisits;
                 
                 card.addEventListener('click', function(e) {
                     selectEmployeeFromCard(e.currentTarget);
@@ -2274,7 +2472,7 @@
         //     // clearEmployeeSearch();
         // }
 
-        // NEW: Load all employees (no department filter)
+        // Load all employees (no department filter)
         function loadAllEmployees() {
             const employeeGrid = document.getElementById('employeeGrid');
             const employeeSearch = document.getElementById('employeeSearch');
@@ -2297,13 +2495,16 @@
             })
             .then(response => response.json())
             .then(result => {
+                console.log('Employees loaded:', result); // Debug log
+                
                 if (result.status === 'success') {
                     // Store employees for filtering
                     currentDepartmentEmployees = result.employees.map(emp => ({
                         ...emp,
                         deptCode: emp.department_code,
                         deptName: emp.department_name,
-                        deptOriginalName: emp.department_name
+                        deptOriginalName: emp.department_name,
+                        active_visits: parseInt(emp.active_visits) || 0 // Ensure it's a number
                     }));
                     
                     // Display all employees
@@ -2322,6 +2523,53 @@
         }
 
         // Update selectEmployeeFromCard to work without pre-selected department
+        // function selectEmployeeFromCard(cardElement) {
+        //     if (!cardElement || !cardElement.classList) {
+        //         console.error('Invalid card element:', cardElement);
+        //         return;
+        //     }
+            
+        //     document.querySelectorAll('.employee-card').forEach(card => {
+        //         card.classList.remove('selected');
+        //     });
+            
+        //     cardElement.classList.add('selected');
+            
+        //     const employeeId = cardElement.dataset.employeeId;
+        //     const employeeName = cardElement.dataset.employeeName;
+        //     const employeeEmail = cardElement.dataset.employeeEmail;
+        //     const deptCode = cardElement.dataset.deptCode;
+        //     const deptName = cardElement.dataset.deptName;
+        //     const deptOriginalName = cardElement.dataset.deptOriginalName;
+            
+        //     selectedHost = {
+        //         id: employeeId,
+        //         employeeId: employeeId,
+        //         name: employeeName,
+        //         email: employeeEmail,
+        //         department: deptName,
+        //         departmentOriginal: deptOriginalName,
+        //         departmentCode: deptCode
+        //     };
+            
+        //     visitorData.host = selectedHost;
+            
+        //     // Update the display
+        //     document.getElementById('selectedHost').innerHTML = `
+        //         <div class="d-flex align-items-center gap-3">
+        //             <i class="bi bi-person-circle" style="font-size: 2em; color: #27ae60;"></i>
+        //             <div>
+        //                 <div style="font-weight: 600;">${employeeName}</div>
+        //                 <div style="font-size: 0.9em; color: #7f8c8d;">${deptName}</div>
+        //             </div>
+        //             <i class="bi bi-check-circle-fill text-success ms-auto" style="font-size: 1.5em;"></i>
+        //         </div>
+        //     `;
+            
+        //     document.getElementById('hostNextBtn').disabled = false;
+        // }
+
+        // Updated selectEmployeeFromCard
         function selectEmployeeFromCard(cardElement) {
             if (!cardElement || !cardElement.classList) {
                 console.error('Invalid card element:', cardElement);
@@ -2337,31 +2585,44 @@
             const employeeId = cardElement.dataset.employeeId;
             const employeeName = cardElement.dataset.employeeName;
             const employeeEmail = cardElement.dataset.employeeEmail;
+            const employeePosition = cardElement.dataset.employeePosition;
+            const employeePhone = cardElement.dataset.employeePhone;
             const deptCode = cardElement.dataset.deptCode;
             const deptName = cardElement.dataset.deptName;
             const deptOriginalName = cardElement.dataset.deptOriginalName;
+            const activeVisits = parseInt(cardElement.dataset.activeVisits) || 0;
             
             selectedHost = {
                 id: employeeId,
                 employeeId: employeeId,
                 name: employeeName,
                 email: employeeEmail,
+                position: employeePosition,
+                phone: employeePhone,
                 department: deptName,
                 departmentOriginal: deptOriginalName,
-                departmentCode: deptCode
+                departmentCode: deptCode,
+                activeVisits: activeVisits
             };
             
             visitorData.host = selectedHost;
             
-            // Update the display
+            // Visit badge
+            const visitBadge = activeVisits > 0 
+                ? `<span class="badge bg-danger ms-2">${activeVisits} active</span>`
+                : '';
+            
             document.getElementById('selectedHost').innerHTML = `
-                <div class="d-flex align-items-center gap-3">
-                    <i class="bi bi-person-circle" style="font-size: 2em; color: #27ae60;"></i>
-                    <div>
-                        <div style="font-weight: 600;">${employeeName}</div>
-                        <div style="font-size: 0.9em; color: #7f8c8d;">${deptName}</div>
+                <div class="d-flex align-items-center gap-3 w-100">
+                    <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #27ae60, #2ecc71); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.5em;">
+                        <i class="bi bi-person-check-fill"></i>
                     </div>
-                    <i class="bi bi-check-circle-fill text-success ms-auto" style="font-size: 1.5em;"></i>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold" style="color: #2c3e50;">${employeeName} ${visitBadge}</div>
+                        <div style="font-size: 0.9em; color: #f39c12;">${employeePosition || 'N/A'}</div>
+                        <div style="font-size: 0.85em; color: #7f8c8d;">${deptName}</div>
+                    </div>
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 2em;"></i>
                 </div>
             `;
             
@@ -3849,12 +4110,13 @@
                     
                     const company = document.getElementById('company');
                     const companyValue = company.value.trim();
-                    if (!companyValue || !validateCompany(companyValue)) {
+                    // Company is now optional - only validate if provided
+                    if (companyValue && !validateCompany(companyValue)) {
                         company.classList.add('is-invalid');
                         isValid = false;
                     } else {
                         company.classList.remove('is-invalid');
-                        visitorData.company = companyValue;
+                        visitorData.company = companyValue || null; // Store null if empty
                     }
                     
                     if (!isValid) {
@@ -6003,5 +6265,91 @@
             });
         });
 
+        // Function to check if visitor has entered any data
+        function hasVisitorData() {
+            // Check if we're past the welcome screen (screen 1) and before agreement (screen 7)
+            if (currentScreen <= 1 || currentScreen >= 8) {
+                return false;
+            }
+            
+            // Check for any entered data
+            const hasBasicInfo = visitorData.firstName || visitorData.lastName || 
+                                visitorData.email || visitorData.phone || visitorData.company;
+            const hasPhoto = capturedPhotoData !== null;
+            const hasHost = selectedHost !== null;
+            const hasPurpose = selectedPurpose !== null;
+            const hasNotes = visitorData.notes;
+            
+            return hasBasicInfo || hasPhoto || hasHost || hasPurpose || hasNotes;
+        }
+
+        // Function to handle company switch with confirmation
+        function confirmCompanySwitch(targetUrl) {
+            // Check if visitor has entered any data
+            if (hasVisitorData()) {
+                // Show confirmation dialog
+                Swal.fire({
+                    title: 'Switch to Toms World?',
+                    html: `
+                        <div style="text-align: left; padding: 10px;">
+                            <p style="font-size: 1.1em; margin-bottom: 15px; text-align: center;">
+                                You have unsaved data in your current check-in process.
+                            </p>
+                            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center">
+                                <strong style="color: #f39c12;">⚠️ Warning:</strong><br>
+                                <p style="margin-top: 10px; color: #856404;">
+                                    All entered information will be lost if you switch companies now. 
+                                    This includes:
+                                </p>
+                                <ul style="margin: 10px 0; padding-left: 20px; color: #856404;">
+                                    ${visitorData.firstName || visitorData.lastName ? '<li>Personal information</li>' : ''}
+                                    ${capturedPhotoData ? '<li>Captured photo</li>' : ''}
+                                    ${selectedHost ? '<li>Selected host</li>' : ''}
+                                    ${selectedPurpose ? '<li>Visit purpose</li>' : ''}
+                                    ${visitorData.notes ? '<li>Additional notes</li>' : ''}
+                                </ul>
+                            </div>
+                            <p style="text-align: center; color: #6c757d;">
+                                Are you sure you want to switch company?
+                            </p>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e74c3c',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, Switch to Toms World',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true,
+                    allowOutsideClick: false,
+                    customClass: {
+                        popup: 'swal-wide'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // User confirmed - show loading and redirect
+                        showLoading();
+                        
+                        // Small delay to show loading, then navigate with forced reload
+                        setTimeout(() => {
+                            // Force reload by adding timestamp parameter
+                            const separator = targetUrl.includes('?') ? '&' : '?';
+                            const urlWithReload = `${targetUrl}${separator}_t=${new Date().getTime()}`;
+                            
+                            // Navigate to target URL (this will naturally reload the page)
+                            window.location.href = urlWithReload;
+                        }, 500);
+                    }
+                });
+            } else {
+                // No data entered, switch directly with reload
+                showLoading();
+                setTimeout(() => {
+                    const separator = targetUrl.includes('?') ? '&' : '?';
+                    const urlWithReload = `${targetUrl}${separator}_t=${new Date().getTime()}`;
+                    window.location.href = urlWithReload;
+                }, 300);
+            }
+        }
 
     </script>

@@ -1122,27 +1122,112 @@ class Kiosk extends CI_Controller {
     //     }
     // }
     
-    // In your Kiosk controller
+    // // In your Kiosk controller
+    // public function get_all_employees() {
+    //     $company_visited = $this->input->get('company_visited');
+        
+    //     if (!$company_visited) {
+    //         echo json_encode(['status' => 'error', 'message' => 'Company not specified']);
+    //         return;
+    //     }
+        
+    //     // Query all active employees with department info
+    //     $this->db->select('e.employee_id, e.name, e.email, e.department_code, d.name as department_name')
+    //             ->from('employees e')
+    //             ->join('departments d', 'e.department_code = d.department_code', 'left')
+    //             ->where('e.is_active', 1)
+    //             ->group_start()
+    //                 ->where('e.company_owned_by', $company_visited)
+    //                 ->or_where('e.company_owned_by', 'Both')
+    //             ->group_end()
+    //             ->order_by('e.name', 'ASC');
+        
+    //     $employees = $this->db->get()->result_array();
+        
+    //     echo json_encode([
+    //         'status' => 'success',
+    //         'employees' => $employees
+    //     ]);
+    // }
+
+
+    // // Get all employees with active visit count
+    // public function get_all_employees() {
+    //     $company_visited = $this->input->get('company_visited') ?? 'Toms World';
+        
+    //     // Query to get employees with active visit count
+    //     $sql = "SELECT 
+    //                 e.employee_id,
+    //                 e.name,
+    //                 e.email,
+    //                 e.position,
+    //                 e.phone_number,
+    //                 e.profile_pic,
+    //                 e.department_code,
+    //                 d.name as department_name,
+    //                 COALESCE(active_counts.active_visits, 0) as active_visits
+    //             FROM employees e
+    //             LEFT JOIN departments d ON e.department_code = d.department_code
+    //             LEFT JOIN (
+    //                 SELECT 
+    //                     host_employee_id,
+    //                     COUNT(*) as active_visits
+    //                 FROM visits
+    //                 WHERE check_out_time IS NULL
+    //                 AND company_visited = ?
+    //                 GROUP BY host_employee_id
+    //             ) active_counts ON e.employee_id = active_counts.host_employee_id
+    //             WHERE e.is_active = 1
+    //             AND (e.company_filter = ? OR e.company_filter = 'Both' OR e.company_owned_by = 'Both')
+    //             ORDER BY e.name ASC";
+        
+    //     $query = $this->db->query($sql, [$company_visited, $company_visited]);
+    //     $employees = $query->result_array();
+        
+    //     echo json_encode([
+    //         'status' => 'success',
+    //         'employees' => $employees
+    //     ]);
+    // }
+
+    // Get all employees with active visit count
     public function get_all_employees() {
-        $company_visited = $this->input->get('company_visited');
+        header('Content-Type: application/json');
         
-        if (!$company_visited) {
-            echo json_encode(['status' => 'error', 'message' => 'Company not specified']);
-            return;
-        }
+        $company_visited = $this->input->get('company_visited') ?? 'Toms World';
         
-        // Query all active employees with department info
-        $this->db->select('e.employee_id, e.name, e.email, e.department_code, d.name as department_name')
-                ->from('employees e')
-                ->join('departments d', 'e.department_code = d.department_code', 'left')
-                ->where('e.is_active', 1)
-                ->group_start()
-                    ->where('e.company_owned_by', $company_visited)
-                    ->or_where('e.company_owned_by', 'Both')
-                ->group_end()
-                ->order_by('e.name', 'ASC');
+        $sql = "SELECT 
+                    e.employee_id,
+                    e.name,
+                    e.email,
+                    e.position,
+                    e.phone_number,
+                    e.profile_pic,
+                    e.department_code,
+                    d.name as department_name,
+                    COALESCE(active_counts.active_visits, 0) as active_visits
+                FROM employees e
+                LEFT JOIN departments d ON e.department_code = d.department_code
+                LEFT JOIN (
+                    SELECT 
+                        host_employee_id,
+                        COUNT(*) as active_visits
+                    FROM visits
+                    WHERE check_out_time IS NULL
+                    AND valid_until > NOW()
+                    GROUP BY host_employee_id
+                ) active_counts ON e.employee_id = active_counts.host_employee_id
+                WHERE e.is_active = 1
+                AND (
+                    e.company_owned_by = ? 
+                    OR e.company_owned_by = 'Both' 
+                    OR e.company_filter = ? 
+                    OR e.company_filter = 'Both'
+                )
+                ORDER BY e.name ASC";
         
-        $employees = $this->db->get()->result_array();
+        $query = $this->db->query($sql, [$company_visited, $company_visited]);
+        $employees = $query->result_array();
         
         echo json_encode([
             'status' => 'success',

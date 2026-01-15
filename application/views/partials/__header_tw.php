@@ -402,7 +402,7 @@
         }
 
         /* Enhanced Host Selection */
-        .department-selection {
+        /* .department-selection {
             margin-bottom: 20px;
         }
 
@@ -429,15 +429,15 @@
         }
 
         .employee-card:hover {
-            border-color: #f39c12;
+            border-color: #1e9338;
             transform: translateY(-3px);
             box-shadow: 0 6px 15px rgba(0,0,0,0.1);
         }
 
         .employee-card.selected {
-            background: #f39c12;
+            background: #1e9338;
             color: white;
-            border-color: #f39c12;
+            border-color: #1e9338;
         }
 
         .employee-card i {
@@ -454,6 +454,154 @@
         .employee-card .employee-email {
             font-size: 0.85em;
             opacity: 0.7;
+        } */
+
+        /* Employee Card - New Layout */
+        .employee-card {
+            display: flex;
+            align-items: stretch;
+            background: #ffffff;
+            border: 2px solid #e8e8e8;
+            border-radius: 16px;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .employee-card:hover {
+            transform: translateY(-4px);
+            border-color: #f39c12;
+            box-shadow: 0 8px 25px rgba(243, 156, 18, 0.25);
+        }
+
+        .employee-card.selected {
+            border-color: #27ae60;
+            background: linear-gradient(135deg, #e8f8f0 0%, #d4edda 100%);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+        }
+
+        /* Left Section - Photo */
+        .employee-card-left {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-width: 100px;
+        }
+
+        .employee-photo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid #f39c12;
+            object-fit: cover;
+            background: #fff;
+        }
+
+        .employee-photo-placeholder {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid #f39c12;
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 28px;
+        }
+
+        /* Center Section - Info */
+        .employee-card-center {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .employee-name {
+            font-size: 1.05em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .employee-position {
+            font-size: 0.85em;
+            color: #f39c12;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .employee-department {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .employee-email,
+        .employee-phone {
+            font-size: 0.75em;
+            color: #95a5a6;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Right Section - Visit Count */
+        .employee-card-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            min-width: 85px;
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            border-left: 2px dashed #f39c12;
+        }
+
+        .visit-count {
+            font-size: 2em;
+            font-weight: 800;
+            color: #27ae60;
+            line-height: 1;
+        }
+
+        .visit-count.has-visits {
+            color: #e74c3c;
+        }
+
+        .visit-label {
+            font-size: 0.6em;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            margin-top: 5px;
+            line-height: 1.2;
+        }
+
+        /* Grid Layout */
+        .employee-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 10px 5px;
         }
 
         /* Purpose Selection */
@@ -502,7 +650,7 @@
             border-radius: 12px;
             padding: 20px;
             margin: 15px 0;
-            max-height: 300px;
+            max-height: 500px;
             overflow-y: auto;
         }
 
@@ -1357,7 +1505,7 @@
             align-items: center;
             gap: 10px;
             padding: 8px 16px;
-            background: linear-gradient(135deg, #1e9338a8, #1e9338);
+            background: linear-gradient(135deg, #1e933830, #0e9d2d8c);
             border-radius: 30px;
             box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
             transition: all 0.3s ease;
@@ -1365,7 +1513,7 @@
         }
 
         .switch-company-link:hover .switch-content {
-            background: linear-gradient(135deg, #e67e22, #d35400);
+            background: linear-gradient(135deg, #1e9338a8, #1e9338);
             transform: scale(1.05);
             box-shadow: 0 6px 20px rgba(243, 156, 18, 0.5);
             border-color: rgba(255, 255, 255, 0.5);
