@@ -2292,6 +2292,53 @@
         //     document.getElementById('hostNextBtn').disabled = false;
         // }
 
+        // NEW: Load all employees (no department filter)
+        function loadAllEmployees() {
+            const employeeGrid = document.getElementById('employeeGrid');
+            const employeeSearch = document.getElementById('employeeSearch');
+            const employeeCount = document.getElementById('employeeCount');
+            
+            // Reset search input
+            if (employeeSearch) {
+                employeeSearch.value = '';
+            }
+            
+            // Show loading indicator
+            employeeGrid.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted">Loading employees...</p></div>';
+            
+            // Fetch all employees from database
+            fetch(`<?= base_url("kiosk/get_all_employees") ?>?company_visited=${encodeURIComponent(COMPANY_VISITED)}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    // Store employees for filtering
+                    currentDepartmentEmployees = result.employees.map(emp => ({
+                        ...emp,
+                        deptCode: emp.department_code,
+                        deptName: emp.department_name,
+                        deptOriginalName: emp.department_name
+                    }));
+                    
+                    // Display all employees
+                    displayEmployees(currentDepartmentEmployees);
+                    
+                    // Update employee count
+                    updateEmployeeCount(currentDepartmentEmployees.length, currentDepartmentEmployees.length);
+                } else {
+                    employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading employees:', error);
+                employeeGrid.innerHTML = '<p class="text-danger text-center">Error loading employees. Please try again.</p>';
+            });
+        }
+
         // Updated: Select employee with translated department name (keep selection visible after filtering)
         function selectEmployeeFromCard(cardElement) {
             if (!cardElement || !cardElement.classList) {
