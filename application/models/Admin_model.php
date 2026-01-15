@@ -170,7 +170,7 @@ class Admin_model extends CI_Model {
         return $this->db->get()->result_array();
     }
 
-    // Add new method to get employee by ID
+    // Also update getEmployeeById to return phone_number
     public function getEmployeeById($employee_id) {
         $this->db->select('e.*, d.name as department_name');
         $this->db->from('employees e');
@@ -182,7 +182,7 @@ class Admin_model extends CI_Model {
         if ($result) {
             return ['status' => 'success', 'employee' => $result];
         }
-          
+        
         return ['status' => 'error', 'message' => 'Employee not found'];
     }
 
@@ -213,33 +213,6 @@ class Admin_model extends CI_Model {
         return ['can_edit' => false, 'reason' => 'This employee belongs to another company'];
     }
     
-    
-    // public function addEmployee($data) {
-    //     // Generate employee ID
-    //     $this->db->select('COUNT(*) as cnt');
-    //     $this->db->from('employees');
-    //     $this->db->where('department_code', $data['department_code']);
-    //     $count = $this->db->get()->row()->cnt + 1;
-        
-    //     $employee_id = $data['department_code'] . str_pad($count, 3, '0', STR_PAD_LEFT);
-        
-    //     $insert_data = [
-    //         'employee_id' => $employee_id,
-    //         'name' => $data['name'],
-    //         'email' => $data['email'],
-    //         'department_code' => $data['department_code'],
-    //         'is_active' => $data['is_active'],
-    //         'created_at' => date('Y-m-d H:i:s')
-    //     ];
-        
-    //     if ($this->db->insert('employees', $insert_data)) {
-    //         return ['success' => true, 'employee_id' => $employee_id];
-    //     }
-        
-    //     return ['success' => false, 'error' => $this->db->error()['message']];
-    // }
-
-    // Modify addEmployee to include company ownership
     public function addEmployee($data) {
         // Generate employee ID
         $this->db->select('COUNT(*) as cnt');
@@ -253,6 +226,8 @@ class Admin_model extends CI_Model {
             'employee_id' => $employee_id,
             'name' => $data['name'],
             'email' => $data['email'],
+            'phone_number' => $data['phone_number'] ?? null,    // Use phone_number (matches form)
+            'position' => $data['position'] ?? null,
             'department_code' => $data['department_code'],
             'is_active' => $data['is_active'],
             'company_owned_by' => $data['company_owned_by'] ?? 'Both',
@@ -266,14 +241,16 @@ class Admin_model extends CI_Model {
         return ['success' => false, 'error' => $this->db->error()['message']];
     }
 
-    // Add method to update employee
     public function updateEmployee($data) {
         $update_data = [
             'name' => $data['name'],
             'email' => $data['email'],
+            'phone_number' => $data['phone_number'] ?? null,    // Use phone_number (matches form)
+            'position' => $data['position'] ?? null,
             'department_code' => $data['department_code'],
             'company_owned_by' => $data['company_owned_by'],
-            'is_active' => $data['is_active']
+            'is_active' => $data['is_active'],
+            'updated_at' => date('Y-m-d H:i:s')
         ];
         
         $this->db->where('employee_id', $data['employee_id']);
