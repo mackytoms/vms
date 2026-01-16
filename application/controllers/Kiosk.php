@@ -105,229 +105,664 @@ class Kiosk extends CI_Controller {
         echo json_encode(['status' => 'success', 'employees' => $employees]);
     }
 
+    // In Kiosk.php controller - Replace the complete_checkin function's company handling
+
     public function complete_checkin() {
-        // SET TIMEZONE FIRST - This is the key fix!
+        // SET TIMEZONE FIRST
         date_default_timezone_set('Asia/Manila');
         
-        // Get JSON input
-        $json = file_get_contents('php://input');
-        $data = json_decode($json, true);
+        // Set JSON header
+        header('Content-Type: application/json');
         
-        if (!$data) {
-            echo json_encode(['status' => 'error', 'message' => 'Invalid data received']);
-            return;
-        }
-        
-        // VALIDATE: At least one of email or phone must be provided
-        $has_email = !empty($data['email']);
-        $has_phone = !empty($data['phone']);
-        
-        if (!$has_email && !$has_phone) {
-            echo json_encode([
-                'status' => 'error', 
-                'message' => 'At least one contact method (email or phone) is required'
-            ]);
-            return;
-        }
-        
-        // Get company_visited from request (defaults to 'Pan Asia' if not provided)
-        $company_visited = isset($data['company_visited']) ? $data['company_visited'] : 'Pan Asia';
-        
-        // // ========================================
-        // // NEW: CHECK FOR ACTIVE VISIT BEFORE ALLOWING CHECK-IN
-        // // ========================================
-        // $active_visit_check = "SELECT 
-        //                         vis.visit_id,
-        //                         vis.badge_number,
-        //                         vis.check_in_time,
-        //                         vis.valid_until,
-        //                         vis.purpose,
-        //                         v.visitor_id,
-        //                         v.first_name,
-        //                         v.last_name,
-        //                         v.company,
-        //                         e.name as host_name,
-        //                         d.name as department
-        //                     FROM visits vis
-        //                     JOIN visitors v ON vis.visitor_id = v.visitor_id
-        //                     JOIN employees e ON vis.host_employee_id = e.employee_id
-        //                     JOIN departments d ON e.department_code = d.department_code
-        //                     WHERE vis.check_out_time IS NULL
-        //                     AND vis.company_visited = ?
-        //                     AND (";
-        
-        // $params = array($company_visited);
-        // $conditions = array();
-        
-        // if ($has_email) {
-        //     $conditions[] = "LOWER(v.email) = ?";
-        //     $params[] = strtolower($data['email']);
-        // }
-        
-        // if ($has_phone) {
-        //     $conditions[] = "v.phone = ?";
-        //     $params[] = $data['phone'];
-        // }
-        
-        // $active_visit_check .= implode(' OR ', $conditions) . ")
-        //                     ORDER BY vis.check_in_time DESC
-        //                     LIMIT 1";
-        
-        // $active_visit_result = $this->db->query($active_visit_check, $params);
-        
-        // if ($active_visit_result->num_rows() > 0) {
-        //     $active_visit = $active_visit_result->row_array();
+        try {
+            // Get JSON input
+            $json = file_get_contents('php://input');
+            $data = json_decode($json, true);
             
-        //     // Visitor already has an active visit - DENY check-in
-        //     echo json_encode([
-        //         'status' => 'error',
-        //         'message' => 'You are already checked in at the premises',
-        //         'has_active_visit' => true,
-        //         'active_visit' => [
-        //             'visit_id' => $active_visit['visit_id'],
-        //             'badge_number' => $active_visit['badge_number'],
-        //             'visitor_name' => $active_visit['first_name'] . ' ' . $active_visit['last_name'],
-        //             'company' => $active_visit['company'],
-        //             'host_name' => $active_visit['host_name'],
-        //             'department' => $active_visit['department'],
-        //             'purpose' => $active_visit['purpose'],
-        //             'check_in_time' => $active_visit['check_in_time'],
-        //             'valid_until' => $active_visit['valid_until']
-        //         ]
-        //     ]);
-        //     return;
-        // }
-        // // ========================================
-        // // END: ACTIVE VISIT CHECK
-        // // ========================================
+            if (!$data) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid data received']);
+                return;
+            }
+            
+            // Log incoming data for debugging
+            log_message('info', 'Check-in data received: ' . json_encode([
+                'firstName' => $data['firstName'] ?? 'N/A',
+                'lastName' => $data['lastName'] ?? 'N/A',
+                'email' => $data['email'] ?? 'N/A',
+                'phone' => $data['phone'] ?? 'N/A',
+                'company' => $data['company'] ?? 'N/A'
+            ]));
+            
+            // Sanitize and normalize input data
+            $email = isset($data['email']) && !empty(trim($data['email'])) 
+                ? strtolower(trim($data['email'])) 
+                : null;
+            $phone = isset($data['phone']) && !empty(trim($data['phone'])) 
+                ? trim($data['phone']) 
+                : null;
+            $firstName = isset($data['firstName']) ? trim($data['firstName']) : '';
+            $lastName = isset($data['lastName']) ? trim($data['lastName']) : '';
+            
+            // FIXED: Company defaults to empty string instead of null if DB doesn't allow null
+            $company = isset($data['company']) && !empty(trim($data['company'])) 
+                ? trim($data['company']) 
+                : '';  // Changed from null to empty string
+            
+            // VALIDATE: At least one of email or phone must be provided
+            $has_email = !empty($email);
+            $has_phone = !empty($phone);
+            
+            if (!$has_email && !$has_phone) {
+                echo json_encode([
+                    'status' => 'error', 
+                    'message' => 'At least one contact method (email or phone) is required'
+                ]);
+                return;
+            }
+            
+            // Validate required fields
+            if (empty($firstName) || empty($lastName)) {
+                echo json_encode([
+                    'status' => 'error', 
+                    'message' => 'First name and last name are required'
+                ]);
+                return;
+            }
+            
+            // Get company_visited from request
+            $company_visited = isset($data['company_visited']) && !empty($data['company_visited']) 
+                ? $data['company_visited'] 
+                : 'Toms World';
+            
+            // Check for active visit
+            $active_visit = $this->check_for_active_visit($email, $phone, $company_visited);
+            
+            if ($active_visit !== null) {
+                echo json_encode([
+                    'status' => 'error',
+                    'error_type' => 'active_visit_exists',
+                    'message' => 'You are already checked in at the premises',
+                    'has_active_visit' => true,
+                    'visitor' => [
+                        'visitor_id' => $active_visit['visitor_id'],
+                        'first_name' => $active_visit['first_name'],
+                        'last_name' => $active_visit['last_name'],
+                        'company' => $active_visit['company']
+                    ],
+                    'active_visit' => [
+                        'visit_id' => $active_visit['visit_id'],
+                        'badge_number' => $active_visit['badge_number'],
+                        'host_name' => $active_visit['host_name'],
+                        'department' => $active_visit['department'],
+                        'purpose' => $active_visit['purpose'],
+                        'check_in_time' => $active_visit['check_in_time'],
+                        'valid_until' => $active_visit['valid_until']
+                    ]
+                ]);
+                return;
+            }
+            
+            // Start transaction
+            $this->db->trans_start();
+            
+            // Check if visitor already exists by email OR phone
+            // FIXED: Pass force_new flag from client
+            $force_new_visitor = isset($data['force_new_visitor']) && $data['force_new_visitor'] === true;
+            
+            $existing_visitor = null;
+            if (!$force_new_visitor) {
+                $existing_visitor = $this->find_existing_visitor($email, $phone);
+            }
+            
+            // Handle photo data
+            $photo_data = null;
+            if (isset($data['photo']) && !empty($data['photo'])) {
+                if (strlen($data['photo']) < 7000000) {
+                    $photo_data = $data['photo'];
+                } else {
+                    log_message('warning', 'Photo data too large, skipping');
+                }
+            }
+            
+            if ($existing_visitor) {
+                $visitor_id = $existing_visitor->visitor_id;
+                
+                // Update existing visitor
+                $visitor_update = [
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'visitor_type' => isset($data['type']) ? $data['type'] : 'returning',
+                    'company_visited' => $company_visited,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ];
+                
+                // FIXED: Only update email if provided AND (visitor didn't have one OR we're updating contact)
+                if ($has_email) {
+                    $visitor_update['email'] = $email;
+                }
+                
+                // FIXED: Only update phone if provided
+                if ($has_phone) {
+                    $visitor_update['phone'] = $phone;
+                }
+                
+                // FIXED: Update company - use existing if new is empty
+                if (!empty($company)) {
+                    $visitor_update['company'] = $company;
+                } elseif (empty($existing_visitor->company)) {
+                    // Both are empty, set to empty string (not null)
+                    $visitor_update['company'] = '';
+                }
+                // If new company is empty but existing has value, don't update (keep existing)
+                
+                // Update photo only if new one is provided
+                if ($photo_data !== null) {
+                    $visitor_update['photo'] = $photo_data;
+                }
+                
+                $this->db->where('visitor_id', $visitor_id);
+                $this->db->update('visitors', $visitor_update);
+                
+                log_message('info', 'Updated existing visitor: ' . $visitor_id);
+                
+            } else {
+                // Create new visitor
+                $visitor_data = [
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'email' => $email,
+                    'phone' => $phone,
+                    'company' => $company,  // Will be empty string if not provided
+                    'photo' => $photo_data,
+                    'visitor_type' => isset($data['type']) ? $data['type'] : 'new',
+                    'company_visited' => $company_visited,
+                    'created_at' => date('Y-m-d H:i:s')
+                ];
+                
+                $this->db->insert('visitors', $visitor_data);
+                $visitor_id = $this->db->insert_id();
+                
+                if (!$visitor_id) {
+                    throw new Exception('Failed to create visitor record');
+                }
+                
+                log_message('info', 'Created new visitor: ' . $visitor_id);
+            }
+            
+            // Validate host data
+            if (!isset($data['host']) || !isset($data['host']['id'])) {
+                throw new Exception('Host information is required');
+            }
+            
+            // Create visit record
+            $check_in_time = isset($data['check_in_time']) && !empty($data['check_in_time']) 
+                ? $data['check_in_time'] 
+                : date('Y-m-d H:i:s');
+            
+            $valid_until = date('Y-m-d H:i:s', strtotime($check_in_time . ' +8 hours'));
+            
+            $visit_data = [
+                'visitor_id' => $visitor_id,
+                'host_employee_id' => $data['host']['id'],
+                'purpose' => isset($data['purpose']) ? $data['purpose'] : 'other',
+                'additional_notes' => isset($data['notes']) && !empty($data['notes']) ? $data['notes'] : null,
+                'check_in_time' => $check_in_time,
+                'valid_until' => $valid_until,
+                'terms_accepted' => 1,
+                'photo_consent' => 1,
+                'company_visited' => $company_visited
+            ];
+            
+            $this->db->insert('visits', $visit_data);
+            $visit_id = $this->db->insert_id();
+            
+            if (!$visit_id) {
+                throw new Exception('Failed to create visit record');
+            }
+            
+            // Get the generated badge number
+            $visit = $this->db->get_where('visits', ['visit_id' => $visit_id])->row();
+            
+            if (!$visit) {
+                throw new Exception('Failed to retrieve visit record');
+            }
+            
+            $this->db->trans_complete();
+            
+            if ($this->db->trans_status() === FALSE) {
+                throw new Exception('Database transaction failed');
+            }
+            
+            log_message('info', 'Check-in completed: Visit ID ' . $visit_id . ', Badge: ' . $visit->badge_number);
+            
+            // Return success response
+            echo json_encode([
+                'status' => 'success',
+                'data' => [
+                    'visit_id' => $visit_id,
+                    'visitor_id' => $visitor_id,
+                    'badge_number' => $visit->badge_number,
+                    'visitor_name' => $firstName . ' ' . $lastName,
+                    'company' => $company,
+                    'host_name' => isset($data['host']['name']) ? $data['host']['name'] : 'N/A',
+                    'check_in_time' => $check_in_time,
+                    'valid_until' => $valid_until,
+                    'company_visited' => $company_visited
+                ]
+            ]);
+            
+        } catch (Exception $e) {
+            if ($this->db->trans_status() !== FALSE) {
+                $this->db->trans_rollback();
+            }
+            
+            log_message('error', 'Check-in error: ' . $e->getMessage());
+            log_message('error', 'Stack trace: ' . $e->getTraceAsString());
+            
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'An error occurred during check-in: ' . $e->getMessage()
+            ]);
+        }
+    }
 
-        // Start transaction
-        $this->db->trans_start();
+    /**
+     * Helper function to check for active visits
+     */
+    private function check_for_active_visit($email, $phone, $company_visited) {
+        if (empty($email) && empty($phone)) {
+            return null;
+        }
         
-        // Check if visitor already exists by email OR phone
+        $sql = "SELECT 
+                    vis.visit_id,
+                    vis.badge_number,
+                    vis.check_in_time,
+                    vis.valid_until,
+                    vis.purpose,
+                    v.visitor_id,
+                    v.first_name,
+                    v.last_name,
+                    v.company,
+                    e.name as host_name,
+                    d.name as department
+                FROM visits vis
+                JOIN visitors v ON vis.visitor_id = v.visitor_id
+                JOIN employees e ON vis.host_employee_id = e.employee_id
+                JOIN departments d ON e.department_code = d.department_code
+                WHERE vis.check_out_time IS NULL
+                AND vis.valid_until > NOW()
+                AND vis.company_visited = ?";
+        
+        $params = array($company_visited);
+        $conditions = array();
+        
+        if (!empty($email)) {
+            $conditions[] = "LOWER(v.email) = ?";
+            $params[] = $email;
+        }
+        
+        if (!empty($phone)) {
+            $conditions[] = "v.phone = ?";
+            $params[] = $phone;
+        }
+        
+        if (empty($conditions)) {
+            return null;
+        }
+        
+        $sql .= " AND (" . implode(' OR ', $conditions) . ")";
+        $sql .= " ORDER BY vis.check_in_time DESC LIMIT 1";
+        
+        $result = $this->db->query($sql, $params);
+        
+        if ($result && $result->num_rows() > 0) {
+            return $result->row_array();
+        }
+        
+        return null;
+    }
+
+    /**
+     * Helper function to find existing visitor
+     */
+    private function find_existing_visitor($email, $phone) {
         $existing_visitor = null;
         
-        if ($has_email) {
-            // Try to find by email first
-            $existing_visitor = $this->db->get_where('visitors', ['email' => $data['email']])->row();
+        if (!empty($email)) {
+            $this->db->where('LOWER(email)', $email);
+            $result = $this->db->get('visitors');
+            if ($result->num_rows() > 0) {
+                $existing_visitor = $result->row();
+            }
         }
         
         // If not found by email and phone is provided, try phone
-        if (!$existing_visitor && $has_phone) {
-            $existing_visitor = $this->db->get_where('visitors', ['phone' => $data['phone']])->row();
-        }
-        
-        if ($existing_visitor) {
-            $visitor_id = $existing_visitor->visitor_id;
-            
-            // Update visitor info if needed
-            $visitor_update = [
-                'first_name' => $data['firstName'],
-                'last_name' => $data['lastName'],
-                'email' => $has_email ? $data['email'] : null,
-                'phone' => $has_phone ? $data['phone'] : null,
-                'company' => $data['company'],
-                'visitor_type' => $data['type'],
-                'company_visited' => $company_visited,
-                'updated_at' => date('Y-m-d H:i:s')  // Now uses Asia/Manila timezone
-            ];
-            
-            // Update photo only if new one is provided
-            if (!empty($data['photo'])) {
-                $visitor_update['photo'] = $data['photo'];
+        if (!$existing_visitor && !empty($phone)) {
+            $this->db->where('phone', $phone);
+            $result = $this->db->get('visitors');
+            if ($result->num_rows() > 0) {
+                $existing_visitor = $result->row();
             }
-            
-            $this->db->where('visitor_id', $visitor_id);
-            $this->db->update('visitors', $visitor_update);
-        } else {
-            // Create new visitor
-            $visitor_data = [
-                'first_name' => $data['firstName'],
-                'last_name' => $data['lastName'],
-                'email' => $has_email ? $data['email'] : null,
-                'phone' => $has_phone ? $data['phone'] : null,
-                'company' => $data['company'],
-                'photo' => isset($data['photo']) ? $data['photo'] : null,
-                'visitor_type' => $data['type'],
-                'company_visited' => $company_visited,
-                'created_at' => date('Y-m-d H:i:s')  // Now uses Asia/Manila timezone
-            ];
-            
-            $this->db->insert('visitors', $visitor_data);
-            $visitor_id = $this->db->insert_id();
         }
         
-        // Create visit record
-        // Use client-provided time if available, otherwise use server time (now in correct timezone)
-        $check_in_time = isset($data['check_in_time']) && !empty($data['check_in_time']) 
-            ? $data['check_in_time'] 
-            : date('Y-m-d H:i:s');
+        return $existing_visitor;
+    }
+
+    // public function complete_checkin() {
+    //     // SET TIMEZONE FIRST - This is the key fix!
+    //     date_default_timezone_set('Asia/Manila');
         
-        // Calculate valid_until as 8 hours from check_in_time
-        $valid_until = date('Y-m-d H:i:s', strtotime($check_in_time . ' +8 hours'));
+    //     // Get JSON input
+    //     $json = file_get_contents('php://input');
+    //     $data = json_decode($json, true);
         
-        $visit_data = [
-            'visitor_id' => $visitor_id,
-            'host_employee_id' => $data['host']['id'],
-            'purpose' => $data['purpose'],
-            'additional_notes' => isset($data['notes']) ? $data['notes'] : null,
-            'check_in_time' => $check_in_time,  // Now uses Asia/Manila timezone
-            'valid_until' => $valid_until,      // Now uses Asia/Manila timezone
-            'terms_accepted' => 1,
-            'photo_consent' => 1,
-            'company_visited' => $company_visited
-        ];
+    //     if (!$data) {
+    //         echo json_encode(['status' => 'error', 'message' => 'Invalid data received']);
+    //         return;
+    //     }
         
-        $this->db->insert('visits', $visit_data);
-        $visit_id = $this->db->insert_id();
+    //     // VALIDATE: At least one of email or phone must be provided
+    //     $has_email = !empty($data['email']);
+    //     $has_phone = !empty($data['phone']);
         
-        // Get the generated badge number
-        $visit = $this->db->get_where('visits', ['visit_id' => $visit_id])->row();
+    //     if (!$has_email && !$has_phone) {
+    //         echo json_encode([
+    //             'status' => 'error', 
+    //             'message' => 'At least one contact method (email or phone) is required'
+    //         ]);
+    //         return;
+    //     }
         
-        $this->db->trans_complete();
+    //     // Get company_visited from request (defaults to 'Pan Asia' if not provided)
+    //     $company_visited = isset($data['company_visited']) ? $data['company_visited'] : 'Pan Asia';
         
-        if ($this->db->trans_status() === FALSE) {
-            echo json_encode(['status' => 'error', 'message' => 'Database error occurred']);
+    //     // ========================================
+    //     // CHECK FOR ACTIVE VISIT BEFORE ALLOWING CHECK-IN
+    //     // ========================================
+    //     $active_visit_check = "SELECT 
+    //                             vis.visit_id,
+    //                             vis.badge_number,
+    //                             vis.check_in_time,
+    //                             vis.valid_until,
+    //                             vis.purpose,
+    //                             v.visitor_id,
+    //                             v.first_name,
+    //                             v.last_name,
+    //                             v.company,
+    //                             e.name as host_name,
+    //                             d.name as department
+    //                         FROM visits vis
+    //                         JOIN visitors v ON vis.visitor_id = v.visitor_id
+    //                         JOIN employees e ON vis.host_employee_id = e.employee_id
+    //                         JOIN departments d ON e.department_code = d.department_code
+    //                         WHERE vis.check_out_time IS NULL
+    //                         AND vis.valid_until > NOW()
+    //                         AND vis.company_visited = ?
+    //                         AND (";
+        
+    //     $params = array($company_visited);
+    //     $conditions = array();
+        
+    //     if ($has_email) {
+    //         $conditions[] = "LOWER(v.email) = ?";
+    //         $params[] = strtolower($data['email']);
+    //     }
+        
+    //     if ($has_phone) {
+    //         $conditions[] = "v.phone = ?";
+    //         $params[] = $data['phone'];
+    //     }
+        
+    //     $active_visit_check .= implode(' OR ', $conditions) . ")
+    //                         ORDER BY vis.check_in_time DESC
+    //                         LIMIT 1";
+        
+    //     $active_visit_result = $this->db->query($active_visit_check, $params);
+        
+    //     if ($active_visit_result->num_rows() > 0) {
+    //         $active_visit = $active_visit_result->row_array();
+            
+    //         // Visitor already has an active visit - DENY check-in
+    //         echo json_encode([
+    //             'status' => 'error',
+    //             'error_type' => 'active_visit_exists',
+    //             'message' => 'You are already checked in at the premises',
+    //             'has_active_visit' => true,
+    //             'visitor' => [
+    //                 'visitor_id' => $active_visit['visitor_id'],
+    //                 'first_name' => $active_visit['first_name'],
+    //                 'last_name' => $active_visit['last_name'],
+    //                 'company' => $active_visit['company']
+    //             ],
+    //             'active_visit' => [
+    //                 'visit_id' => $active_visit['visit_id'],
+    //                 'badge_number' => $active_visit['badge_number'],
+    //                 'host_name' => $active_visit['host_name'],
+    //                 'department' => $active_visit['department'],
+    //                 'purpose' => $active_visit['purpose'],
+    //                 'check_in_time' => $active_visit['check_in_time'],
+    //                 'valid_until' => $active_visit['valid_until']
+    //             ]
+    //         ]);
+    //         return;
+    //     }
+    //     // // ========================================
+    //     // // NEW: CHECK FOR ACTIVE VISIT BEFORE ALLOWING CHECK-IN
+    //     // // ========================================
+    //     // $active_visit_check = "SELECT 
+    //     //                         vis.visit_id,
+    //     //                         vis.badge_number,
+    //     //                         vis.check_in_time,
+    //     //                         vis.valid_until,
+    //     //                         vis.purpose,
+    //     //                         v.visitor_id,
+    //     //                         v.first_name,
+    //     //                         v.last_name,
+    //     //                         v.company,
+    //     //                         e.name as host_name,
+    //     //                         d.name as department
+    //     //                     FROM visits vis
+    //     //                     JOIN visitors v ON vis.visitor_id = v.visitor_id
+    //     //                     JOIN employees e ON vis.host_employee_id = e.employee_id
+    //     //                     JOIN departments d ON e.department_code = d.department_code
+    //     //                     WHERE vis.check_out_time IS NULL
+    //     //                     AND vis.company_visited = ?
+    //     //                     AND (";
+        
+    //     // $params = array($company_visited);
+    //     // $conditions = array();
+        
+    //     // if ($has_email) {
+    //     //     $conditions[] = "LOWER(v.email) = ?";
+    //     //     $params[] = strtolower($data['email']);
+    //     // }
+        
+    //     // if ($has_phone) {
+    //     //     $conditions[] = "v.phone = ?";
+    //     //     $params[] = $data['phone'];
+    //     // }
+        
+    //     // $active_visit_check .= implode(' OR ', $conditions) . ")
+    //     //                     ORDER BY vis.check_in_time DESC
+    //     //                     LIMIT 1";
+        
+    //     // $active_visit_result = $this->db->query($active_visit_check, $params);
+        
+    //     // if ($active_visit_result->num_rows() > 0) {
+    //     //     $active_visit = $active_visit_result->row_array();
+            
+    //     //     // Visitor already has an active visit - DENY check-in
+    //     //     echo json_encode([
+    //     //         'status' => 'error',
+    //     //         'message' => 'You are already checked in at the premises',
+    //     //         'has_active_visit' => true,
+    //     //         'active_visit' => [
+    //     //             'visit_id' => $active_visit['visit_id'],
+    //     //             'badge_number' => $active_visit['badge_number'],
+    //     //             'visitor_name' => $active_visit['first_name'] . ' ' . $active_visit['last_name'],
+    //     //             'company' => $active_visit['company'],
+    //     //             'host_name' => $active_visit['host_name'],
+    //     //             'department' => $active_visit['department'],
+    //     //             'purpose' => $active_visit['purpose'],
+    //     //             'check_in_time' => $active_visit['check_in_time'],
+    //     //             'valid_until' => $active_visit['valid_until']
+    //     //         ]
+    //     //     ]);
+    //     //     return;
+    //     // }
+    //     // // ========================================
+    //     // // END: ACTIVE VISIT CHECK
+    //     // // ========================================
+
+    //     // Start transaction
+    //     $this->db->trans_start();
+        
+    //     // Check if visitor already exists by email OR phone
+    //     $existing_visitor = null;
+        
+    //     if ($has_email) {
+    //         // Try to find by email first
+    //         $existing_visitor = $this->db->get_where('visitors', ['email' => $data['email']])->row();
+    //     }
+        
+    //     // If not found by email and phone is provided, try phone
+    //     if (!$existing_visitor && $has_phone) {
+    //         $existing_visitor = $this->db->get_where('visitors', ['phone' => $data['phone']])->row();
+    //     }
+        
+    //     if ($existing_visitor) {
+    //         $visitor_id = $existing_visitor->visitor_id;
+            
+    //         // Update visitor info if needed
+    //         $visitor_update = [
+    //             'first_name' => $data['firstName'],
+    //             'last_name' => $data['lastName'],
+    //             'email' => $has_email ? $data['email'] : null,
+    //             'phone' => $has_phone ? $data['phone'] : null,
+    //             'company' => $data['company'],
+    //             'visitor_type' => $data['type'],
+    //             'company_visited' => $company_visited,
+    //             'updated_at' => date('Y-m-d H:i:s')  // Now uses Asia/Manila timezone
+    //         ];
+            
+    //         // Update photo only if new one is provided
+    //         if (!empty($data['photo'])) {
+    //             $visitor_update['photo'] = $data['photo'];
+    //         }
+            
+    //         $this->db->where('visitor_id', $visitor_id);
+    //         $this->db->update('visitors', $visitor_update);
+    //     } else {
+    //         // Create new visitor
+    //         $visitor_data = [
+    //             'first_name' => $data['firstName'],
+    //             'last_name' => $data['lastName'],
+    //             'email' => $has_email ? $data['email'] : null,
+    //             'phone' => $has_phone ? $data['phone'] : null,
+    //             'company' => $data['company'],
+    //             'photo' => isset($data['photo']) ? $data['photo'] : null,
+    //             'visitor_type' => $data['type'],
+    //             'company_visited' => $company_visited,
+    //             'created_at' => date('Y-m-d H:i:s')  // Now uses Asia/Manila timezone
+    //         ];
+            
+    //         $this->db->insert('visitors', $visitor_data);
+    //         $visitor_id = $this->db->insert_id();
+    //     }
+        
+    //     // Create visit record
+    //     // Use client-provided time if available, otherwise use server time (now in correct timezone)
+    //     $check_in_time = isset($data['check_in_time']) && !empty($data['check_in_time']) 
+    //         ? $data['check_in_time'] 
+    //         : date('Y-m-d H:i:s');
+        
+    //     // Calculate valid_until as 8 hours from check_in_time
+    //     $valid_until = date('Y-m-d H:i:s', strtotime($check_in_time . ' +8 hours'));
+        
+    //     $visit_data = [
+    //         'visitor_id' => $visitor_id,
+    //         'host_employee_id' => $data['host']['id'],
+    //         'purpose' => $data['purpose'],
+    //         'additional_notes' => isset($data['notes']) ? $data['notes'] : null,
+    //         'check_in_time' => $check_in_time,  // Now uses Asia/Manila timezone
+    //         'valid_until' => $valid_until,      // Now uses Asia/Manila timezone
+    //         'terms_accepted' => 1,
+    //         'photo_consent' => 1,
+    //         'company_visited' => $company_visited
+    //     ];
+        
+    //     $this->db->insert('visits', $visit_data);
+    //     $visit_id = $this->db->insert_id();
+        
+    //     // Get the generated badge number
+    //     $visit = $this->db->get_where('visits', ['visit_id' => $visit_id])->row();
+        
+    //     $this->db->trans_complete();
+        
+    //     if ($this->db->trans_status() === FALSE) {
+    //         echo json_encode(['status' => 'error', 'message' => 'Database error occurred']);
+    //         return;
+    //     }
+        
+    //     // Log for debugging (optional - remove in production)
+    //     log_message('info', 'Check-in completed at: ' . $check_in_time . ' (Asia/Manila)');
+        
+    //     // Return success response
+    //     echo json_encode([
+    //         'status' => 'success',
+    //         'data' => [
+    //             'visit_id' => $visit_id,
+    //             'visitor_id' => $visitor_id,
+    //             'badge_number' => $visit->badge_number,
+    //             'visitor_name' => $data['firstName'] . ' ' . $data['lastName'],
+    //             'company' => $data['company'],
+    //             'host_name' => $data['host']['name'],
+    //             'check_in_time' => $check_in_time,  // Send back for verification
+    //             'valid_until' => $valid_until,
+    //             'company_visited' => $company_visited
+    //         ]
+    //     ]);
+    // }
+
+    public function check_duplicate_visitor() {
+        header('Content-Type: application/json');
+        
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        $email = isset($input['email']) && !empty(trim($input['email'])) 
+            ? strtolower(trim($input['email'])) 
+            : null;
+        $phone = isset($input['phone']) && !empty(trim($input['phone'])) 
+            ? trim($input['phone']) 
+            : null;
+        
+        // If neither email nor phone provided, no duplicate check needed
+        if (empty($email) && empty($phone)) {
+            echo json_encode(['status' => 'not_found']);
             return;
         }
         
-        // Log for debugging (optional - remove in production)
-        log_message('info', 'Check-in completed at: ' . $check_in_time . ' (Asia/Manila)');
-        
-        // Return success response
-        echo json_encode([
-            'status' => 'success',
-            'data' => [
-                'visit_id' => $visit_id,
-                'visitor_id' => $visitor_id,
-                'badge_number' => $visit->badge_number,
-                'visitor_name' => $data['firstName'] . ' ' . $data['lastName'],
-                'company' => $data['company'],
-                'host_name' => $data['host']['name'],
-                'check_in_time' => $check_in_time,  // Send back for verification
-                'valid_until' => $valid_until,
-                'company_visited' => $company_visited
-            ]
-        ]);
-    }
-
-    public function check_duplicate_visitor() {
-        $input = json_decode(file_get_contents('php://input'), true);
-        
-        $email = $input['email'] ?? null;
-        $phone = $input['phone'] ?? null;
+        $visitor = null;
         
         // Search for existing visitor with matching email OR phone
-        $this->db->group_start();
-        if ($email) {
-            $this->db->or_where('email', $email);
+        // IMPORTANT: Only match on the contact info that was provided
+        if (!empty($email)) {
+            $this->db->where('LOWER(email)', $email);
+            $result = $this->db->get('visitors');
+            if ($result->num_rows() > 0) {
+                $visitor = $result->row_array();
+            }
         }
-        if ($phone) {
-            $this->db->or_where('phone', $phone);
-        }
-        $this->db->group_end();
         
-        $visitor = $this->db->get('visitors')->row_array();
+        // If not found by email, try phone (only if phone was provided)
+        if (!$visitor && !empty($phone)) {
+            $this->db->where('phone', $phone);
+            $result = $this->db->get('visitors');
+            if ($result->num_rows() > 0) {
+                $visitor = $result->row_array();
+            }
+        }
         
         if ($visitor) {
             // Count total visits
@@ -339,7 +774,8 @@ class Kiosk extends CI_Controller {
             
             echo json_encode([
                 'status' => 'found',
-                'visitor' => $visitor
+                'visitor' => $visitor,
+                'matched_by' => !empty($email) && strtolower($visitor['email'] ?? '') === $email ? 'email' : 'phone'
             ]);
         } else {
             echo json_encode([
@@ -1189,6 +1625,112 @@ class Kiosk extends CI_Controller {
     //         'employees' => $employees
     //     ]);
     // }
+
+    /**
+     * Check for active visit by email or phone
+     * Used when returning visitors don't have their QR code
+     */
+    public function check_active_visit_by_contact() {
+        header('Content-Type: application/json');
+        
+        if ($this->input->method() !== 'post') {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
+            return;
+        }
+        
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        
+        if (!$data) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid data']);
+            return;
+        }
+        
+        $email = isset($data['email']) ? strtolower(trim($data['email'])) : null;
+        $phone = isset($data['phone']) ? trim($data['phone']) : null;
+        $company_visited = isset($data['company_visited']) ? $data['company_visited'] : 'Toms World';
+        
+        if (empty($email) && empty($phone)) {
+            echo json_encode(['status' => 'error', 'message' => 'Email or phone required']);
+            return;
+        }
+        
+        // Build query to find visitor with active visit
+        $sql = "SELECT 
+                    vis.visit_id,
+                    vis.badge_number,
+                    vis.check_in_time,
+                    vis.valid_until,
+                    vis.purpose,
+                    v.visitor_id,
+                    v.first_name,
+                    v.last_name,
+                    v.email,
+                    v.phone,
+                    v.company,
+                    v.photo,
+                    e.name as host_name,
+                    d.name as department
+                FROM visits vis
+                JOIN visitors v ON vis.visitor_id = v.visitor_id
+                JOIN employees e ON vis.host_employee_id = e.employee_id
+                JOIN departments d ON e.department_code = d.department_code
+                WHERE vis.check_out_time IS NULL
+                AND vis.valid_until > NOW()
+                AND vis.company_visited = ?
+                AND (";
+        
+        $params = array($company_visited);
+        $conditions = array();
+        
+        if (!empty($email)) {
+            $conditions[] = "LOWER(v.email) = ?";
+            $params[] = $email;
+        }
+        
+        if (!empty($phone)) {
+            $conditions[] = "v.phone = ?";
+            $params[] = $phone;
+        }
+        
+        $sql .= implode(' OR ', $conditions) . ")
+                ORDER BY vis.check_in_time DESC
+                LIMIT 1";
+        
+        $result = $this->db->query($sql, $params);
+        
+        if ($result->num_rows() > 0) {
+            $active_visit = $result->row_array();
+            
+            echo json_encode([
+                'status' => 'active_visit_found',
+                'message' => 'Visitor already has an active visit',
+                'visitor' => [
+                    'visitor_id' => $active_visit['visitor_id'],
+                    'first_name' => $active_visit['first_name'],
+                    'last_name' => $active_visit['last_name'],
+                    'email' => $active_visit['email'],
+                    'phone' => $active_visit['phone'],
+                    'company' => $active_visit['company'],
+                    'photo' => $active_visit['photo']
+                ],
+                'active_visit' => [
+                    'visit_id' => $active_visit['visit_id'],
+                    'badge_number' => $active_visit['badge_number'],
+                    'host_name' => $active_visit['host_name'],
+                    'department' => $active_visit['department'],
+                    'purpose' => $active_visit['purpose'],
+                    'check_in_time' => $active_visit['check_in_time'],
+                    'valid_until' => $active_visit['valid_until']
+                ]
+            ]);
+        } else {
+            echo json_encode([
+                'status' => 'no_active_visit',
+                'message' => 'No active visit found'
+            ]);
+        }
+    }
 
     // Get all employees with active visit count
     public function get_all_employees() {

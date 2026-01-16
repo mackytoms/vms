@@ -58,7 +58,7 @@
         .quick-stat-label { font-size: 0.9em; opacity: 0.9; }
         .table-container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .table td, .table tr, .table th { overflow: hidden; text-overflow: ellipsis; word-wrap: break-word; word-break: break-word; white-space: normal; }
+        .table td, .table tr, .table th { overflow: hidden; text-overflow: ellipsis; word-wrap: break-word; white-space: normal; }
         .visitor-photo { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #f8f9fa; display: inline-flex; align-items: center; justify-content: center; }
         .visitor-photo img { width: 100%; height: 100%; object-fit: cover; }
         .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
@@ -783,7 +783,7 @@
                     <thead>
                         <tr>
                             <th>Visitor</th>
-                            <th>Company</th>
+                            <th>Company / Branch</th>
                             <th>Host</th>
                             <th>Department</th>
                             <th>Check-in Time</th>
@@ -907,8 +907,9 @@
                     <thead>
                         <tr>
                             <th>Host ID</th>
+                            <th></th>
                             <th>Name</th>
-                            <th>Email</th>
+                            <th>Email & Phone Number</th>
                             <th>Department</th>
                             <th>Status</th>
                             <th>Total Visits Hosted</th>
@@ -1473,7 +1474,7 @@
                 <div class="info-grid">
                     <div class="row mb-2">
                         <div class="col-sm-4 fw-bold"><i class="bi bi-code-square text-primary"></i> System Version:</div>
-                        <div class="col-sm-8">Kiosk V-Pass v1.5.6.9.4</div>
+                        <div class="col-sm-8">Kiosk V-Pass v1.5.8</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-sm-4 fw-bold"><i class="bi bi-calendar-check text-primary"></i> Last Updated:</div>
@@ -2589,7 +2590,7 @@
                                 <tr>
                                     <th>Host ID</th>
                                     <th>Name</th>
-                                    <th>Email</th>
+                                    <th>Email & Phone Number</th>
                                     <th>Status</th>
                                     <th>Total Visits Hosted</th>
                                     <th>Actions</th>
@@ -3748,12 +3749,12 @@
                         picSrc = baseUrl + picSrc;
                     }
                     profilePicHtml = `<img src="${picSrc}" class="rounded-circle me-2" 
-                                    style="width: 35px; height: 35px; object-fit: cover;" 
+                                    style="width: 50px; height: 45px; object-fit: cover;" 
                                     onerror="this.src='${baseUrl}assets/images/icons/default-avatar.png'">`;
                 } else {
                     profilePicHtml = `<div class="rounded-circle bg-secondary text-white me-2 d-inline-flex 
                                     align-items-center justify-content-center" 
-                                    style="width: 35px; height: 35px; font-size: 14px;">
+                                    style="width: 50px; height: 45px; font-size: 14px;">
                                     ${(e.name || 'E')[0].toUpperCase()}
                                     </div>`;
                 }
@@ -3763,7 +3764,12 @@
                     <td>${e.employee_id || ''}</td>
                     <td>
                         <div class="d-flex align-items-center">
-                            ${profilePicHtml}
+                            ${profilePicHtml}                           
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            
                             <div>
                                 <strong>${e.name || ''}</strong>
                                 ${e.position ? `<br><small class="text-muted">${e.position}</small>` : ''}

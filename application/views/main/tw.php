@@ -3470,7 +3470,7 @@
                             <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
                                 <strong>${result.visitor.first_name} ${result.visitor.last_name}</strong><br>
                                 <span style="color: #7f8c8d;">
-                                    ${result.visitor.company}<br>
+                                    ${result.visitor.company || 'No company'}<br>
                                     Email: ${result.visitor.email || 'Not provided'}<br>
                                     Phone: ${result.visitor.phone || 'Not provided'}<br>
                                     Previous visits: ${result.visitor.total_visits}
@@ -3483,7 +3483,8 @@
                         confirmButtonColor: '#27ae60',
                         cancelButtonColor: '#3498db',
                         confirmButtonText: 'Yes, that\'s me',
-                        cancelButtonText: 'No, I\'m a new visitor'
+                        cancelButtonText: 'No, I\'m a new visitor',
+                        allowOutsideClick: false
                     });
                     
                     if (choice.isConfirmed) {
@@ -3507,8 +3508,38 @@
                         
                         return true; // Proceed with check-in as returning visitor
                     } else {
-                        // Continue as new visitor
-                        return true;
+                        // User says they are NOT this person - they need different contact info
+                        // Show dialog to enter different contact info
+                        const differentContact = await Swal.fire({
+                            title: 'Different Contact Information Needed',
+                            html: `
+                                <p style="margin-bottom: 15px;">Since you're a different person, please provide contact information that isn't already in our system.</p>
+                                <div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: left;">
+                                    <small><strong>Already registered:</strong><br>
+                                    ${result.visitor.email ? `Email: ${result.visitor.email}` : ''}
+                                    ${result.visitor.email && result.visitor.phone ? '<br>' : ''}
+                                    ${result.visitor.phone ? `Phone: ${result.visitor.phone}` : ''}
+                                    </small>
+                                </div>
+                                <p style="color: #e74c3c; font-size: 0.9em;">Please go back and enter a different email or phone number.</p>
+                            `,
+                            icon: 'info',
+                            confirmButtonText: 'Go Back to Edit',
+                            confirmButtonColor: '#3498db',
+                            allowOutsideClick: false
+                        });
+                        
+                        // Clear the conflicting field(s) so user can enter new ones
+                        if (result.visitor.email && visitorData.email === result.visitor.email.toLowerCase()) {
+                            document.getElementById('email').value = '';
+                            visitorData.email = null;
+                        }
+                        if (result.visitor.phone && visitorData.phone === result.visitor.phone) {
+                            document.getElementById('phone').value = '';
+                            visitorData.phone = null;
+                        }
+                        
+                        return false; // Don't proceed, user needs to change contact info
                     }
                 }
                 
@@ -4184,12 +4215,109 @@
         // Validate current screen
         function validateCurrentScreen() {
             switch(currentScreen) {
+                // case 3:
+                //     let isValid = true;
+                    
+                //     const firstName = document.getElementById('firstName');
+                //     const firstNameValue = firstName.value.trim();
+                //     if (!firstNameValue || !validateName(firstNameValue)) {
+                //         firstName.classList.add('is-invalid');
+                //         isValid = false;
+                //     } else {
+                //         firstName.classList.remove('is-invalid');
+                //         visitorData.firstName = firstNameValue;
+                //     }
+                    
+                //     const lastName = document.getElementById('lastName');
+                //     const lastNameValue = lastName.value.trim();
+                //     if (!lastNameValue || !validateName(lastNameValue)) {
+                //         lastName.classList.add('is-invalid');
+                //         isValid = false;
+                //     } else {
+                //         lastName.classList.remove('is-invalid');
+                //         visitorData.lastName = lastNameValue;
+                //     }
+                    
+                //     // EMAIL AND PHONE VALIDATION - At least one required
+                //     const email = document.getElementById('email');
+                //     const emailValue = email.value.trim();
+                //     const isEmailProvided = emailValue.length > 0;
+                //     const isEmailValid = isEmailProvided && validateEmail(emailValue);
+                    
+                //     const phone = document.getElementById('phone');
+                //     const phoneValue = phone.value.trim();
+                //     const isPhoneProvided = phoneValue.length > 0;
+                //     const isPhoneValid = isPhoneProvided && validatePhone(phoneValue);
+                    
+                //     // Check if at least one is provided
+                //     if (!isEmailProvided && !isPhoneProvided) {
+                //         // Both are empty - show error
+                //         email.classList.add('is-invalid');
+                //         phone.classList.add('is-invalid');
+                //         showNotification('Please provide either email address or phone number');
+                //         isValid = false;
+                //     } else {
+                //         // At least one is provided - validate each one that has input
+                        
+                //         // Validate email if provided
+                //         if (isEmailProvided) {
+                //             if (!isEmailValid) {
+                //                 email.classList.add('is-invalid');
+                //                 isValid = false;
+                //             } else {
+                //                 email.classList.remove('is-invalid');
+                //                 visitorData.email = emailValue.toLowerCase();
+                //             }
+                //         } else {
+                //             // Email not provided but phone is - that's okay
+                //             email.classList.remove('is-invalid');
+                //             visitorData.email = null;
+                //         }
+                        
+                //         // Validate phone if provided
+                //         if (isPhoneProvided) {
+                //             if (!isPhoneValid) {
+                //                 phone.classList.add('is-invalid');
+                //                 isValid = false;
+                //             } else {
+                //                 phone.classList.remove('is-invalid');
+                //                 visitorData.phone = phoneValue;
+                //             }
+                //         } else {
+                //             // Phone not provided but email is - that's okay
+                //             phone.classList.remove('is-invalid');
+                //             visitorData.phone = null;
+                //         }
+                //     }
+                    
+                //     const company = document.getElementById('company');
+                //     const companyValue = company.value.trim();
+                //     // Company is now optional - only validate if provided
+                //     if (companyValue && !validateCompany(companyValue)) {
+                //         company.classList.add('is-invalid');
+                //         isValid = false;
+                //     } else {
+                //         company.classList.remove('is-invalid');
+                //         visitorData.company = companyValue || null; // Store null if empty
+                //     }
+                    
+                //     if (!isValid) {
+                //         showNotification('Please correct the highlighted fields');
+                //     }
+                //     return isValid;
+                    
+                //     // NEW: Check for duplicate before proceeding
+                //     // This returns a promise, so we need to handle it differently
+                //     return true; // Will check duplicates in nextScreen instead
+                   
+                // Replace the case 3 section in validateCurrentScreen function
                 case 3:
                     let isValid = true;
                     
+                    // Validate First Name
                     const firstName = document.getElementById('firstName');
                     const firstNameValue = firstName.value.trim();
-                    if (!firstNameValue || !validateName(firstNameValue)) {
+                    if (!firstNameValue || firstNameValue.length < 2) {
                         firstName.classList.add('is-invalid');
                         isValid = false;
                     } else {
@@ -4197,9 +4325,10 @@
                         visitorData.firstName = firstNameValue;
                     }
                     
+                    // Validate Last Name
                     const lastName = document.getElementById('lastName');
                     const lastNameValue = lastName.value.trim();
-                    if (!lastNameValue || !validateName(lastNameValue)) {
+                    if (!lastNameValue || lastNameValue.length < 2) {
                         lastName.classList.add('is-invalid');
                         isValid = false;
                     } else {
@@ -4238,7 +4367,7 @@
                                 visitorData.email = emailValue.toLowerCase();
                             }
                         } else {
-                            // Email not provided but phone is - that's okay
+                            // Email not provided - clear validation state and set to null
                             email.classList.remove('is-invalid');
                             visitorData.email = null;
                         }
@@ -4253,32 +4382,23 @@
                                 visitorData.phone = phoneValue;
                             }
                         } else {
-                            // Phone not provided but email is - that's okay
+                            // Phone not provided - clear validation state and set to null
                             phone.classList.remove('is-invalid');
                             visitorData.phone = null;
                         }
                     }
                     
+                    // Company is optional
                     const company = document.getElementById('company');
                     const companyValue = company.value.trim();
-                    // Company is now optional - only validate if provided
-                    if (companyValue && !validateCompany(companyValue)) {
-                        company.classList.add('is-invalid');
-                        isValid = false;
-                    } else {
-                        company.classList.remove('is-invalid');
-                        visitorData.company = companyValue || null; // Store null if empty
-                    }
+                    company.classList.remove('is-invalid');
+                    visitorData.company = companyValue.length > 0 ? companyValue : null;
                     
                     if (!isValid) {
                         showNotification('Please correct the highlighted fields');
                     }
+                    
                     return isValid;
-                    
-                    // NEW: Check for duplicate before proceeding
-                    // This returns a promise, so we need to handle it differently
-                    return true; // Will check duplicates in nextScreen instead
-                    
                     
                 case 4:
                     visitorData.photo = capturedPhotoData;
@@ -4314,15 +4434,144 @@
             }
         }
 
-        // MODIFY nextScreen function:
+        // Add this new function to check for active visits
+        async function checkActiveVisitByContact(email, phone) {
+            try {
+                const response = await fetch('<?= base_url("kiosk/check_active_visit_by_contact") ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        phone: phone,
+                        company_visited: COMPANY_VISITED
+                    })
+                });
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Error checking active visit:', error);
+                return { status: 'error', message: 'Connection error' };
+            }
+        }
+
+        // Function to show existing badge/QR for active visitors
+        function showExistingBadgeDialog(visitor, activeVisit) {
+            // Generate QR code for the existing badge
+            const qrContainer = document.createElement('div');
+            qrContainer.id = 'existingQrContainer';
+            qrContainer.style.cssText = 'display: flex; justify-content: center; margin: 15px 0;';
+            
+            Swal.fire({
+                title: '⚠️ Already Checked In',
+                html: `
+                    <div style="text-align: left; padding: 10px;">
+                        <p style="font-size: 1.1em; margin-bottom: 15px; text-align: center;">
+                            <strong>${visitor.first_name} ${visitor.last_name}</strong>, 
+                            you are currently checked in at the premises.
+                        </p>
+
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #f39c12; margin-bottom: 15px;">
+                            <strong style="color: #f39c12;">Active Visit Details:</strong><br>
+                            <div style="margin-top: 10px; line-height: 1.8;">
+                                <strong>Badge:</strong> ${activeVisit.badge_number}<br>
+                                <strong>Host:</strong> ${activeVisit.host_name}<br>
+                                <strong>Department:</strong> ${activeVisit.department}<br>
+                                <strong>Check-in Time:</strong> ${new Date(activeVisit.check_in_time).toLocaleString('en-US', { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit',
+                                    hour12: true,
+                                    month: 'short',
+                                    day: 'numeric'
+                                })}<br>
+                                <strong>Valid Until:</strong> ${new Date(activeVisit.valid_until).toLocaleString('en-US', { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit',
+                                    hour12: true
+                                })}
+                            </div>
+                        </div>
+                        
+                        <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border: 2px dashed #27ae60; margin-bottom: 15px;">
+                            <h5 style="color: #27ae60; margin-bottom: 10px; text-align: center;">
+                                <i class="bi bi-qr-code"></i> Your Existing Badge QR Code
+                            </h5>
+                            <p style="font-size: 0.9em; color: #6c757d; margin-bottom: 10px; text-align: center;">
+                                Take a photo of this QR code for your records
+                            </p>
+                            <div id="existingQrCodeContainer" style="display: flex; justify-content: center;"></div>
+                            <p style="font-size: 1.2em; font-weight: bold; color: #27ae60; text-align: center; margin-top: 10px;">
+                                ${activeVisit.badge_number}
+                            </p>
+                        </div>
+                        
+                        <p style="color: #e74c3c; font-weight: 600; text-align: center;">
+                            <i class="bi bi-exclamation-triangle"></i> 
+                            Please check out first before checking in again.
+                        </p>
+                    </div>
+                `,
+                icon: 'warning',
+                confirmButtonColor: '#f39c12',
+                confirmButtonText: 'OK, I Understand',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    // Generate QR code in the dialog
+                    const qrCodeContainer = document.getElementById('existingQrCodeContainer');
+                    if (qrCodeContainer) {
+                        try {
+                            new QRCode(qrCodeContainer, {
+                                text: activeVisit.badge_number,
+                                width: 150,
+                                height: 150,
+                                colorDark: "#27ae60",
+                                colorLight: "#ffffff",
+                                correctLevel: QRCode.CorrectLevel.H
+                            });
+                        } catch (e) {
+                            console.error('Error generating QR code:', e);
+                            qrCodeContainer.innerHTML = `<p style="font-size: 2em; font-weight: bold; color: #27ae60;">${activeVisit.badge_number}</p>`;
+                        }
+                    }
+                },
+                customClass: {
+                    popup: 'swal-wide'
+                }
+            }).then(() => {
+                // Return to welcome screen
+                resetKiosk();
+            });
+        }
+
+        // REPLACE the existing nextScreen function with this updated version:
         async function nextScreen() {
             if (!validateCurrentScreen()) {
                 return;
             }
             
-            // NEW: If moving from basic info screen, check for duplicates first
+            // Check for active visit when moving from basic info screen (screen 3)
             if (currentScreen === 3) {
+                showLoading();
+                
+                // First check for active visit
+                const activeVisitResult = await checkActiveVisitByContact(
+                    visitorData.email,
+                    visitorData.phone
+                );
+                
+                if (activeVisitResult.status === 'active_visit_found') {
+                    hideLoading();
+                    // Show existing badge dialog instead of continuing
+                    showExistingBadgeDialog(activeVisitResult.visitor, activeVisitResult.active_visit);
+                    return;
+                }
+                
+                // If no active visit, check for existing visitor (duplicate check)
                 const canProceed = await checkExistingVisitor();
+                hideLoading();
+                
                 if (!canProceed) {
                     return;
                 }
@@ -4344,6 +4593,37 @@
                 showScreen(currentScreen + 1);
             }
         }
+
+        // // MODIFY nextScreen function:
+        // async function nextScreen() {
+        //     if (!validateCurrentScreen()) {
+        //         return;
+        //     }
+            
+        //     // NEW: If moving from basic info screen, check for duplicates first
+        //     if (currentScreen === 3) {
+        //         const canProceed = await checkExistingVisitor();
+        //         if (!canProceed) {
+        //             return;
+        //         }
+        //     }
+            
+        //     // Rest of existing nextScreen code...
+        //     if (currentFlow.length > 0) {
+        //         currentFlowIndex++;
+        //         if (currentFlowIndex < currentFlow.length) {
+        //             const nextScreenNumber = currentFlow[currentFlowIndex];
+                    
+        //             if (nextScreenNumber === 6 && visitorData.initialPurpose === 'delivery') {
+        //                 showScreen(nextScreenNumber);
+        //             } else {
+        //                 showScreen(nextScreenNumber);
+        //             }
+        //         }
+        //     } else {
+        //         showScreen(currentScreen + 1);
+        //     }
+        // }
         
         // Clear validation errors on input
         document.addEventListener('DOMContentLoaded', function() {
@@ -4627,7 +4907,7 @@
         //     }, 2000);
         // }
 
-        // FIXED: Complete check-in function
+        // FIXED: Complete check-in function with force_new_visitor support
         function completeCheckIn() {
             showLoading();
             
@@ -4646,32 +4926,106 @@
                 return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
             };
             
+            // Helper function to sanitize string values
+            const sanitizeString = (value) => {
+                if (value === undefined || value === null || value === '') {
+                    return null;
+                }
+                return String(value).trim();
+            };
+            
+            // Sanitize all input data
+            const sanitizedFirstName = sanitizeString(visitorData.firstName);
+            const sanitizedLastName = sanitizeString(visitorData.lastName);
+            const sanitizedEmail = sanitizeString(visitorData.email);
+            const sanitizedPhone = sanitizeString(visitorData.phone);
+            const sanitizedCompany = sanitizeString(visitorData.company) || '';  // Default to empty string
+            const sanitizedNotes = sanitizeString(visitorData.notes);
+            
+            // Validate required fields
+            if (!sanitizedFirstName || !sanitizedLastName) {
+                hideLoading();
+                Swal.fire({
+                    title: 'Missing Information',
+                    text: 'First name and last name are required.',
+                    icon: 'error',
+                    confirmButtonColor: '#e74c3c'
+                });
+                return;
+            }
+            
+            // Validate at least one contact method
+            if (!sanitizedEmail && !sanitizedPhone) {
+                hideLoading();
+                Swal.fire({
+                    title: 'Contact Required',
+                    text: 'Please provide either an email address or phone number.',
+                    icon: 'error',
+                    confirmButtonColor: '#e74c3c'
+                });
+                return;
+            }
+            
+            // Validate host selection
+            if (!selectedHost || !selectedHost.id) {
+                hideLoading();
+                Swal.fire({
+                    title: 'Host Required',
+                    text: 'Please select who you are here to see.',
+                    icon: 'error',
+                    confirmButtonColor: '#e74c3c'
+                });
+                return;
+            }
+            
+            // Handle photo data - check size
+            let photoData = null;
+            if (visitorData.photo && visitorData.photo.length > 0) {
+                if (visitorData.photo.length < 7000000) {
+                    photoData = visitorData.photo;
+                } else {
+                    console.warn('Photo data too large, skipping');
+                }
+            }
+            
             // Prepare data for database insertion
             const checkInData = {
-                firstName: visitorData.firstName,
-                lastName: visitorData.lastName,
-                email: visitorData.email,
-                phone: visitorData.phone,
-                company: visitorData.company,
-                photo: visitorData.photo || null,
-                type: visitorData.type,
+                firstName: sanitizedFirstName,
+                lastName: sanitizedLastName,
+                email: sanitizedEmail,
+                phone: sanitizedPhone,
+                company: sanitizedCompany,  // Will be empty string if not provided
+                photo: photoData,
+                type: visitorData.type || 'new',
                 host: {
                     id: selectedHost.id || selectedHost.employeeId,
-                    name: selectedHost.name,
-                    email: selectedHost.email,
-                    department: selectedHost.department,
-                    departmentCode: selectedHost.departmentCode
+                    name: selectedHost.name || 'Unknown',
+                    email: selectedHost.email || null,
+                    department: selectedHost.department || 'Unknown',
+                    departmentCode: selectedHost.departmentCode || null
                 },
-                purpose: selectedPurpose,
-                notes: visitorData.notes || null,
+                purpose: selectedPurpose || 'other',
+                notes: sanitizedNotes,
                 booking_code: visitorData.booking_code || null,
                 company_visited: COMPANY_VISITED,
                 check_in_time: formatDateTime(phTime),
                 client_timezone: 'Asia/Manila',
-                timezone_offset: now.getTimezoneOffset()
+                timezone_offset: now.getTimezoneOffset(),
+                // ADDED: Force new visitor flag if user explicitly chose to be new
+                force_new_visitor: visitorData.force_new_visitor || false
             };
             
-            console.log('Sending check-in data:', checkInData);
+            console.log('Sending check-in data:', {
+                firstName: checkInData.firstName,
+                lastName: checkInData.lastName,
+                email: checkInData.email,
+                phone: checkInData.phone,
+                company: checkInData.company,
+                host: checkInData.host.name,
+                purpose: checkInData.purpose,
+                hasPhoto: !!checkInData.photo,
+                forceNew: checkInData.force_new_visitor
+            });
             
             // Send data to server for database insertion
             fetch('<?= base_url("kiosk/complete_checkin") ?>', {
@@ -4683,8 +5037,13 @@
                 body: JSON.stringify(checkInData)
             })
             .then(response => {
+                console.log('Response status:', response.status);
+                
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.text().then(text => {
+                        console.error('Server response:', text);
+                        throw new Error(`Server error (${response.status}): ${text.substring(0, 200)}`);
+                    });
                 }
                 return response.json();
             })
@@ -4713,9 +5072,12 @@
                     
                     console.log('Success screen displayed');
                     
+                } else if (result.error_type === 'active_visit_exists' && result.has_active_visit) {
+                    // Show existing badge dialog
+                    showExistingBadgeDialog(result.visitor, result.active_visit);
+                
                 } else {
                     console.error('Check-in failed:', result.message);
-                    // Show error message
                     Swal.fire({
                         title: 'Check-in Failed',
                         text: result.message || 'An error occurred during check-in. Please try again.',
@@ -4728,9 +5090,15 @@
                 hideLoading();
                 console.error('Check-in error:', error);
                 
+                let errorMessage = 'Unable to connect to the server. Please check your connection and try again.';
+                
+                if (error.message && error.message.includes('Server error')) {
+                    errorMessage = 'The server encountered an error. Please try again or contact support.';
+                }
+                
                 Swal.fire({
                     title: 'Connection Error',
-                    text: 'Unable to connect to the server. Please check your connection and try again.',
+                    html: `<p>${errorMessage}</p><p style="font-size: 0.8em; color: #999; margin-top: 10px;">Error: ${error.message}</p>`,
                     icon: 'error',
                     confirmButtonColor: '#e74c3c'
                 });
@@ -5827,114 +6195,114 @@
         // }
 
         // FIXED: Complete check-in function
-        function completeCheckIn() {
-            showLoading();
+        // function completeCheckIn() {
+        //     showLoading();
             
-            // Get current time in Philippines timezone
-            const now = new Date();
-            const phTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+        //     // Get current time in Philippines timezone
+        //     const now = new Date();
+        //     const phTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
             
-            // Format as MySQL datetime: YYYY-MM-DD HH:MM:SS
-            const formatDateTime = (date) => {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                const seconds = String(date.getSeconds()).padStart(2, '0');
-                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-            };
+        //     // Format as MySQL datetime: YYYY-MM-DD HH:MM:SS
+        //     const formatDateTime = (date) => {
+        //         const year = date.getFullYear();
+        //         const month = String(date.getMonth() + 1).padStart(2, '0');
+        //         const day = String(date.getDate()).padStart(2, '0');
+        //         const hours = String(date.getHours()).padStart(2, '0');
+        //         const minutes = String(date.getMinutes()).padStart(2, '0');
+        //         const seconds = String(date.getSeconds()).padStart(2, '0');
+        //         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        //     };
             
-            // Prepare data for database insertion
-            const checkInData = {
-                firstName: visitorData.firstName,
-                lastName: visitorData.lastName,
-                email: visitorData.email,
-                phone: visitorData.phone,
-                company: visitorData.company,
-                photo: visitorData.photo || null,
-                type: visitorData.type,
-                host: {
-                    id: selectedHost.id || selectedHost.employeeId,
-                    name: selectedHost.name,
-                    email: selectedHost.email,
-                    department: selectedHost.department,
-                    departmentCode: selectedHost.departmentCode
-                },
-                purpose: selectedPurpose,
-                notes: visitorData.notes || null,
-                booking_code: visitorData.booking_code || null,
-                company_visited: COMPANY_VISITED,
-                check_in_time: formatDateTime(phTime),
-                client_timezone: 'Asia/Manila',
-                timezone_offset: now.getTimezoneOffset()
-            };
+        //     // Prepare data for database insertion
+        //     const checkInData = {
+        //         firstName: visitorData.firstName,
+        //         lastName: visitorData.lastName,
+        //         email: visitorData.email,
+        //         phone: visitorData.phone,
+        //         company: visitorData.company,
+        //         photo: visitorData.photo || null,
+        //         type: visitorData.type,
+        //         host: {
+        //             id: selectedHost.id || selectedHost.employeeId,
+        //             name: selectedHost.name,
+        //             email: selectedHost.email,
+        //             department: selectedHost.department,
+        //             departmentCode: selectedHost.departmentCode
+        //         },
+        //         purpose: selectedPurpose,
+        //         notes: visitorData.notes || null,
+        //         booking_code: visitorData.booking_code || null,
+        //         company_visited: COMPANY_VISITED,
+        //         check_in_time: formatDateTime(phTime),
+        //         client_timezone: 'Asia/Manila',
+        //         timezone_offset: now.getTimezoneOffset()
+        //     };
             
-            console.log('Sending check-in data:', checkInData);
+        //     console.log('Sending check-in data:', checkInData);
             
-            // Send data to server for database insertion
-            fetch('<?= base_url("kiosk/complete_checkin") ?>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(checkInData)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(result => {
-                console.log('Check-in response:', result);
-                hideLoading();
+        //     // Send data to server for database insertion
+        //     fetch('<?= base_url("kiosk/complete_checkin") ?>', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'X-Requested-With': 'XMLHttpRequest'
+        //         },
+        //         body: JSON.stringify(checkInData)
+        //     })
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error(`HTTP error! status: ${response.status}`);
+        //         }
+        //         return response.json();
+        //     })
+        //     .then(result => {
+        //         console.log('Check-in response:', result);
+        //         hideLoading();
                 
-                if (result.status === 'success') {
-                    // Store visit data before updating screen
-                    visitorData.visit_id = result.data.visit_id;
-                    visitorData.badge_number = result.data.badge_number;
+        //         if (result.status === 'success') {
+        //             // Store visit data before updating screen
+        //             visitorData.visit_id = result.data.visit_id;
+        //             visitorData.badge_number = result.data.badge_number;
                     
-                    console.log('Check-in successful, updating screen...');
+        //             console.log('Check-in successful, updating screen...');
                     
-                    // Update success screen with actual data from database
-                    updateSuccessScreen(result.data);
+        //             // Update success screen with actual data from database
+        //             updateSuccessScreen(result.data);
                     
-                    // Update step indicator to show final step
-                    updateStepIndicator(8);
+        //             // Update step indicator to show final step
+        //             updateStepIndicator(8);
                     
-                    // Show success screen
-                    showScreen(8);
+        //             // Show success screen
+        //             showScreen(8);
                     
-                    // Start countdown timer
-                    startCountdown();
+        //             // Start countdown timer
+        //             startCountdown();
                     
-                    console.log('Success screen displayed');
+        //             console.log('Success screen displayed');
                     
-                } else {
-                    console.error('Check-in failed:', result.message);
-                    // Show error message
-                    Swal.fire({
-                        title: 'Check-in Failed',
-                        text: result.message || 'An error occurred during check-in. Please try again.',
-                        icon: 'error',
-                        confirmButtonColor: '#e74c3c'
-                    });
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Check-in error:', error);
+        //         } else {
+        //             console.error('Check-in failed:', result.message);
+        //             // Show error message
+        //             Swal.fire({
+        //                 title: 'Check-in Failed',
+        //                 text: result.message || 'An error occurred during check-in. Please try again.',
+        //                 icon: 'error',
+        //                 confirmButtonColor: '#e74c3c'
+        //             });
+        //         }
+        //     })
+        //     .catch(error => {
+        //         hideLoading();
+        //         console.error('Check-in error:', error);
                 
-                Swal.fire({
-                    title: 'Connection Error',
-                    text: 'Unable to connect to the server. Please check your connection and try again.',
-                    icon: 'error',
-                    confirmButtonColor: '#e74c3c'
-                });
-            });
-        }
+        //         Swal.fire({
+        //             title: 'Connection Error',
+        //             text: 'Unable to connect to the server. Please check your connection and try again.',
+        //             icon: 'error',
+        //             confirmButtonColor: '#e74c3c'
+        //         });
+        //     });
+        // }
 
         // function completeCheckIn() {
         //     showLoading();
