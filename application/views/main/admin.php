@@ -667,7 +667,7 @@
                 <table class="table table-hover" id="recentActivityTable">
                     <thead>
                         <tr>
-                            <th>Badge #</th><th>Visitor</th><th>Company</th><th>Host</th><th>Purpose</th><th>Notes</th><th>Visiting</th><th>Check-In</th><th>Status</th>
+                            <th>Badge #</th><th>Visitor</th><th>Company / Branch</th><th>Host</th><th>Purpose</th><th>Notes</th><th>Visiting</th><th>Check-In</th><th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="recentActivityTableBody">
@@ -813,7 +813,7 @@
                 <table class="table table-hover" id="allVisitorsTable">
                     <thead>
                         <tr>
-                            <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Type</th><th>Total Visits</th><th>Last Visit</th><th>Actions</th>
+                            <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Company / Branch</th><th>Type</th><th>Total Visits</th><th>Last Visit</th><th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="allVisitorsTableBody"></tbody>
@@ -913,7 +913,7 @@
                             <th>Department</th>
                             <th>Status</th>
                             <th>Total Visits Hosted</th>
-                            <th>Company</th>
+                            <th>Company Located</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -1618,7 +1618,7 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Company Ownership</label>
+                            <label class="form-label">Company located</label>
                             <select class="form-select" name="company_owned_by" id="addCompanyOwnedBy">
                                 <option value="Both">Both Companies</option>
                                 <option value="Toms World">Tom's World Only</option>
