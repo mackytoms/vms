@@ -23,7 +23,7 @@ class Admin_model extends CI_Model {
         // $this->db->from('visits');
         // $this->db->where('DATE(check_in_time)', 'CURDATE()', false);
         if ($companyFilter) {
-            $this->db->where('company_visited', $companyFilter);
+            $this->db->where('v.company_visited', $companyFilter);
         }
         $query = $this->db->get();
         $stats['today_total'] = $query->row()->today_total;
