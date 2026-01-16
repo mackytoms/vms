@@ -1474,7 +1474,7 @@
                 <div class="info-grid">
                     <div class="row mb-2">
                         <div class="col-sm-4 fw-bold"><i class="bi bi-code-square text-primary"></i> System Version:</div>
-                        <div class="col-sm-8">Kiosk V-Pass v1.5.8</div>
+                        <div class="col-sm-8">Kiosk V-Pass v1.5.9</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-sm-4 fw-bold"><i class="bi bi-calendar-check text-primary"></i> Last Updated:</div>

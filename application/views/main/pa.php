@@ -29,7 +29,7 @@
             </div>
 
             <!-- Enhanced Switch to Tom's World Link with Logo -->
-            <a href="javascript:void(0);" 
+            <!-- <a href="javascript:void(0);" 
             onclick="confirmCompanySwitch('https://sandbox.tomsworld.com.ph/vms/main/tw')"
             class="switch-company-link" 
             aria-label="Switch to Tom's World"
@@ -44,7 +44,7 @@
                     </div>
                     <i class="bi bi-arrow-right-circle switch-icon"></i>
                 </div>
-            </a>
+            </a> -->
         </div>
         
         <!-- Off-canvas Info Panel -->
