@@ -1032,7 +1032,7 @@
 
         .emergency-btn i {
             font-size: 2em;
-            color: white;
+            color: #ffffff00;
         }
 
         /* @keyframes pulse-emergency {
