@@ -569,6 +569,44 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
+
+
+        /* Auto-Logout Modal Styles */
+        #sessionWarningModal .modal-content {
+            border-radius: 16px;
+        }
+
+        #sessionWarningModal .modal-header {
+            border-radius: 16px 16px 0 0;
+            padding: 20px 24px 20px;
+        }
+
+        #sessionWarningIcon {
+            animation: pulseIcon 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseIcon {
+            0%, 100% { transform: scale(1); background: rgba(255,255,255,0.2); }
+            50%       { transform: scale(1.1); background: rgba(255,255,255,0.35); }
+        }
+
+        #countdownArc {
+            filter: drop-shadow(0 0 4px rgba(231,76,60,0.4));
+        }
+
+        /* Urgency pulse when <= 10 seconds */
+        .countdown-urgent #countdownSeconds {
+            animation: urgentPulse 0.6s ease-in-out infinite;
+        }
+
+        @keyframes urgentPulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.4; }
+        }
+
+        #sessionExpiredModal .modal-content {
+            border-radius: 16px;
+        }
     </style>
 </head>
 
@@ -2607,6 +2645,115 @@
         </div>
     </div>
     
+    <!-- ============================================
+        AUTO-LOGOUT WARNING MODAL
+    ============================================ -->
+    <div class="modal fade" id="sessionWarningModal" tabindex="-1" 
+        data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg overflow-hidden">
+                
+                <!-- Animated header -->
+                <div class="modal-header border-0 pb-0"
+                    style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">
+                    <div class="d-flex align-items-center gap-3 w-100">
+                        <div id="sessionWarningIcon" 
+                            style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.2);
+                                    display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-shield-exclamation" style="font-size:1.6em;"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-0 fw-bold">Session Expiring Soon</h5>
+                            <small style="opacity:0.85;">Your session is about to expire due to inactivity</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-body pt-4 pb-2 px-4">
+
+                    <!-- Countdown Ring -->
+                    <div class="text-center mb-4">
+                        <div style="position:relative;display:inline-block;width:130px;height:130px;">
+                            <svg width="130" height="130" style="transform:rotate(-90deg);">
+                                <!-- background track -->
+                                <circle cx="65" cy="65" r="56"
+                                        fill="none" stroke="#f0f0f0" stroke-width="8"/>
+                                <!-- countdown arc -->
+                                <circle id="countdownArc"
+                                        cx="65" cy="65" r="56"
+                                        fill="none" stroke="#e74c3c" stroke-width="8"
+                                        stroke-linecap="round"
+                                        stroke-dasharray="351.86"
+                                        stroke-dashoffset="0"
+                                        style="transition:stroke-dashoffset 1s linear, stroke 0.5s ease;"/>
+                            </svg>
+                            <!-- center text -->
+                            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+                                        text-align:center;line-height:1.1;">
+                                <span id="countdownSeconds"
+                                    style="font-size:2.4em;font-weight:700;color:#e74c3c;"></span>
+                                <div style="font-size:0.7em;color:#7f8c8d;font-weight:500;">seconds</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div class="mb-3">
+                        <div class="progress" style="height:6px;border-radius:10px;background:#f0f0f0;">
+                            <div id="countdownProgressBar"
+                                class="progress-bar bg-danger"
+                                style="width:100%;border-radius:10px;transition:width 1s linear;"></div>
+                        </div>
+                    </div>
+
+                    <p class="text-center text-muted mb-1" style="font-size:0.92em;">
+                        <i class="bi bi-info-circle me-1"></i>
+                        You will be automatically logged out in <strong id="countdownSecondsText"></strong> seconds.
+                    </p>
+                    <p class="text-center text-muted mb-0" style="font-size:0.85em;">
+                        Click <strong>"Stay Logged In"</strong> to continue your session.
+                    </p>
+
+                </div>
+
+                <div class="modal-footer border-0 pt-2 px-4 pb-4 d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary flex-fill"
+                            onclick="performSessionLogout()">
+                        <i class="bi bi-box-arrow-left me-1"></i> Logout Now
+                    </button>
+                    <button type="button" class="btn btn-success flex-fill fw-bold"
+                            id="stayLoggedInBtn" onclick="extendSession()">
+                        <i class="bi bi-shield-check me-1"></i> Stay Logged In
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto-Logout Complete Modal (shown after timeout) -->
+    <div class="modal fade" id="sessionExpiredModal" tabindex="-1"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow-lg text-center">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <div style="width:70px;height:70px;border-radius:50%;background:#fee;
+                                    display:flex;align-items:center;justify-content:center;margin:0 auto;">
+                            <i class="bi bi-lock-fill text-danger" style="font-size:2em;"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold text-danger mb-1">Session Expired</h5>
+                    <p class="text-muted small mb-3">
+                        Your session has expired.<br>Redirecting to login page...
+                    </p>
+                    <div class="spinner-border spinner-border-sm text-danger" role="status">
+                        <span class="visually-hidden">Redirecting...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js"></script>
@@ -7582,6 +7729,210 @@
                 });
             });
         }
+
+        // ============================================
+        // AUTO-LOGOUT SYSTEM
+        // ============================================
+
+        const SESSION_TIMEOUT_MINUTES = 30;    // Total session lifetime (match php session.gc_maxlifetime)
+        const WARNING_BEFORE_MINUTES   = 2;    // Show warning this many minutes before logout
+        const WARNING_DURATION_SECONDS = WARNING_BEFORE_MINUTES * 60;  // = 120
+
+        let sessionTimer       = null;   // fires to show warning
+        let countdownTimer     = null;   // ticks every second inside the modal
+        let countdownRemaining = WARNING_DURATION_SECONDS;
+        let sessionModalInstance = null;
+
+        // ── Boot ─────────────────────────────────────────────────────────────────────
+        function initAutoLogout() {
+            resetSessionTimer();
+
+            // Reset on any user activity
+            ['mousemove', 'keydown', 'mousedown', 'touchstart', 'scroll', 'click']
+                .forEach(evt => document.addEventListener(evt, onUserActivity, { passive: true }));
+        }
+
+        // Debounce activity so we don't reset the timer hundreds of times per second
+        let activityDebounce = null;
+        function onUserActivity() {
+            if (activityDebounce) return;
+            activityDebounce = setTimeout(() => {
+                activityDebounce = null;
+                // Only reset if the warning modal is NOT open
+                if (!sessionModalInstance || !document.getElementById('sessionWarningModal').classList.contains('show')) {
+                    resetSessionTimer();
+                }
+            }, 500);
+        }
+
+        // ── Timer Management ─────────────────────────────────────────────────────────
+        function resetSessionTimer() {
+            clearTimeout(sessionTimer);
+            stopCountdown();
+
+            const idleBeforeWarningMs = (SESSION_TIMEOUT_MINUTES - WARNING_BEFORE_MINUTES) * 60 * 1000;
+
+            sessionTimer = setTimeout(() => {
+                showSessionWarning();
+            }, idleBeforeWarningMs);
+        }
+
+        function showSessionWarning() {
+            countdownRemaining = WARNING_DURATION_SECONDS;
+
+            // Show modal
+            const modalEl = document.getElementById('sessionWarningModal');
+            sessionModalInstance = new bootstrap.Modal(modalEl, {
+                backdrop: 'static',
+                keyboard: false
+            });
+            sessionModalInstance.show();
+
+            // Play soft alert sound
+            playWarningBeep();
+
+            // Start countdown
+            updateCountdownUI();
+            countdownTimer = setInterval(tickCountdown, 1000);
+        }
+
+        function tickCountdown() {
+            countdownRemaining--;
+            updateCountdownUI();
+
+            if (countdownRemaining <= 0) {
+                stopCountdown();
+                handleSessionExpired();
+            }
+        }
+
+        function updateCountdownUI() {
+            const secEl        = document.getElementById('countdownSeconds');
+            const secTextEl    = document.getElementById('countdownSecondsText');
+            const progressEl   = document.getElementById('countdownProgressBar');
+            const arcEl        = document.getElementById('countdownArc');
+            const bodyEl       = document.getElementById('sessionWarningModal')?.querySelector('.modal-body');
+
+            if (!secEl) return;
+
+            secEl.textContent     = countdownRemaining;
+            if (secTextEl) secTextEl.textContent = countdownRemaining;
+
+            // Progress bar
+            const pct = (countdownRemaining / WARNING_DURATION_SECONDS) * 100;
+            if (progressEl) progressEl.style.width = pct + '%';
+
+            // SVG arc  (circumference = 2π × 56 ≈ 351.86)
+            const circumference = 351.86;
+            if (arcEl) {
+                const offset = circumference * (1 - countdownRemaining / WARNING_DURATION_SECONDS);
+                arcEl.style.strokeDashoffset = offset;
+
+                // Colour shift: green → orange → red
+                if (countdownRemaining > WARNING_DURATION_SECONDS * 0.5) {
+                    arcEl.style.stroke = '#27ae60';
+                    if (progressEl) progressEl.className = 'progress-bar bg-success';
+                } else if (countdownRemaining > WARNING_DURATION_SECONDS * 0.25) {
+                    arcEl.style.stroke = '#f39c12';
+                    if (progressEl) progressEl.className = 'progress-bar bg-warning';
+                } else {
+                    arcEl.style.stroke = '#e74c3c';
+                    if (progressEl) progressEl.className = 'progress-bar bg-danger';
+                }
+            }
+
+            // Urgency class when <= 10 s
+            const modalContent = document.getElementById('sessionWarningModal');
+            if (countdownRemaining <= 10) {
+                if (secEl) secEl.closest('.text-center')?.classList.add('countdown-urgent');
+            } else {
+                if (secEl) secEl.closest('.text-center')?.classList.remove('countdown-urgent');
+            }
+        }
+
+        function stopCountdown() {
+            clearInterval(countdownTimer);
+            countdownTimer = null;
+        }
+
+        // ── Actions ───────────────────────────────────────────────────────────────────
+        function extendSession() {
+            // Ping the server to keep the PHP session alive
+            fetch(ajaxUrl + '?action=keep_alive', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        closeSessionWarning();
+                        resetSessionTimer();
+
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Session extended successfully',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    } else {
+                        // Server says session is already dead — log out
+                        handleSessionExpired();
+                    }
+                })
+                .catch(() => {
+                    // Network error — assume session is gone
+                    handleSessionExpired();
+                });
+        }
+
+        function performSessionLogout() {
+            closeSessionWarning();
+            window.location.href = '<?= base_url("auth/logout") ?>';
+        }
+
+        function handleSessionExpired() {
+            closeSessionWarning();
+
+            // Show expired modal, then redirect
+            const expiredEl = document.getElementById('sessionExpiredModal');
+            if (expiredEl) {
+                new bootstrap.Modal(expiredEl, { backdrop: 'static', keyboard: false }).show();
+            }
+
+            setTimeout(() => {
+                window.location.href = '<?= base_url("auth/logout") ?>?reason=timeout';
+            }, 2500);
+        }
+
+        function closeSessionWarning() {
+            stopCountdown();
+            if (sessionModalInstance) {
+                sessionModalInstance.hide();
+                sessionModalInstance = null;
+            }
+        }
+
+        // ── Optional: soft beep ───────────────────────────────────────────────────────
+        function playWarningBeep() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                [440, 520].forEach((freq, i) => {
+                    const osc  = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
+                    const t = ctx.currentTime + i * 0.18;
+                    gain.gain.setValueAtTime(0.15, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+                    osc.start(t);
+                    osc.stop(t + 0.25);
+                });
+            } catch (_) {}
+        }
+
+        // ── Start ─────────────────────────────────────────────────────────────────────
+        initAutoLogout();
 
     </script>
 

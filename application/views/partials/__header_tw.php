@@ -1018,7 +1018,7 @@
             justify-content: center;
             cursor: pointer;
             /* box-shadow: 0 4px 20px rgba(231, 76, 60, 0.4); */            
-            box-shadow: 0 4px 20px rgb(255 255 255 / 40%);            
+            /* box-shadow: 0 4px 20px rgb(255 255 255 / 40%); */
             z-index: 9999;
             transition: all 0.3s ease;
             animation: pulse-emergency 2s infinite;
@@ -1027,7 +1027,7 @@
         .emergency-btn:hover {
             transform: scale(1.1);
             /* box-shadow: 0 6px 30px rgba(231, 76, 60, 0.6); */
-            box-shadow: 0 4px 20px rgb(255 255 255 / 40%);
+            /* box-shadow: 0 4px 20px rgb(255 255 255 / 40%); */
         }
 
         .emergency-btn i {

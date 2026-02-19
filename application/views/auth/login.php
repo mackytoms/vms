@@ -712,6 +712,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 setTimeout(() => alert.remove(), 500);
             });
         }, 5000);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Session Expired',
+                text: 'You were logged out due to inactivity. Please log in again.',
+                confirmButtonColor: '#f39c12'
+            });
+        });
     </script>
 </body>
 </html>

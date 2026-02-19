@@ -567,6 +567,18 @@ class Admin extends CI_Controller {
                         'ticket_id' => $ticket_id
                     ]);
                     break;
+
+                case 'keep_alive':
+                    // Verify the session is still valid, then touch it to reset expiry
+                    if ($this->session->userdata('admin_logged_in')) {
+                        // Re-set a value to reset session's last-activity timestamp
+                        $this->session->set_userdata('last_activity', time());
+                        echo json_encode(['status' => 'success', 'message' => 'Session extended']);
+                    } else {
+                        http_response_code(401);
+                        echo json_encode(['status' => 'error', 'message' => 'Session expired']);
+                    }
+                    break;
                     
                 default:
                     echo json_encode(['error' => 'Invalid action']);

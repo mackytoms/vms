@@ -235,7 +235,7 @@
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label class="form-label" data-translate="company">Company / Branch </label>
+                                <label class="form-label" data-translate="company">Company / Branch (Optional) </label>
                                 <input type="text" class="form-control form-control-lg" id="company" data-translate-placeholder="companyPlaceholder" placeholder="Your Affiliated Company">
                                 <div class="invalid-feedback" data-translate="companyRequired">Company name is required</div>
                             </div>
@@ -953,7 +953,7 @@
                 email: "Email Address *",
                 phone: "Phone Number *",
                 emailOrPhoneRequired: "At least one required: email or phone",
-                company: "Company / Branch",
+                company: "Company / Branch (Optional)",
                 companyPlaceholder: "Your Company Name",
                 back: "Back",
                 continue: "Continue",
@@ -1060,7 +1060,7 @@
                 email: "電子郵件地址 *",
                 phone: "電話號碼 *",
                 emailOrPhoneRequired: "至少需要一項：電子郵件或電話",
-                company: "公司 / 分支",
+                company: "公司 / 分行（選填）",
                 companyPlaceholder: "您的公司名稱",
                 back: "返回",
                 continue: "繼續",
@@ -1167,7 +1167,7 @@
                 email: "电子邮件地址 *",
                 phone: "电话号码 *",
                 emailOrPhoneRequired: "至少需要一项：电子邮件或电话",
-                company: "公司 / 分支",
+                company: "公司 / 分行（选填）",
                 companyPlaceholder: "您的公司名称",
                 back: "返回",
                 continue: "继续",
@@ -1274,7 +1274,7 @@
                 email: "Email Address *",
                 phone: "Numero ng Telepono *",
                 emailOrPhoneRequired: "Kailangan ang kahit isa: email o telepono",
-                company: "Kumpanya / Sangay",
+                company: "Kumpanya / Sangay (Opsyonal)",
                 companyPlaceholder: "Pangalan ng Kumpanya",
                 back: "Bumalik",
                 continue: "Magpatuloy",
@@ -1381,7 +1381,7 @@
                 email: "メールアドレス *",
                 phone: "電話番号 *",
                 emailOrPhoneRequired: "いずれか1つ必須：メールまたは電話",
-                company: "会社 / 支店",
+                company: "会社名 / 支店名（任意）",
                 companyPlaceholder: "会社名を入力",
                 back: "戻る",
                 continue: "続ける",
