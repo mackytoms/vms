@@ -8,6 +8,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <title>LOGIN - KIOSK V-PASS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Favicons -->
+    <link href="<?= base_url('assets/images/icons/icon_vms_transparent.png') ?>" rel="icon">
     <style>
         body {
             background-image: url('<?= base_url("assets/images/bg/index_bg.jpg") ?>');

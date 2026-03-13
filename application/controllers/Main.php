@@ -21,6 +21,7 @@ class Main extends CI_Controller {
         $this->load->view('partials/__header_tw', $data);
         $this->load->view($content_view, $data);
         $this->load->view('partials/__footer', $data);
+        // $this->load->view('errors/html/error_restrict', $data);  // Temporary Access Restriction Page, Uncomment Above to Work
     }
 
     // Template helper method for PA (Pan Asia) - WITH header and footer
@@ -33,7 +34,8 @@ class Main extends CI_Controller {
         
         $this->load->view('partials/__header_pa', $data);
         $this->load->view($content_view, $data);
-        $this->load->view('partials/__footer', $data);
+        $this->load->view('partials/__footer', $data);        
+        // $this->load->view('errors/html/error_restrict', $data);  // Temporary Access Restriction Page, Uncomment Above to Work
     }
 
     // Template helper method for Admin - NO header and footer
@@ -91,6 +93,7 @@ class Main extends CI_Controller {
             redirect('main/admin');
         }
         $this->load->view('auth/login');
+        // $this->load->view('errors/html/error_restrict');  // Temporary Access Restriction Page, Uncomment Above to Work
     }
 
     // Admin page - Protected, requires login
@@ -322,6 +325,7 @@ class Main extends CI_Controller {
             'theme' => 'green'
         );
         $this->render_template_pa('main/pa', $data);
+        
     }
 
     public function revisit() {
@@ -337,6 +341,7 @@ class Main extends CI_Controller {
         $data = array(
             'page_title' => 'Login'
         );
-        $this->render_template_login('auth/login', $data);
+        // $this->render_template_login('auth/login', $data);
+        // $this->render_template_login('errors/html/error_restrict', $data);  // Temporary Access Restriction Page, Uncomment Above to Work
     }
 }

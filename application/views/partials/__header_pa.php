@@ -14,6 +14,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    
+    <!-- Favicons -->
+    <link href="<?= base_url('assets/images/icons/icon_vms_transparent.png') ?>" rel="icon">
 
 
 
@@ -79,12 +82,22 @@
 
         /* Main Content Area */
         .kiosk-content {
+            background-image: url("<?= base_url('assets/images/bg/index_bg.jpg'); ?>"); 
+            background-size: contain; 
+            background-position: center; 
+            background-repeat: repeat; 
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+            color: var(--tw-gray-900); 
+            margin: 0; 
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            background: #f8f9fa;
+            /* background: #f8f9fa; */
             position: relative;
             overflow-y: auto;
             flex-wrap: wrap;

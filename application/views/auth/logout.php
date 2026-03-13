@@ -573,7 +573,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>    
+    <!-- Favicons -->
+    <link href="<?= base_url('assets/images/icons/icon_vms_transparent.png') ?>" rel="icon">
     <script>
         // Portal Navigation with Transition
         function navigateToPortal(portal) {

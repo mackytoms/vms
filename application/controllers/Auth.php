@@ -18,6 +18,7 @@ class Auth extends CI_Controller {
             redirect('main/admin');
         }
         $this->load->view('auth/login');
+        // $this->load->view('errors/html/error_restrict'); // Temporary Access Restriction Page, Uncomment Above to Work
     }
     
     /**

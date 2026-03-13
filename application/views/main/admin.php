@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <!-- Favicons -->
+    <link href="<?= base_url('assets/images/icons/icon_vms_transparent.png') ?>" rel="icon">
 
     <style>
         :root {
@@ -1512,7 +1515,7 @@
                 <div class="info-grid">
                     <div class="row mb-2">
                         <div class="col-sm-4 fw-bold"><i class="bi bi-code-square text-primary"></i> System Version:</div>
-                        <div class="col-sm-8">Kiosk V-Pass v1.5.9</div>
+                        <div class="col-sm-8">Kiosk V-Pass v1.7</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-sm-4 fw-bold"><i class="bi bi-calendar-check text-primary"></i> Last Updated:</div>
